@@ -17,6 +17,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['user', 'instructor', 'admin'],
         reuired: true
+    },
+    deleted: {
+        type: Boolean,
+        default: false
     }
 });
 
