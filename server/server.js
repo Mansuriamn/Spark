@@ -1,10 +1,12 @@
 import express from 'express';
 import connectDB from './config/dataBase.js';
 import dotenv from 'dotenv';
+import courseRoutes from './routes/courseRoutes.js';
 
 dotenv.config();
 
 const app = express();
+app.use(express.json());
 const PORT = process.env.PORT || 5000;
 
 connectDB();
@@ -12,6 +14,7 @@ connectDB();
 app.get('/', (req, res) => {
     res.send('API is running...');
 });
+app.use('/api/courses', courseRoutes);
 
 
 
