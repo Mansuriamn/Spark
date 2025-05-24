@@ -1,17 +1,17 @@
 import mongoose from 'mongoose';
 
-const TestCaseSchema = new mongoose.Schema({
+export const TestCaseSchema = new mongoose.Schema({
   input: { type: String, required: true },
   output: { type: String, required: true },
 }, { _id: false });
 
-const CodingDetailsSchema = new mongoose.Schema({
+export const CodingDetailsSchema = new mongoose.Schema({
   discussionTab: { type: String, default: '' },
   starterCode: { type: String, default: '' },
   testCases: [TestCaseSchema],
 }, { _id: false });
 
-const QuestionSchema = new mongoose.Schema({
+export const QuestionSchema = new mongoose.Schema({
   questionText: { type: String, required: true },
   options: {
     type: [String],
@@ -37,7 +37,7 @@ const QuestionSchema = new mongoose.Schema({
   },
 }, { _id: false });
 
-const QuizSchema = new mongoose.Schema({
+export const QuizSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String, default: '' },
   questions: {
@@ -50,5 +50,3 @@ const QuizSchema = new mongoose.Schema({
   lesson: { type: mongoose.Schema.Types.ObjectId, ref: 'Lesson', required: true },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 }, { timestamps: true });
-
-export const Quiz = mongoose.model('Quiz', QuizSchema);

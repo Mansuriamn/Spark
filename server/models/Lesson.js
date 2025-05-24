@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { QuizSchema } from './Quiz.js';
 
 const VideoSchema = new mongoose.Schema({
   title: { type: String, required: true },
