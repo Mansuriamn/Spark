@@ -2,6 +2,7 @@ import express from 'express';
 import connectDB from './config/dataBase.js';
 import dotenv from 'dotenv';
 import courseRoutes from './routes/courseRoutes.js';
+import lessonRoutes from './routes/lessonRoutes.js';
 
 dotenv.config();
 
@@ -18,7 +19,7 @@ app.get('/', (req, res) => {
 app.use('/uploads', express.static('uploads'));  // serve uploaded images
 
 app.use('/api/courses', courseRoutes);
-
+app.use('/api/lessons', lessonRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on PORT: ${PORT}`);
