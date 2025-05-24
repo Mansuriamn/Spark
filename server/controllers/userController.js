@@ -1,6 +1,6 @@
-import User from '../models/User.js';
+import { User } from '../models/User.js';
 import bcrypt from 'bcrypt';
-import JsonWebTokenError from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 export const registerUser = async (req, res) => {
   try {
@@ -11,7 +11,7 @@ export const registerUser = async (req, res) => {
     const user = new User({ name, email, password: hashedPassword, role:'user' });
     await user.save();
 
-    const token = JsonWebTokenError.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '1h'});
+    const token = jwt.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '1h'});
 
     res.status(201).json(user, token);
   } catch (error) {
@@ -49,4 +49,3 @@ export const softDeleteUser = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-

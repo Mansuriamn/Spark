@@ -3,6 +3,7 @@ import connectDB from './config/dataBase.js';
 import dotenv from 'dotenv';
 import courseRoutes from './routes/courseRoutes.js';
 import lessonRoutes from './routes/lessonRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 dotenv.config();
 
@@ -17,7 +18,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/uploads', express.static('uploads'));  // serve uploaded images
-
+app.use('/api/users', userRoutes);  // serve user routes
 app.use('/api/courses', courseRoutes);
 app.use('/api/lessons', lessonRoutes);
 

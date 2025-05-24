@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        reuired: true
+        required: true
     },
     password: {
         type: String,
@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String,
         enum: ['user', 'instructor', 'admin'],
-        reuired: true
+        required: true
     },
     deleted: {
         type: Boolean,
