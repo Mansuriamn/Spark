@@ -7,11 +7,11 @@ const VideoSchema = new mongoose.Schema({
   description: String,
 }, { _id: false });
 
-const QuizSchema = new mongoose.Schema({
+/*const QuizSchema = new mongoose.Schema({
   question: String,
   options: [String],
   answer: String,
-}, { _id: false });
+}, { _id: false });*/
 
 const LessonSchema = new mongoose.Schema({
   title: { type: String, required: true },
