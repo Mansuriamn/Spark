@@ -14,8 +14,10 @@ connectDB();
 app.get('/', (req, res) => {
     res.send('API is running...');
 });
-app.use('/api/courses', courseRoutes);
 
+app.use('/uploads', express.static('uploads'));  // serve uploaded images
+
+app.use('/api/courses', courseRoutes);
 
 
 app.listen(PORT, () => {
