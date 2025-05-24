@@ -1,6 +1,6 @@
 import React from 'react';
 import Progress from '../Models/Progress';
-import Chart from '../Models/chart';
+import Chart from '../Models/Chart';
 import UpcomingCourses from '../Models/Upcoming';
 import sampleCourses from '../../constants/index';
 import RecommendedCourses from '../Models/rec_course';

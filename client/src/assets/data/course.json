@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "title": "React for Beginners",
+    "category": "Educate",
+    "instructor": "John Doe",
+    "duration": "6 weeks",
+    "students": 1200,
+    "lessons": 30,
+    "review": 4,
+    "price": "Free",
+    "level": "Beginner",
+    "image": "https://i.pinimg.com/736x/cd/34/8b/cd348b55d06f92d252109ad2784a9382.jpg",
+    "originalPrice": "29.00"
+  },
+  
+
+ {
+    "id": 2,
+    "title": "Advanced UI/UX Design",
+    "category": "Design",
+    "instructor": "Jane Smith",
+    "duration": "4 weeks",
+    "students": 800,
+    "lessons": 20,
+    "review": 5,
+    "price": "Paid",
+    "level": "Advanced",
+    "image": "https://i.pinimg.com/736x/cd/34/8b/cd348b55d06f92d252109ad2784a9382.jpg",
+    "originalPrice": "78.32"
+  },
+  {
+    "id": 3,
+    "title": "Introduction to AI",
+    "category": "AI",
+    "instructor": "Alice Johnson",
+    "duration": "8 weeks",
+    "students": 1500,
+    "lessons": 40,
+    "review": 4,
+    "price": "Free",
+    "level": "Intermediate",
+    "image": "https://i.pinimg.com/736x/cd/34/8b/cd348b55d06f92d252109ad2784a9382.jpg",
+    "originalPrice": "49.99"
+    
+  }
+]
