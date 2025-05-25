@@ -6,7 +6,7 @@ import sampleCourses from '../../constants/index';
 import RecommendedCourses from '../Models/rec_course';
 import Footer from '../Models/footer';
 import UpcomingEvents from '../Models/calender';
- // Adjust the path as necessary
+ 
 const Dashboard = () => {
   return (
     <div className="mt-2 h-screen flex items-center justify-center">
