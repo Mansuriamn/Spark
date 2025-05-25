@@ -46,7 +46,7 @@ export default function Courses() {
     <>
      <div className='w-full h-max '><h1 className =' p-4 text-3xl font-bold  m-4'>All Courses</h1>
       <div className="flex">
-      <div className="w-1/4 p-4 border-r space-y-4">
+      <div className="w-1/4 p-9 border-r space-y-4 ">
         <CourseCategory filters={filters} onChange={handleFilterChange} />
         <Instructors filters={filters} onChange={handleFilterChange} />
         <PriceFilter filters={filters} onChange={handleFilterChange} />
