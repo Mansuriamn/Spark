@@ -11,6 +11,7 @@ export default function CourseCategory({ filters, onChange }) {
   };
 
   return (
+    <>
     <div>
       <h3 className="font-semibold mb-2">Category</h3>
       {categories.map(category => (
@@ -26,5 +27,6 @@ export default function CourseCategory({ filters, onChange }) {
         </div>
       ))}
     </div>
+    </>
   );
 }
