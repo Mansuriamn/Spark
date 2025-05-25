@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        reuired: true
+        required: true
     },
     password: {
         type: String,
@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String,
         enum: ['user', 'instructor', 'admin'],
-        reuired: true
+        required: true
     },
     deleted: {
         type: Boolean,
@@ -24,5 +24,4 @@ const userSchema = new mongoose.Schema({
     }
 });
 
-const User = mongoose.model('User', userSchema);
-export default User;
+export const User = mongoose.model('User', userSchema);
