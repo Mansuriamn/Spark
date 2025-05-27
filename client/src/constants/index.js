@@ -49,3 +49,22 @@ const sampleCourses = [
 ];
 
 export { sampleCourses };
+
+export const Logo = [
+  {
+    id:1,
+    name:'logo1',
+    imgPath:'/assets/img/logo2.svg'
+  },
+   {
+    id:2,
+    name:'logo2',
+    imgPath:'/assets/img/logo3.jpg'
+  },
+   {
+    id:3,
+    name:'logo3',
+    imgPath:'/assets/img/logo4.jpg'
+  },
+ 
+]

@@ -1,12 +1,13 @@
 import React ,{useState} from 'react';
-import CourseCard from '../Models/CourseCard';
-import CourseCategory from '../Models/CourseCategory';
-import Instructors from '../Models/Instructor';
-import PriceFilter from '../Models/PriceFilter';
-import ReviewFilter from '../Models/ReviewFilter';
-import LevelFilter from '../Models/LeaveFilter';
-import coursesData from '../../assets/data/course.json';
+import CourseCard from '../assets/Models/CourseCard';
+import CourseCategory from '../assets/Models/CourseCategory';
+import Instructors from '../assets/Models/Instructor';
+import PriceFilter from '../assets/Models/PriceFilter';
+import ReviewFilter from '../assets/Models/ReviewFilter';
+import LevelFilter from '../assets/Models/LeaveFilter';
+import coursesData from '../assets/data/course.json';
 import { FiSearch } from "react-icons/fi";
+import { FaTimes } from "react-icons/fa";
 
 export default function Courses() {
   const [search, setSearch] = useState("");
@@ -46,16 +47,16 @@ export default function Courses() {
   return (
     <>
      
-      <div className="flex">
+      <div className="flex justify-center bg-gray-100 border-gray-200">
         
-      <div className="w-1/4 p-9 border-r space-y-4 ">
+      <div className="w-1/4 p-10 border-r space-y-4 ">
         <CourseCategory filters={filters} onChange={handleFilterChange} />
         <Instructors filters={filters} onChange={handleFilterChange} />
         <PriceFilter filters={filters} onChange={handleFilterChange} />
         <ReviewFilter filters={filters} onChange={handleFilterChange} />
         <LevelFilter filters={filters} onChange={handleFilterChange} />
       </div>
-      <div className="p-7">
+      <div className="p-8">
   <div className='flex justify-between items-center px-6 py-4'>
     <div>
       <h1 className="text-3xl font-bold">All Courses</h1>
@@ -84,4 +85,3 @@ export default function Courses() {
     </>
   );
 }
-

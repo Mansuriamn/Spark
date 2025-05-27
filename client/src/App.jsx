@@ -1,29 +1,37 @@
-import React from 'react'
-import Navbar from './assets/Models/Navbar'
-import Wel from './assets/Models/Wel'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import CoursesPage from './pages/Home';
+import DashboardPage from './pages/DashboardPage';
+import LiveSessionsPage from './pages/LiveSession';
+import Schedule from './pages/Schedule';
+import ContactPage from './pages/Contact';
+import Courses from './pages/Courses';
 
-import Dashboard from './assets/sections/dashboard'
-import { BrowserRouter as Router , Routes , Route} from 'react-router-dom'
-import Courses from './assets/pages/Courses'
-
-
-const App  = () => {
-  return (
-    <>
+function App() {
+   return (
     <Router>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={
-          <>
-            <Wel />
-            <Dashboard />
-          </>
-        } />
-        <Route path="/courses" element={<Courses />} />
-      </Routes>
+     
+      <div className="min-h-screen bg-purple-50 font-sans text-gray-800">
+        <Navbar />
+        <main>
+         
+          <Routes>
+            
+            <Route path="/home" element={<CoursesPage />} />
+            <Route path='/courses' element={<Courses/>}/>
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/live-sessions" element={<LiveSessionsPage />} />
+            <Route path="/schedule" element={<Schedule />} />
+            <Route path="/contact" element={<ContactPage />} />
+          
+          </Routes>
+        </main>
+        
+      </div>
     </Router>
-    </>
-  )
+  );
 }
 
-export default App
+export default App;
+

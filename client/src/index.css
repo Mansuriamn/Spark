@@ -1,7 +1,17 @@
 @import 'tailwindcss';
+@import 'flowbite';
 
-section {
+section{
   width: 80%;
-  height: 100dvh;
 }
-
+.marquee{
+  width: 50%;
+  overflow: hidden;
+  position: relative;
+}
+.marquee-box{
+  animation: marquee 60s liner infinite
+}
+.marquee-items{
+  float:left
+}
