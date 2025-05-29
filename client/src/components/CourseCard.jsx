@@ -1,11 +1,17 @@
 import React from 'react';
 
-
 function CourseCard({ icon, title, instructorName, instructorImage, rating, students }) {
+  const handleClick = () => {
+    alert(`You clicked on ${title}`);
+  };
+
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md flex flex-col items-center text-center">
+    <div
+      className="bg-white p-6 rounded-lg shadow-md flex flex-col items-center text-center
+                 transform transition duration-300 hover:scale-105 hover:shadow-xl cursor-pointer active:scale-95"
+      onClick={handleClick}
+    >
       <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
-        
         {icon}
       </div>
       <h3 className="text-xl font-semibold text-gray-800 mb-2">{title}</h3>

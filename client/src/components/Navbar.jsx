@@ -38,8 +38,8 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Nav Items and Icons */}
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-4">
+  <div className="flex items-center space-x-4">
               {navItems.map((item) => (
                 <NavLink
                   key={item}

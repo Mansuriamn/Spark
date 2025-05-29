@@ -1,9 +1,19 @@
-import React from 'react';
-
+import React, { useRef, useState } from 'react';
+import CountUp from 'react-countup';
 import imgheader from '../assets/img/imgheader.png';
-import LogoSection from './LogoSection';
+import { counterItems } from '../constants';
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/all';
+
+gsap.registerPlugin(ScrollTrigger);
 
 function HeroSection() {
+  const statsRef = useRef(null);
+  const [shouldAnimate, setShouldAnimate] = useState(true);
+
+  
+
   return (
     <div className="relative flex flex-col md:flex-row items-center justify-between text-center md:text-left p-6">
       {/* Background Bubbles */}
@@ -17,24 +27,24 @@ function HeroSection() {
           <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent bg-clip-text">Learnohub</span>
         </h1>
 
-        {/* Stats */}
-        <div className="flex flex-wrap justify-center md:justify-start gap-8 mb-10">
-          <div>
-            <p className="text-3xl md:text-4xl font-bold text-purple-600">20M</p>
-            <p className="text-gray-500 text-sm">Learners</p>
-          </div>
-          <div>
-            <p className="text-3xl md:text-4xl font-bold text-purple-600">50K</p>
-            <p className="text-gray-500 text-sm">Classes</p>
-          </div>
-          <div>
-            <p className="text-3xl md:text-4xl font-bold text-purple-600">4.8</p>
-            <p className="text-gray-500 text-sm">Rating</p>
-          </div>
+        {/* ✅ Animated Stats Section */}
+        <div ref={statsRef} className="flex flex-wrap justify-center md:justify-start gap-8 mb-10">
+          {counterItems.map((item, index) => (
+            <div key={index}>
+              <p className="text-3xl md:text-4xl font-bold text-purple-600">
+                {shouldAnimate ? (
+                  <CountUp end={item.value} duration={2.8} suffix={item.suffix} />
+                ) : (
+                  `0${item.suffix}`
+                )}
+              </p>
+              <p className="text-gray-500 text-sm">{item.label}</p>
+            </div>
+          ))}
         </div>
 
         {/* Logos */}
-        
+        {/* <LogoSection /> */}
       </div>
 
       {/* Right Image */}

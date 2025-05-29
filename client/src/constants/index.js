@@ -68,3 +68,24 @@ export const Logo = [
   },
  
 ]
+
+export const counterItems =[
+  {value:'20',
+  label:'Learners',
+    icon:'👩‍🎓',
+    suffix:'M' // Optional suffix
+  },
+  {
+    value:'50',
+    label:'Classes',
+    icon:'📚',
+    suffix:'K' // Optional suffix
+  },
+  {
+    value:'4.8',
+    label:'Rating',
+    icon:'⭐',
+    suffix:'' // Optional suffix
+  }
+  
+]

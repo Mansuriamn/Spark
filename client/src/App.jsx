@@ -7,6 +7,7 @@ import LiveSessionsPage from './pages/LiveSession';
 import Schedule from './pages/Schedule';
 import ContactPage from './pages/Contact';
 import Courses from './pages/Courses';
+import Trackdetails from './components/Trackdetails';
 
 function App() {
    return (
@@ -17,13 +18,16 @@ function App() {
         <main>
          
           <Routes>
-            
+            <Route path="/" element={<CoursesPage />} />
             <Route path="/home" element={<CoursesPage />} />
             <Route path='/courses' element={<Courses/>}/>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/live-sessions" element={<LiveSessionsPage />} />
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/contact" element={<ContactPage />} />
+            { /* Home page - tracklist dynamic routing */ }
+            <Route path="/track/:trackName" element={<Trackdetails />} />
+            
           
           </Routes>
         </main>
