@@ -1,9 +1,19 @@
 import React from 'react';
 import { FaClock, FaUsers, FaChartBar, FaBook } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 export default function CourseCard({ course }) {
+  const navigate = useNavigate();
+
+  const handleNavigation = () => {
+    navigate(`/track/${course.id}`); // Replace with the correct path
+  };
+
   return (
-    <div className="bg-white shadow-md rounded-2xl overflow-hidden flex max-w-3xl">
+    <div
+      onClick={handleNavigation}
+      className="bg-white shadow-md rounded-2xl overflow-hidden flex max-w-3xl cursor-pointer transition-transform hover:scale-[1.02]"
+    >
       {/* Left Image Section */}
       <div className="relative w-1/2">
         <img src={course.image} alt={course.title} className="w-full h-full object-cover" />
@@ -39,12 +49,19 @@ export default function CourseCard({ course }) {
         </div>
 
         <div className="flex items-center justify-between mt-2">
-          <span className="text-gray-400 ">${course.originalPrice}</span>
+          <span className="text-gray-400">${course.originalPrice}</span>
           <span className="text-green-600 font-bold">{course.price}</span>
-          <button className="text-sm text-blue-600 hover:underline">View More</button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent card click
+              handleNavigation();
+            }}
+            className="text-sm text-blue-600 hover:underline"
+          >
+            View More
+          </button>
         </div>
       </div>
     </div>
   );
 }
-

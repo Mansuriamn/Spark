@@ -9,6 +9,7 @@ import coursesData from '../assets/data/course.json';
 import { FiSearch } from "react-icons/fi";
 import { FaTimes } from "react-icons/fa";
 import Pagination from '../assets/Models/Pagination'; 
+import Footer from '../components/Footer'
 
 export default function Courses() {
   const [search, setSearch] = useState("");
@@ -109,7 +110,10 @@ export default function Courses() {
           )}
           </div>
         </div>
+        
       </div>
+      <Footer></Footer>
+
     </>
   );
 }

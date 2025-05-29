@@ -8,6 +8,7 @@ import Schedule from './pages/Schedule';
 import ContactPage from './pages/Contact';
 import Courses from './pages/Courses';
 import Trackdetails from './components/Trackdetails';
+import MyCoursesPage from './components/ProgressUpdate';
 
 function App() {
    return (
@@ -27,6 +28,7 @@ function App() {
             <Route path="/contact" element={<ContactPage />} />
             { /* Home page - tracklist dynamic routing */ }
             <Route path="/track/:trackName" element={<Trackdetails />} />
+            <Route path ='/progressupdate' element={<MyCoursesPage/>}/>
             
           
           </Routes>
