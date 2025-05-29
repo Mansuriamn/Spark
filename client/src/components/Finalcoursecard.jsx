@@ -40,6 +40,33 @@ const TrackCard = ({ icon, title, description, courses, lessons, duration }) => 
     navigate(`/track/${title.toLowerCase()}`); // future route
   };
 
+  //shaRE HANDLER FUNCTION 
+   const handleShare = async (e) => {
+    e.stopPropagation(); // Prevent card click navigation
+    const shareUrl = window.location.origin + `/track/${title.toLowerCase()}`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Check out this track: ${title}`,
+          url: shareUrl,
+        });
+        setShared(true);
+      } catch (error) {
+        console.error("Error sharing:", error);
+      }
+    } else {
+      // Fallback: copy URL to clipboard
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        alert("Link copied to clipboard!");
+        setShared(true);
+      } catch (error) {
+        alert("Failed to copy the link.");
+      }
+    }
+  };
+
   return (
     <div
       onClick={handleCardClick}
@@ -60,7 +87,7 @@ const TrackCard = ({ icon, title, description, courses, lessons, duration }) => 
         </div>
         <div className="flex items-center gap-3 text-gray-500 z-20" onClick={(e) => e.stopPropagation()}>
           <FiShare2
-            onClick={() => setShared(!shared)}
+             onClick={handleShare}  // <-- Here you add the onClick handler
             className={`cursor-pointer hover:text-blue-500 ${shared ? "text-blue-600" : ""}`}
             title="Share"
           />
