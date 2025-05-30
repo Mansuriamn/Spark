@@ -17,6 +17,7 @@
     "flowbite": "^3.1.2",
     "flowbite-react": "^0.11.7",
     "lucide-react": "^0.511.0",
+    "ract": "^0.0.1",
     "react": "^19.1.0",
     "react-chartjs-2": "^5.3.0",
     "react-countup": "^6.5.3",

@@ -9,7 +9,7 @@ const Navbar = () => {
   const searchInputRef = useRef(null);
   const navigate = useNavigate();
 
-  const navItems = ['Home', 'Courses', 'Dashboard', 'Schedule', 'Contact'];
+  const navItems = ['Home', 'Courses', 'Dashboard', 'Schedule', 'Contest'];
 
   // Close dropdown when clicked outside
   useEffect(() => {

@@ -5,10 +5,11 @@ import CoursesPage from './pages/Home';
 import DashboardPage from './pages/DashboardPage';
 import LiveSessionsPage from './pages/LiveSession';
 import Schedule from './pages/Schedule';
-import ContactPage from './pages/Contact';
+
 import Courses from './pages/Courses';
 import Trackdetails from './components/Trackdetails';
 import MyCoursesPage from './components/ProgressUpdate';
+import Contest from './pages/Contest';
 
 function App() {
    return (
@@ -25,7 +26,8 @@ function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/live-sessions" element={<LiveSessionsPage />} />
             <Route path="/schedule" element={<Schedule />} />
-            <Route path="/contact" element={<ContactPage />} />
+            
+            <Route path="/contest" element={<Contest />} />
             { /* Home page - tracklist dynamic routing */ }
             <Route path="/track/:trackName" element={<Trackdetails />} />
             <Route path ='/progressupdate' element={<MyCoursesPage/>}/>
