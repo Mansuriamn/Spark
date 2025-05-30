@@ -3,8 +3,7 @@ import { FaChevronDown } from 'react-icons/fa';
 
 export default function Instructors({ filters, onChange }) {
   const instructors = ['John Doe', 'Jane Smith', 'Alice Johnson'];
-  const [isOpen, setIsOpen] = useState(true); // State for accordion behavior
-
+  const [isOpen, setIsOpen] = useState(true); 
   const handleChange = (instructor) => {
     const updated = filters.instructor.includes(instructor)
       ? filters.instructor.filter(i => i !== instructor)
@@ -18,7 +17,7 @@ export default function Instructors({ filters, onChange }) {
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex justify-between items-center text-left text-gray-800 font-semibold mb-3 focus:outline-none"
       >
-        <span>Instructor</span>
+        <span>Top Instructor</span>
         <FaChevronDown className={`text-gray-500 transition-transform duration-200 ${isOpen ? 'rotate-0' : '-rotate-90'}`} />
       </button>
       {isOpen && (
