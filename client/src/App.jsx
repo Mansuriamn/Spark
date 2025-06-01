@@ -10,6 +10,8 @@ import Courses from './pages/Courses';
 import Trackdetails from './components/Trackdetails';
 import MyCoursesPage from './components/ProgressUpdate';
 import Contest from './pages/Contest';
+import Register from './pages/Register';
+import Login from './pages/Login';
 
 function App() {
    return (
@@ -31,13 +33,16 @@ function App() {
             { /* Home page - tracklist dynamic routing */ }
             <Route path="/track/:trackName" element={<Trackdetails />} />
             <Route path ='/progressupdate' element={<MyCoursesPage/>}/>
-            
+            <Route path='/Login' element={<Login />}/>
+            <Route path='/Register' element={<Register />} />
           
           </Routes>
         </main>
         
       </div>
     </Router>
+   
+   
   );
 }
 
