@@ -177,7 +177,7 @@ const Contest = () => {
         {/* Header */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10">
           <div className="mb-6 md:mb-0">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent animate-fadeIn">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text animate-fadeIn">
               Student Competitions Hub
             </h1>
             <p className="text-gray-600 mt-2 max-w-xl animate-fadeIn animation-delay-100">
@@ -376,10 +376,10 @@ const Contest = () => {
                   {/* Prize and CTA */}
                   <div className="border-t border-gray-100 group-hover:border-indigo-100 transition-colors pt-4 mt-4">
                     <div className="flex justify-between items-center">
-                      <div className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                      <div className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text ">
                         {contest.prize}
                       </div>
-                      <button className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-medium hover:from-indigo-700 hover:to-purple-700 transition-all transform hover:-translate-y-0.5 shadow-md hover:shadow-lg text-sm">
+                      <button className="px-4 py-2 bg-purple-500 text-white rounded-lg font-medium hover:from-indigo-700 hover:to-purple-700 transition-all transform hover:-translate-y-0.5 shadow-md hover:shadow-lg text-sm">
                         Participate
                       </button>
                     </div>
