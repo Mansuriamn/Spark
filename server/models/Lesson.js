@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { QuizSchema } from './quizQuestion.js';
+import { QuizQuestionSchema } from './quizQuestion.js';
 
 const VideoSchema = new mongoose.Schema({
   title: { type: String, required: true },
@@ -18,7 +18,7 @@ const LessonSchema = new mongoose.Schema({
   title: { type: String, required: true },
   content: String,
   videos: [VideoSchema],
-  quizzes: [QuizSchema],
+  quizzes: [QuizQuestionSchema],
   module: { type: mongoose.Schema.Types.ObjectId, ref: 'Module' },
   duration: { type: Number, default: 0 },
   attachments: [String],
