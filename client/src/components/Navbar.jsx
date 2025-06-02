@@ -48,8 +48,8 @@ const Navbar = () => {
   }, [searchActive, navigate]);
 
   return (
-    <div className="min-h-[90px] flex justify-center py-4 bg-white shadow-sm">
-      <div className="w-[95%] max-w-[1280px] flex items-center justify-between">
+    <div className="min-h-[90px] flex flex-col justify-start py-4 bg-white shadow-sm">
+      <div className="w-[95%] max-w-[1280px] flex items-center justify-between mx-auto">
 
         {/* Logo */}
         <div className={`flex items-center space-x-2 transition-all duration-300 ${searchActive ? 'mr-auto' : ''}`}>
@@ -57,9 +57,8 @@ const Navbar = () => {
           <h1 className="text-xl font-bold text-gray-900">LearnoHub</h1>
         </div>
 
-        {/* Nav Items */}
+        {/* Nav Items - Desktop */}
         <div className={`hidden md:flex items-center space-x-4 transition-all duration-300 ${searchActive ? 'ml-0 justify-center flex-1' : 'ml-auto'}`}>
-
           {/* Navigation Links */}
           <div className={`flex items-center space-x-4 transition-all duration-300 ${searchActive ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
             {navItems.map((item) => (
@@ -88,7 +87,6 @@ const Navbar = () => {
               <FaSearch size={18} />
             </div>
 
-            {/* Expanding Search Input */}
             <input
               ref={searchInputRef}
               type="text"
@@ -103,7 +101,7 @@ const Navbar = () => {
               <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full" />
             </div>
 
-            {/* Profile Image and Dropdown */}
+            {/* Profile Image */}
             <div className="relative">
               <img
                 src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
@@ -138,13 +136,41 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Hamburger Menu for Mobile */}
+        {/* Hamburger Menu Button - Mobile */}
         <div className="md:hidden">
           <button onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? <FaTimes className="text-xl" /> : <FaBars className="text-xl" />}
           </button>
         </div>
       </div>
+
+      {/* Mobile Nav Items */}
+      {menuOpen && (
+        <div className="md:hidden bg-white shadow-md px-4 py-3 space-y-2">
+          {navItems.map((item) => (
+            <NavLink
+              key={item}
+              to={`/${item.toLowerCase()}`}
+              className="block text-gray-800 px-4 py-2 rounded-md hover:bg-gray-100"
+              onClick={() => setMenuOpen(false)}
+            >
+              {item}
+            </NavLink>
+          ))}
+
+          {/* Search and Notifications */}
+          <div className="flex justify-between items-center mt-4">
+            <FaSearch className="text-gray-700" />
+            <FaBell className="text-gray-700" />
+            <img
+              src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+              alt="profile"
+              className="h-8 w-8 rounded-full"
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
