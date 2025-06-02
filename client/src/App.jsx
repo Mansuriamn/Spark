@@ -14,6 +14,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import UserProfile from './components/Userprofile';
 import VideoDashboard from './components/VideoDashboard';
+import WebRTCMeeting from './components/WebRTCMeeting';
 
 function App() {
    return (
@@ -24,6 +25,12 @@ function App() {
         <main>
          
           <Routes>
+            {/**
+             * webRTCMeet
+             * http://localhost:3001/meeting/lms-123456
+             */}
+              <Route path="/meeting/:roomName" element={<WebRTCMeeting userName="Roshan" />} />
+
             <Route path="/" element={<CoursesPage />} />
             <Route path="/home" element={<CoursesPage />} />
             <Route path='/courses' element={<Courses/>}/>
