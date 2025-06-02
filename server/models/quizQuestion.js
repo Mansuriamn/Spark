@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const QuizQuestionSchema = new mongoose.Schema({
+export const QuizQuestionSchema = new mongoose.Schema({
     questionText: {
         type: String,
         required: true
