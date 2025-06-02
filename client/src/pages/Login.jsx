@@ -8,7 +8,7 @@ import img from '../assets/img/imgheader.png';
 
 
 export default function Login() {
-        
+        const navigate =useNavigate();
   const [loginData, setLoginData] = useState({
     email: '',
     password: ''
@@ -72,7 +72,7 @@ export default function Login() {
             <a href="#">Forget password?</a>
           </div>
           <div className="register-link1">
-            <p>Don't have an account? <a >Register</a></p>
+            <p>Don't have an account? <a onClick={()=>navigate("/Register")}>Register</a></p>
           </div>
         </form>
       </div>

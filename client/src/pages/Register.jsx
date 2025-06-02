@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import img from '../assets/img/imgheader.png';
 
 export default function Register() {
- 
+  const navigate=useNavigate();
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -100,7 +100,7 @@ export default function Register() {
             <a href="#">Forget password?</a>
           </div>
           <div className="register-link1">
-            <p>Already have an account? <a  >Login</a></p>
+            <p>Already have an account? <a onClick={()=>navigate("/Login")}  >Login</a></p>
           </div>
         </form>
       </div>
