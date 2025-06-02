@@ -63,8 +63,8 @@ export default function Courses() {
 
   return (
     <>
-      <div className="flex justify-center bg-gray-100 border-gray-200">
-        <div className="w-1/4 p-10 border-r space-y-4 ">
+      <div className="flex  justify-center bg-gray-100 border-gray-200 course_op_card">
+        <div className="w-1/4 p-10 border-r space-y-4 course_options ">
           <CourseCategory filters={filters} onChange={handleFilterChange} />
           <Instructors filters={filters} onChange={handleFilterChange} />
           <PriceFilter filters={filters} onChange={handleFilterChange} />
@@ -72,11 +72,11 @@ export default function Courses() {
           <LevelFilter filters={filters} onChange={handleFilterChange} />
         </div>
         <div className="p-8">
-          <div className='flex justify-between items-center px-6 py-4'>
+          <div className='flex flex-col justify-between items-center px-6 py-4'>
             <div>
-              <h1 className="text-3xl font-bold">All Courses</h1>
+              <h1 className="text-3xl font-bold mb-3">All Courses</h1>
             </div>
-            <div className="relative w-72 mb-">
+            <div className="relative w-72 mb-5">
               <input
                 type="text"
                 placeholder="Search courses..."

@@ -1,0 +1,36 @@
+.mycourses_card {
+         display: flex;
+         flex-wrap: wrap;
+}
+
+#continue-learning-btn {
+         font-size: 16px;
+}
+
+
+@media screen and (max-width:480px) {
+         .CoursesCard {
+                  width: 100%;
+         }
+
+         #continue-learning-btn {
+                  padding: 0.5rem 1rem;
+                  font-size: 14px;
+                  gap: 0.5rem;
+                  margin-left: 0.25rem;
+                  
+         }
+
+}
+
+@media screen and (min-width:481px) and (max-width:768px) {
+         .CoursesCard {
+                  width: 80%;
+         }
+}
+
+@media screen and (min-width:769px) and (max-width:1024px) {
+         .CoursesCard {
+                  width: 80%;
+         }
+}

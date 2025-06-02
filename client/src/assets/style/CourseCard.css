@@ -1,0 +1,22 @@
+
+.course-card {
+  margin: 1rem auto;
+}
+
+
+@media screen and (max-width: 480px) {
+  .course-card {
+    flex-direction: column;
+  }
+  .course_op_card{
+         display: flex;
+         flex-direction: column;
+  }
+  .course_options{
+         border: none;
+         display: flex;
+         padding: 0px;
+        flex-wrap: wrap;
+         
+  }
+}
