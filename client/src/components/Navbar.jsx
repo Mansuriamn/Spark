@@ -1,23 +1,25 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FaSearch, FaBell, FaBars, FaTimes } from 'react-icons/fa';
+import UserProfile from './Userprofile';
 
 const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchActive, setSearchActive] = useState(false);
   const searchInputRef = useRef(null);
+  const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  const navItems = ['Home', 'Courses', 'Dashboard', 'Schedule', 'Contest'];
+  const navItems = ['Home', 'Courses', 'Dashboard', 'Contest'];
 
-  // Close dropdown when clicked outside
+  // Close search on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
-        searchInputRef.current && 
+        searchInputRef.current &&
         !searchInputRef.current.contains(event.target) &&
-        event.target.closest('.search-icon') === null
+        !event.target.closest('.search-icon')
       ) {
         setSearchActive(false);
       }
@@ -26,7 +28,18 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Focus input when activated and navigate to courses
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutsideDropdown = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutsideDropdown);
+    return () => document.removeEventListener('mousedown', handleClickOutsideDropdown);
+  }, []);
+
+  // Focus input and navigate to /courses
   useEffect(() => {
     if (searchActive) {
       searchInputRef.current?.focus();
@@ -39,22 +52,16 @@ const Navbar = () => {
       <div className="w-[95%] max-w-[1280px] flex items-center justify-between">
 
         {/* Logo */}
-        <div className={`flex items-center space-x-2 transition-all duration-300 ${
-          searchActive ? 'mr-auto' : ''
-        }`}>
+        <div className={`flex items-center space-x-2 transition-all duration-300 ${searchActive ? 'mr-auto' : ''}`}>
           <span className="text-purple-600 text-2xl font-black">✖</span>
           <h1 className="text-xl font-bold text-gray-900">LearnoHub</h1>
         </div>
 
         {/* Nav Items */}
-        <div className={`hidden md:flex items-center space-x-4 transition-all duration-300 ${
-          searchActive ? 'ml-0 justify-center flex-1' : 'ml-auto'
-        }`}>
+        <div className={`hidden md:flex items-center space-x-4 transition-all duration-300 ${searchActive ? 'ml-0 justify-center flex-1' : 'ml-auto'}`}>
 
           {/* Navigation Links */}
-          <div className={`flex items-center space-x-4 transition-all duration-300 ${
-            searchActive ? 'opacity-50 pointer-events-none' : 'opacity-100'
-          }`}>
+          <div className={`flex items-center space-x-4 transition-all duration-300 ${searchActive ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
             {navItems.map((item) => (
               <NavLink
                 key={item}
@@ -77,7 +84,6 @@ const Navbar = () => {
             <div
               className="search-icon cursor-pointer text-gray-700 flex items-center"
               onMouseEnter={() => setSearchActive(true)}
-              // onClick={() => setSearchActive(true)} // Optional: activate on click
             >
               <FaSearch size={18} />
             </div>
@@ -88,44 +94,51 @@ const Navbar = () => {
               type="text"
               placeholder="Search courses..."
               className={`transition-all duration-300 ease-in-out bg-gray-100 rounded-full px-4 py-1 text-sm outline-none
-                ${
-                  searchActive
-                    ? 'w-48 opacity-100 ml-2'
-                    : 'w-0 opacity-0 ml-0 pointer-events-none'
-                }`}
+                ${searchActive ? 'w-48 opacity-100 ml-2' : 'w-0 opacity-0 ml-0 pointer-events-none'}`}
             />
 
-            {/* Other Icons */}
+            {/* Notification Icon */}
             <div className="relative">
               <FaBell className="text-gray-700 cursor-pointer" />
               <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full" />
             </div>
 
-            <img
-              src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
-              alt="profile"
-              className="h-8 w-8 rounded-full cursor-pointer"
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-            />
+            {/* Profile Image and Dropdown */}
+            <div className="relative">
+              <img
+                src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+                alt="profile"
+                className="h-8 w-8 rounded-full cursor-pointer"
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+              />
 
-            {/* Profile Dropdown */}
-            {dropdownOpen && (
-              <div className="absolute top-12 right-0 mt-2 w-40 border-gray-200 bg-gray-100 rounded-md shadow-lg z-50 py-2 border">
-                <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  Profile
-                </button>
-                <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  Settings
-                </button>
-                <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  Logout
-                </button>
-              </div>
-            )}
+              {dropdownOpen && (
+                <div
+                  ref={dropdownRef}
+                  className="absolute top-12 right-0 mt-2 w-40 border-gray-200 bg-gray-100 rounded-md shadow-lg z-50 py-2 border"
+                >
+                  <button
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      navigate('/profile');
+                    }}
+                  >
+                    Profile
+                  </button>
+                  <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-200">
+                    Settings
+                  </button>
+                  <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-200">
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Hamburger Menu for mobile (not handled here) */}
+        {/* Hamburger Menu for Mobile */}
         <div className="md:hidden">
           <button onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? <FaTimes className="text-xl" /> : <FaBars className="text-xl" />}

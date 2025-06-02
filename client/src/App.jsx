@@ -12,6 +12,8 @@ import MyCoursesPage from './components/ProgressUpdate';
 import Contest from './pages/Contest';
 import Register from './pages/Register';
 import Login from './pages/Login';
+import UserProfile from './components/Userprofile';
+import VideoDashboard from './components/VideoDashboard';
 
 function App() {
    return (
@@ -35,6 +37,8 @@ function App() {
             <Route path ='/progressupdate' element={<MyCoursesPage/>}/>
             <Route path='/Login' element={<Login />}/>
             <Route path='/Register' element={<Register />} />
+            <Route path='/profile' element={<UserProfile/>}/>
+            <Route path='/video' element={<VideoDashboard/>}></Route>
           
           </Routes>
         </main>
