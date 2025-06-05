@@ -16,6 +16,8 @@ import UserProfile from './components/Userprofile';
 import VideoDashboard from './components/VideoDashboard';
 import WebRTCMeeting from './components/WebRTCMeeting';
 import Practice from './pages/Practice';
+import PathToProficiency from './components/Practiceinside';
+
 
 function App() {
    return (
@@ -49,6 +51,8 @@ function App() {
            <Route path='/video' element={<VideoDashboard/>}></Route>
           
           <Route path='/practice' element={<Practice/>}></Route>
+          <Route path='/practiceinside' element={<PathToProficiency/>}></Route>
+        
          </Routes>
         </main>
         
