@@ -11,7 +11,7 @@ const Navbar = () => {
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  const navItems = ['Home', 'Courses', 'Dashboard', 'Contest'];
+  const navItems = ['Home', 'Courses', 'Dashboard','Practice', 'Contest'];
 
   // Close search on outside click
   useEffect(() => {

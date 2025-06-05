@@ -19,41 +19,42 @@ import Practice from './pages/Practice';
 
 function App() {
    return (
-    // <Router>
+     <Router>
      
-    //   <div className="min-h-screen bg-purple-50 font-sans text-gray-800">
-    //     <Navbar />
-    //     <main>
+     <div className="min-h-screen bg-purple-50 font-sans text-gray-800">
+       <Navbar />
+       <main>
          
-    //       <Routes>
-    //         {/**
-    //          * webRTCMeet
-    //          * http://localhost:3001/meeting/lms-123456
-    //          */}
-    //           <Route path="/meeting/:roomName" element={<WebRTCMeeting userName="Roshan" />} />
+         <Routes>
+          {/**
+              * webRTCMeet
+             * http://localhost:3001/meeting/lms-123456
+            */}
+             <Route path="/meeting/:roomName" element={<WebRTCMeeting userName="Roshan" />} />
 
-    //         <Route path="/" element={<CoursesPage />} />
-    //         <Route path="/home" element={<CoursesPage />} />
-    //         <Route path='/courses' element={<Courses/>}/>
-    //         <Route path="/dashboard" element={<DashboardPage />} />
-    //         <Route path="/live-sessions" element={<LiveSessionsPage />} />
-    //         <Route path="/schedule" element={<Schedule />} />
+        <Route path="/" element={<CoursesPage />} />
+          <Route path="/home" element={<CoursesPage />} />
+          <Route path='/courses' element={<Courses/>}/>
+           <Route path="/dashboard" element={<DashboardPage />} />
+           <Route path="/live-sessions" element={<LiveSessionsPage />} />
+            <Route path="/schedule" element={<Schedule />} />
             
-    //         <Route path="/contest" element={<Contest />} />
-    //         { /* Home page - tracklist dynamic routing */ }
-    //         <Route path="/track/:trackName" element={<Trackdetails />} />
-    //         <Route path ='/progressupdate' element={<MyCoursesPage/>}/>
-    //         <Route path='/Login' element={<Login />}/>
-    //         <Route path='/Register' element={<Register />} />
-    //         <Route path='/profile' element={<UserProfile/>}/>
-    //         <Route path='/video' element={<VideoDashboard/>}></Route>
+          <Route path="/contest" element={<Contest />} />
+           { /* Home page - tracklist dynamic routing */ }
+           <Route path="/track/:trackName" element={<Trackdetails />} />
+           <Route path ='/progressupdate' element={<MyCoursesPage/>}/>
+           <Route path='/Login' element={<Login />}/>
+           <Route path='/Register' element={<Register />} />
+           <Route path='/profile' element={<UserProfile/>}/>
+           <Route path='/video' element={<VideoDashboard/>}></Route>
           
-    //       </Routes>
-    //     </main>
+          <Route path='/practice' element={<Practice/>}></Route>
+         </Routes>
+        </main>
         
-    //   </div>
-    // </Router>
-    <Practice></Practice>
+       </div>
+    </Router>
+    
    
    
   );
