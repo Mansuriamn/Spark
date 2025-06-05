@@ -1,7 +1,6 @@
-import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useState } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import "../assets/style/Practice.css"; // External CSS file
+import "../assets/style/Practice.css"; // External CSS
 
 export default function Practice() {
   const practiceTopics = [
@@ -30,16 +29,20 @@ export default function Practice() {
 
   const sectionTitles = [
     "Kodnest 75",
-    "Advance Algorithm Technique",
+    "Advanced Algorithm Techniques",
     "SQL Power Play",
     "Algorithmic Journey",
-    "Sorting Algorithm",
+    "Sorting Algorithms",
   ];
-
+const [select, setSelect]=useState("All")
+const handle = (e) => {
+   console.log(e.target.value)
+    setSelect(e.target.value);
+  };
   return (
     <>
       <div className="filter-wrapper">
-        <select className="filter-select">
+        <select className="filter-select" value={select} onChange={handle}>
           <option value="Difficulty">Select Difficulty</option>
           <option value="All">All</option>
           <option value="Beginner">Beginner</option>
@@ -63,16 +66,36 @@ export default function Practice() {
 }
 
 function Card({ practice }) {
+  const difficultyColor = {
+    Beginner: "#dcfce7",
+    Intermediate: "#fef9c3",
+    Advanced: "#fee2e2",
+  };
+
+  const difficultyTextColor = {
+    Beginner: "#15803d",
+    Intermediate: "#92400e",
+    Advanced: "#b91c1c",
+  };
+
   return (
     <div className="practice-card">
       <div className="card-header">
         <div className="card-information">
           <div className="trophy">
-            <i className="fa-solid fa-trophy" aria-hidden="true"></i>
+            <i className="fa-solid fa-trophy"></i>
           </div>
           <div>
             <h3 className="practice-topic">{practice.topic}</h3>
-            <span className="badge difficulty-badge">{practice.difficulty}</span>
+            <span
+              className="badge difficulty-badge"
+              style={{
+                backgroundColor: difficultyColor[practice.difficulty],
+                color: difficultyTextColor[practice.difficulty],
+              }}
+            >
+              {practice.difficulty}
+            </span>
           </div>
           <div className="progress-summary">
             <h3 className="practice-topic">{practice.progress}%</h3>
@@ -93,18 +116,18 @@ function Card({ practice }) {
             <div
               className="progress-fill"
               style={{ width: `${practice.progress}%` }}
+              role="progressbar"
               aria-valuenow={practice.progress}
               aria-valuemin="0"
               aria-valuemax="100"
-              role="progressbar"
             ></div>
           </div>
         </div>
         <div className="Practice-buttons">
-          <button className="view-button" aria-label="View problems">
+          <button className="view-button">
             <i className="fa-solid fa-book-open-reader"></i> View Problems
           </button>
-          <button className="Continue-button" aria-label="Continue practice">
+          <button className="Continue-button">
             <i className="fa-solid fa-arrow-right"></i> Continue
           </button>
         </div>
