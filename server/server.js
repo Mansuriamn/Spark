@@ -27,6 +27,7 @@ const io = new Server(server, {
   },
 });
 connectDB();
+// Example usage in a React component
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));  // allow nested objects in request body
@@ -57,9 +58,17 @@ server.listen(5000, () => {
   console.log('✅ Server running at http://localhost:5000');
 });
 
+const user = {
+  id: '123',
+  name: 'John Doe',
+  email: 'mananals@getMaxListeners.com'
+}
 app.get('/', (req, res) => {
-    res.send('API is running...');
-});
+    
+    res.json({ message: 'API is running...' ,
+    user: user });
+    })
+
 
 app.use('/uploads', express.static('uploads'));  // serve uploaded images
 app.use('/api/users', userRoutes);  // serve user routes
@@ -67,6 +76,3 @@ app.use('/api/courses', courseRoutes);
 app.use('/api/lessons', lessonRoutes);
 app.use('/api/meetings', meetingRouter)
 
-app.listen(PORT, () => {
-    console.log(`Server is running on PORT: ${PORT}`);
-})

@@ -63,6 +63,9 @@ export const deleteCourse = asyncHandler(async (req, res) => {
 
 import mongoose from 'mongoose';
 import slugify from 'slugify';
+import Category from '../models/Category.js';
+// ...existing code...
+
 
 const VersionHistorySchema = new mongoose.Schema({
   version: Number,
@@ -75,7 +78,7 @@ const CourseSchema = new mongoose.Schema({
   title: { type: String, required: true, trim: true, maxlength: 180 },
   slug:  { type: String, unique: true, index: true },
   description: String,
-  category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
+  category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: false },
   tags: [String],
   level: { type: String, enum: ['Beginner','Intermediate','Advanced'], default: 'Beginner' },
   language: { type: String, default: 'en' },

@@ -22,11 +22,26 @@ export default function Login() {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Login submitted:', loginData);
-  
-  };
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const res = await fetch('/api/users/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(loginData)
+    });
+    const data = await res.json();
+    if (res.ok) {
+      alert('Login successful!');
+      // Optionally save token: localStorage.setItem('token', data.token);
+      navigate('/'); // or wherever you want to redirect
+    } else {
+      alert(data.message || 'Login failed');
+    }
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+};
 
   return (
    <div className='contain_both'>
