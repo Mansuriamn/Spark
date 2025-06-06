@@ -1,8 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from 'axios';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "../assets/style/Practice.css"; // External CSS
 
 export default function Practice() {
+  async function Get(){
+    try{
+      let res=await axios.get('https://jsonplaceholder.typicode.com/posts/1');
+      console.log(res.data);
+    }
+    catch(err){
+  console.log(err);
+    }
+  }
+  useEffect(()=>{
+    Get();
+  })
   const practiceTopics = [
     {
       topic: "Path to Policiency",
