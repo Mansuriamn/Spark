@@ -2,7 +2,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import io from 'socket.io-client';
 
-const SOCKET_SERVER_URL = 'http://localhost:5000'; // your backend
+
+const SOCKET_SERVER_URL = 'http://localhost:5000';
+const socket = io(SOCKET_SERVER_URL, {
+  transports: ['websocket'],
+  withCredentials: true,
+});
+
+
 const ICE_SERVERS = {
   iceServers: [
     { urls: 'stun:stun.l.google.com:19302' },
