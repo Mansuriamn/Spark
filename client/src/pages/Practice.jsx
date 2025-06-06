@@ -26,7 +26,6 @@ export default function Practice() {
     navigate("/practiceinside");
   };
 
->>>>>>> 4482ca553568546ea17ace1ce2b48cd07033f677
   const practiceTopics = [
     {
       topic: "Path to Proficiency",
