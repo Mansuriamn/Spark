@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Play, Clock, CheckCircle, User, Calendar, TrendingUp, BookOpen, Award, Video } from 'lucide-react';
+import Footer from './Footer';
 
 const VideoDashboard = () => {
   const [selectedVideo, setSelectedVideo] = useState(null);
@@ -90,6 +91,7 @@ const VideoDashboard = () => {
   const maxHours = Math.max(...recentActivity.map(day => day.hours));
 
   return (
+    <>
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -112,7 +114,7 @@ const VideoDashboard = () => {
               </div>
               <div className="bg-white rounded-lg px-4 py-2 shadow-sm">
                 <div className="flex items-center space-x-2">
-                  <User className="w-5 h-5 text-blue-500" />
+                  <User className="w-5 h-5 text-purple-600" />
                   <span className="text-sm font-medium">80,397 Students</span>
                 </div>
               </div>
@@ -120,7 +122,6 @@ const VideoDashboard = () => {
           </div>
         </div>
 
-        {/* Navigation */}
         <div className="flex space-x-6 mb-8 border-b border-gray-200">
           {['overview', 'progress', 'schedule'].map((tab) => (
             <button
@@ -128,7 +129,7 @@ const VideoDashboard = () => {
               onClick={() => setActiveSection(tab)}
               className={`pb-4 px-2 text-sm font-medium capitalize transition-colors ${
                 activeSection === tab
-                  ? 'border-b-2 border-blue-500 text-blue-600'
+                  ? 'border-b-2 border-purple-600 text-purple-600'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -138,11 +139,11 @@ const VideoDashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Main Content */}
+         
           <div className="lg:col-span-3">
             {activeSection === 'overview' && (
               <div className="space-y-6">
-                {/* Video Player Section */}
+             
                 <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
                   <div className="aspect-video bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center relative">
                     <div className="absolute inset-0 bg-black bg-opacity-20"></div>
@@ -186,8 +187,8 @@ const VideoDashboard = () => {
                       <div className="p-6">
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center space-x-4">
-                            <div className="bg-blue-100 rounded-lg p-2">
-                              <BookOpen className="w-5 h-5 text-blue-600" />
+                            <div className="bg-purple-100 rounded-lg p-2">
+                              <BookOpen className="w-5 h-5 text-purple-600" />
                             </div>
                             <div>
                               <h3 className="text-lg font-semibold text-gray-900">
@@ -200,12 +201,12 @@ const VideoDashboard = () => {
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className="text-2xl font-bold text-blue-600 mb-1">
+                            <div className="text-2xl font-bold text-purple-600 mb-1">
                               {section.progress}%
                             </div>
                             <div className="w-20 bg-gray-200 rounded-full h-2">
                               <div
-                                className="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                                className="bg-purple-600 h-2 rounded-full transition-all duration-500"
                                 style={{ width: `${section.progress}%` }}
                               ></div>
                             </div>
@@ -281,7 +282,7 @@ const VideoDashboard = () => {
                       {recentActivity.map((day, index) => (
                         <div key={index} className="flex-1 flex flex-col items-center">
                           <div
-                            className="w-full bg-blue-500 rounded-t-lg transition-all duration-500 hover:bg-blue-600"
+                            className="w-full bg-purple-600 hover:bg-purple-500 rounded-t-lg transition-all duration-500"
                             style={{ height: `${(day.hours / maxHours) * 100}%`, minHeight: '20px' }}
                           ></div>
                           <div className="text-xs text-gray-500 mt-2">{day.day}</div>
@@ -341,10 +342,10 @@ const VideoDashboard = () => {
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h3 className="text-lg font-semibold mb-4">Overall Progress</h3>
               <div className="text-center mb-4">
-                <div className="text-3xl font-bold text-blue-600 mb-2">{stats.overallProgress}%</div>
+                <div className="text-3xl font-bold text-purple-600 mb-2">{stats.overallProgress}%</div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
                   <div
-                    className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-700"
+                    className="bg-purple-600 h-3 rounded-full transition-all duration-700"
                     style={{ width: `${stats.overallProgress}%` }}
                   ></div>
                 </div>
@@ -401,6 +402,8 @@ const VideoDashboard = () => {
         </div>
       </div>
     </div>
+    <Footer></Footer>
+    </>
   );
 };
 

@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import { Clock, Users, BookOpen, Check, Play, ArrowRight, Filter, Trophy, Medal, Star, GraduationCap, TrendingUp, Crown, Flame, Award, ChevronDown } from 'lucide-react';
 import Footer from './Footer';
+import { useNavigate } from 'react-router-dom';
+
 const coursesData = [
   {
     title: 'English punctuation made easy',
@@ -138,9 +140,7 @@ const StatCard = ({ stat }) => (
 const AchievementCard = ({ achievement }) => (
   <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200 hover:-translate-y-1 h-full flex flex-col">
     <div className="flex items-center mb-4">
-      <div className={`w-12 h-12 rounded-xl ${achievement.bgColor} flex items-center justify-center mr-3 text-white shadow-lg`}>
-        {achievement.icon}
-      </div>
+     
       <div className="flex-1">
         <h3 className="font-bold text-gray-800 text-lg">{achievement.title}</h3>
         <div className="text-sm text-gray-500">{achievement.count}</div>
@@ -159,9 +159,14 @@ const AchievementCard = ({ achievement }) => (
 );
 
 const CourseCard = ({ course }) => {
+
+  const navigate = useNavigate();
+  const handleNavigate = () => {
+    navigate(`/video`); 
+  };
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col lg:flex-row transition-all duration-300 hover:shadow-lg border border-gray-100">
-      {/* Image Section */}
+    
       <div className="relative lg:w-80 h-48 lg:h-auto">
         <img 
           src={course.image} 
@@ -177,7 +182,7 @@ const CourseCard = ({ course }) => {
           </span>
         </div>
         
-        {/* Progress overlay for in-progress courses */}
+        
         {course.status === 'in-progress' && (
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent text-white p-4">
             <div className="flex justify-between text-xs mb-2 font-medium">
@@ -194,7 +199,6 @@ const CourseCard = ({ course }) => {
         )}
       </div>
 
-      {/* Content Section */}
       <div className="p-6 flex-1 flex flex-col">
         <div className="flex-1">
           <div className="flex items-center justify-between mb-2">
@@ -220,7 +224,6 @@ const CourseCard = ({ course }) => {
             </div>
           </div>
           
-          {/* Rating */}
           <div className="flex items-center mb-6">
             <div className="flex text-yellow-400 mr-2">
               {[...Array(5)].map((_, i) => (
@@ -237,7 +240,7 @@ const CourseCard = ({ course }) => {
             <span className="text-2xl font-bold text-purple-600">{course.price}</span>
           </div>
           
-          <button className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
+          <button onClick={handleNavigate} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
             course.status === 'completed' 
               ? 'bg-green-100 text-green-700 hover:bg-green-200' 
               : course.status === 'in-progress'
@@ -310,7 +313,7 @@ export default function MyCoursesPage() {
     <>
     <div className="min-h-screen bg-gray-50 px-4 py-8 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
+       
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8">
           <div>
             <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
@@ -322,7 +325,7 @@ export default function MyCoursesPage() {
           </div>
           
           <div className="mt-4 lg:mt-0">
-            <button className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl">
+            <button className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-purple-500 transition-all duration-200 shadow-lg hover:shadow-xl">
               Explore New Courses
             </button>
           </div>
@@ -413,7 +416,7 @@ export default function MyCoursesPage() {
           </div>
         )}
 
-        {/* Achievement Banner */}
+        
         <AchievementBanner />
       </div>
     </div>
