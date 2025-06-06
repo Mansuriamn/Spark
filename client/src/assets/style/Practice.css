@@ -1,0 +1,236 @@
+
+
+/* Filter */
+.filter-wrapper {
+  text-align: right;
+  margin: 2rem 15rem 0 0;
+}
+
+.filter-select {
+  padding: 10px 30px 10px 12px;
+  font-size: 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #111827;
+  cursor: pointer;
+  width: 200px;
+  transition: 0.3s ease;
+}
+
+.filter-select:focus,
+.filter-select:hover {
+  border-color: #6366f1;
+  box-shadow: 0 0 6px rgba(99, 102, 241, 0.4);
+}
+
+/* Container */
+.practice-container {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 1rem;
+  max-width: 1280px;
+  margin: 2rem auto;
+}
+
+/* Section Title */
+.practice-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+/* Grid */
+.card-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  .card-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Cards */
+.practice-card {
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.practice-card:hover {
+  transform: translateY(-6px);
+}
+
+/* Header */
+.card-header {
+  background-color: #f3f4f6;
+  padding: 1.25rem;
+}
+
+.card-information {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Trophy Icon */
+.trophy {
+  width: 50px;
+  height: 50px;
+  background-color: #e0e7ff;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4338ca;
+  font-size: 1.25rem;
+}
+
+/* Topic Title */
+.practice-topic {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Badge */
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-top: 0.3rem;
+}
+
+/* Card Body */
+.card-body {
+  padding: 1rem 1.25rem 1.5rem;
+}
+
+/* About Text */
+.practice-about {
+  margin: 1rem 0;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+/* Progress Bar */
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.progress-label {
+  width: 50px;
+  text-align: right;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.progress-bar {
+  flex-grow: 1;
+  height: 10px;
+  background-color: #e5e7eb;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(to right, #6366f1, #9370DB);
+  transition: width 0.5s ease-in-out;
+}
+
+/* Buttons */
+.Practice-buttons {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.view-button,
+.Continue-button {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  transition: 0.3s ease;
+}
+
+.view-button {
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  color: #1f2937;
+}
+
+.view-button:hover {
+  background-color: #f1f5f9;
+  border-color: #1f2937;
+}
+
+.Continue-button {
+  background-color: #9370DB;
+  color: #ffffff;
+  border: none;
+}
+
+.Continue-button:hover {
+  background-color: #8A2BE2;
+}
+
+/* Mobile Tweaks */
+@media screen and (max-width: 640px) {
+  .Practice-buttons {
+    flex-direction: column;
+  }
+
+  .view-button,
+  .Continue-button {
+    width: 100%;
+  }
+
+  .card-header,
+  .card-information {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .progress-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .progress-label {
+    width: auto;
+    text-align: left;
+  }
+
+  .filter-wrapper {
+    margin: 1rem;
+    text-align: left;
+  }
+
+  .filter-select {
+    width: 100%;
+  }
+}

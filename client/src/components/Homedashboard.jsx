@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import '../assets/style/My_Courses.css';
 import {
   FaClock,
   FaUsers,
@@ -14,7 +15,7 @@ import {
   FaCompass,
   FaBook
 } from 'react-icons/fa';
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 const coursesData = [
   {
     title: 'English punctuation made easy',
@@ -124,27 +125,27 @@ const StatCard = ({ stat }) => (
   </div>
 );
 
-const AchievementCard = ({ achievement }) =>{
+const AchievementCard = ({ achievement }) => {
   const Iconcomponent = achievement.icon;
   return (
-  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200 hover:-translate-y-1 h-full flex flex-col">
-    <div className="flex items-center mb-4">
-      <div className={`w-12 h-12 rounded-xl ${achievement.bgColor} flex items-center justify-center mr-3 text-white shadow-lg`}>
-        {achievement.icon}
+    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200 hover:-translate-y-1 h-full flex flex-col">
+      <div className="flex items-center mb-4">
+        <div className={`w-12 h-12 rounded-xl ${achievement.bgColor} flex items-center justify-center mr-3 text-white shadow-lg`}>
+          {achievement.icon}
+        </div>
+        <div className="flex-1">
+          <h3 className="font-bold text-gray-800 text-lg">{achievement.title}</h3>
+          <div className="text-sm text-gray-500">{achievement.count}</div>
+        </div>
       </div>
-      <div className="flex-1">
-        <h3 className="font-bold text-gray-800 text-lg">{achievement.title}</h3>
-        <div className="text-sm text-gray-500">{achievement.count}</div>
+      <div className="flex-1 flex flex-col justify-end">
+        <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+          <div className={`h-2 rounded-full ${achievement.progressBg}`} style={{ width: `${achievement.progress}%` }}></div>
+        </div>
+        <div className="text-right text-sm text-gray-600 font-medium">{achievement.progress}% complete</div>
       </div>
     </div>
-    <div className="flex-1 flex flex-col justify-end">
-      <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-        <div className={`h-2 rounded-full ${achievement.progressBg}`} style={{ width: `${achievement.progress}%` }}></div>
-      </div>
-      <div className="text-right text-sm text-gray-600 font-medium">{achievement.progress}% complete</div>
-    </div>
-  </div>
-);
+  );
 }
 
 const CourseCard = ({ course }) => {
@@ -202,25 +203,26 @@ const CourseCard = ({ course }) => {
           </div>
           <span className="text-sm text-gray-600 font-medium">{course.rating}/5.0</span>
         </div>
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100 gap-2">
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-400 ">{course.originalPrice}</span>
           </div>
           {/* Use Link component for navigation */}
           {course.status === 'in-progress' ? (
             <Link
-              to="/video" // This is the path you want to navigate to
-              className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ml-1 bg-purple-600 text-white hover:bg-purple-700 shadow-lg hover:shadow-xl"
+              to="/video"
+              id="continue-learning-btn"
+              className="continue-learning-btn flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ml-1 bg-purple-600 text-white hover:bg-purple-700 shadow-lg hover:shadow-xl"
             >
               <FaPlay className="w-4 h-4" /> Continue Learning
             </Link>
+
           ) : (
             <button
-              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ml-1 ${
-                course.status === 'completed'
+              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ml-1 ${course.status === 'completed'
                   ? 'bg-green-100 text-green-700 hover:bg-green-200'
                   : 'bg-gray-900 text-white hover:bg-gray-800 shadow-lg hover:shadow-xl'
-              }`}
+                }`}
             >
               {course.status === 'completed' ? (
                 <>
@@ -272,9 +274,9 @@ export default function LearningDashboard() {
           <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2 ">
             <FaBookOpen className="text-purple-500 w-6 h-6" /> My Courses
           </h2>
-          <div className="flex gap-6 overflow-x-auto mx-auto place-items-center justify-center">
+          <div className="flex gap-6 overflow-x-auto mx-auto place-items-center justify-center mycourses_card">
             {coursesData.map((course, idx) => (
-              <div key={idx} className="flex-shrink-0 w-80">
+              <div key={idx} className="flex-shrink-0 CoursesCard ">
                 <CourseCard course={course} />
               </div>
             ))}

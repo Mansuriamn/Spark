@@ -1,0 +1,36 @@
+/* Custom Footer Tweaks */
+#site-footer {
+  word-wrap: break-word;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  #site-footer .footer-col {
+    text-align: center !important;
+    padding-bottom: 1.5rem;
+  }
+
+  #site-footer .footer-col ul {
+    padding-left: 0;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  #site-footer {
+    padding: 2rem 1rem;
+  }
+
+  #site-footer .footer-col {
+    margin-bottom: 2rem;
+  }
+
+  #site-footer .footer-col h4 {
+    font-size: 1.1rem;
+  }
+
+  #site-footer .footer-col p,
+  #site-footer .footer-col ul li a {
+    font-size: 0.9rem;
+  }
+}
