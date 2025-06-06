@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from 'axios';
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import "../assets/style/Practice.css"; // External CSS
+import "../assets/style/Practice.css";
+import { useNavigate } from "react-router-dom";
+import Footer from "../components/Footer";
 
 export default function Practice() {
+<<<<<<< HEAD
   async function Get(){
     try{
       let res=await axios.get('https://jsonplaceholder.typicode.com/posts/1');
@@ -16,27 +19,38 @@ export default function Practice() {
   useEffect(()=>{
     Get();
   })
+=======
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate("/practiceinside");
+  };
+
+>>>>>>> 4482ca553568546ea17ace1ce2b48cd07033f677
   const practiceTopics = [
     {
-      topic: "Path to Policiency",
+      topic: "Path to Proficiency",
       difficulty: "Intermediate",
       progress: "0",
       totalProblems: 22,
-      about: "Enhance your problem-solving skills with more complex data structures and algorithms.",
+      about:
+        "Enhance your problem-solving skills with more complex data structures and algorithms.",
     },
     {
       topic: "DSA Mastery",
       difficulty: "Beginner",
       progress: "25",
       totalProblems: 30,
-      about: "Learn core data structures and algorithms from scratch with examples.",
+      about:
+        "Learn core data structures and algorithms from scratch with examples.",
     },
     {
       topic: "Advanced Challenges",
       difficulty: "Advanced",
       progress: "0",
       totalProblems: 18,
-      about: "Challenge yourself with hard-level coding questions for competitive programming.",
+      about:
+        "Challenge yourself with hard-level coding questions for competitive programming.",
     },
   ];
 
@@ -47,11 +61,13 @@ export default function Practice() {
     "Algorithmic Journey",
     "Sorting Algorithms",
   ];
-const [select, setSelect]=useState("All")
-const handle = (e) => {
-   console.log(e.target.value)
+
+  const [select, setSelect] = useState("All");
+
+  const handle = (e) => {
     setSelect(e.target.value);
   };
+
   return (
     <>
       <div className="filter-wrapper">
@@ -69,7 +85,7 @@ const handle = (e) => {
           <h2 className="practice-title">{title}</h2>
           <div className="card-grid">
             {practiceTopics.map((practice, index) => (
-              <Card key={index} practice={practice} />
+              <Card key={index} practice={practice} handleClick={handleClick} />
             ))}
           </div>
         </div>
@@ -78,7 +94,7 @@ const handle = (e) => {
   );
 }
 
-function Card({ practice }) {
+function Card({ practice, handleClick }) {
   const difficultyColor = {
     Beginner: "#dcfce7",
     Intermediate: "#fef9c3",
@@ -92,6 +108,7 @@ function Card({ practice }) {
   };
 
   return (
+    <>
     <div className="practice-card">
       <div className="card-header">
         <div className="card-information">
@@ -137,7 +154,7 @@ function Card({ practice }) {
           </div>
         </div>
         <div className="Practice-buttons">
-          <button className="view-button">
+          <button className="view-button" onClick={handleClick}>
             <i className="fa-solid fa-book-open-reader"></i> View Problems
           </button>
           <button className="Continue-button">
@@ -146,5 +163,7 @@ function Card({ practice }) {
         </div>
       </div>
     </div>
+    
+    </>
   );
 }
