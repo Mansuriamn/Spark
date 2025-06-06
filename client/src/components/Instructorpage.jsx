@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { User, Edit3, Users, DollarSign, BookOpen, Plus, X, Save, TrendingUp, Award, Calendar } from 'lucide-react';
+import Footer from './Footer';
 
 export default function InstructorDashboard() {
   const [courses, setCourses] = useState([
@@ -89,6 +90,7 @@ export default function InstructorDashboard() {
   const avgRating = courses.length > 0 ? (courses.reduce((sum, course) => sum + course.rating, 0) / courses.length).toFixed(1) : 0;
 
   return (
+    <>
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header Stats */}
@@ -405,5 +407,7 @@ export default function InstructorDashboard() {
         </div>
       </div>
     </div>
+      <Footer />
+    </>
   );
 }
