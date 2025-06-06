@@ -6,20 +6,6 @@ import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 
 export default function Practice() {
-<<<<<<< HEAD
-  async function Get(){
-    try{
-      let res=await axios.get('https://jsonplaceholder.typicode.com/posts/1');
-      console.log(res.data);
-    }
-    catch(err){
-  console.log(err);
-    }
-  }
-  useEffect(()=>{
-    Get();
-  })
-=======
   const navigate = useNavigate();
 
   const handleClick = () => {
