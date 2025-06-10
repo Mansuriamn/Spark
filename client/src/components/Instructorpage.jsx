@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { User, Edit3, Users, DollarSign, BookOpen, Plus, X, Save, TrendingUp, Award, Calendar } from 'lucide-react';
 import Footer from './Footer';
+import React, { useState } from 'react';
+import { User, Edit3, Users, DollarSign, BookOpen, Plus, X, Save, TrendingUp, Award, Calendar, Eye, UserMinus, ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function InstructorDashboard() {
   const [courses, setCourses] = useState([
@@ -15,6 +15,13 @@ export default function InstructorDashboard() {
       topics: 'HTML, CSS, React, Node.js',
       rating: 4.8,
       completion: 85,
+      enrolledStudents: [
+        { id: 1, name: 'Rahul Sharma', email: 'rahul@email.com', enrolledDate: '2024-01-15', progress: 75 },
+        { id: 2, name: 'Priya Patel', email: 'priya@email.com', enrolledDate: '2024-01-18', progress: 92 },
+        { id: 3, name: 'Amit Kumar', email: 'amit@email.com', enrolledDate: '2024-01-20', progress: 68 },
+        { id: 4, name: 'Sneha Singh', email: 'sneha@email.com', enrolledDate: '2024-01-22', progress: 84 },
+        { id: 5, name: 'Vikash Gupta', email: 'vikash@email.com', enrolledDate: '2024-01-25', progress: 56 }
+      ]
     },
     {
       id: 2,
@@ -27,6 +34,11 @@ export default function InstructorDashboard() {
       topics: 'Machine Learning, Python, NLP',
       rating: 4.6,
       completion: 78,
+      enrolledStudents: [
+        { id: 6, name: 'Anita Desai', email: 'anita@email.com', enrolledDate: '2024-02-01', progress: 82 },
+        { id: 7, name: 'Rajesh Mehta', email: 'rajesh@email.com', enrolledDate: '2024-02-03', progress: 65 },
+        { id: 8, name: 'Kavya Nair', email: 'kavya@email.com', enrolledDate: '2024-02-05', progress: 91 }
+      ]
     },
   ]);
 
@@ -41,6 +53,7 @@ export default function InstructorDashboard() {
   const [editingCourse, setEditingCourse] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [profileEdit, setProfileEdit] = useState(false);
+  const [expandedCourse, setExpandedCourse] = useState(null);
   const [profile, setProfile] = useState({
     name: 'Pragati Mishra',
     email: 'p@gmail.com',
@@ -74,6 +87,7 @@ export default function InstructorDashboard() {
           price: price,
           rating: 0,
           completion: 0,
+          enrolledStudents: []
         },
       ]);
       setNewCourse({ title: '', duration: '', topics: '', level: 'Beginner', price: '' });
@@ -85,6 +99,25 @@ export default function InstructorDashboard() {
     setProfileEdit(false);
   };
 
+  const removeStudent = (courseId, studentId) => {
+    setCourses(courses.map(course => {
+      if (course.id === courseId) {
+        const updatedStudents = course.enrolledStudents.filter(student => student.id !== studentId);
+        return {
+          ...course,
+          enrolledStudents: updatedStudents,
+          students: updatedStudents.length,
+          revenue: updatedStudents.length * course.price
+        };
+      }
+      return course;
+    }));
+  };
+
+  const toggleStudentView = (courseId) => {
+    setExpandedCourse(expandedCourse === courseId ? null : courseId);
+  };
+
   const totalStudents = courses.reduce((sum, course) => sum + course.students, 0);
   const totalRevenue = courses.reduce((sum, course) => sum + course.revenue, 0);
   const avgRating = courses.length > 0 ? (courses.reduce((sum, course) => sum + course.rating, 0) / courses.length).toFixed(1) : 0;
@@ -93,7 +126,7 @@ export default function InstructorDashboard() {
     <>
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header Stats */}
+        
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 text-white">
             <div className="flex items-center justify-between">
@@ -133,7 +166,6 @@ export default function InstructorDashboard() {
           </div>
         </div>
 
-        {/* Profile */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-8 border border-white/20">
           <div className="flex flex-col lg:flex-row items-center justify-between">
             <div className="flex items-center space-x-6 mb-6 lg:mb-0">
@@ -205,7 +237,7 @@ export default function InstructorDashboard() {
           </div>
         </div>
 
-        {/* Add Course Button */}
+       
         <div className="flex justify-between items-center mb-8">
           <h3 className="text-2xl font-bold text-gray-800">Your Courses</h3>
           <button
@@ -217,7 +249,7 @@ export default function InstructorDashboard() {
           </button>
         </div>
 
-        {/* Add Course Panel */}
+        
         {showAddForm && (
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-8 border border-white/20">
             <div className="flex justify-between items-center mb-6">
@@ -285,7 +317,7 @@ export default function InstructorDashboard() {
           </div>
         )}
 
-        {/* Courses Grid */}
+        
         <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
           {courses.map((course) => (
             <div
@@ -362,7 +394,6 @@ export default function InstructorDashboard() {
                         <span>{course.students} students</span>
                       </span>
                       <span className="flex items-center space-x-2 text-sm font-medium text-green-600">
-                       
                         <span>₹{course.revenue.toLocaleString()}</span>
                       </span>
                     </div>
@@ -393,13 +424,67 @@ export default function InstructorDashboard() {
                     )}
                   </div>
 
-                  <button
-                    onClick={() => setEditingCourse(course.id)}
-                    className="w-full bg-purple-600 hover:bg-purple-500 text-white py-3 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
-                  >
-                    <Edit3 className="w-4 h-4" />
-                    <span>Edit Course</span>
-                  </button>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => setEditingCourse(course.id)}
+                      className="w-full bg-purple-600 hover:bg-purple-500 text-white py-3 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                      <span>Edit Course</span>
+                    </button>
+                    
+                    <button
+                      onClick={() => toggleStudentView(course.id)}
+                      className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
+                    >
+                      <Eye className="w-4 h-4" />
+                      <span>View Students</span>
+                      {expandedCourse === course.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </button>
+                  </div>
+
+                  {/* Student List */}
+                  {expandedCourse === course.id && (
+                    <div className="mt-4 space-y-3 border-t pt-4">
+                      <h5 className="font-medium text-gray-800 mb-3">Enrolled Students ({course.enrolledStudents.length})</h5>
+                      {course.enrolledStudents.length === 0 ? (
+                        <p className="text-gray-500 text-sm">No students enrolled yet.</p>
+                      ) : (
+                        <div className="max-h-60 overflow-y-auto space-y-2">
+                          {course.enrolledStudents.map((student) => (
+                            <div key={student.id} className="bg-gray-50 rounded-lg p-3 flex items-center justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center space-x-3">
+                                  <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+                                    <User className="w-4 h-4 text-indigo-600" />
+                                  </div>
+                                  <div>
+                                    <p className="font-medium text-sm text-gray-800">{student.name}</p>
+                                    <p className="text-xs text-gray-500">{student.email}</p>
+                                  </div>
+                                </div>
+                                <div className="mt-2 flex items-center justify-between">
+                                  <span className="text-xs text-gray-500">
+                                    Enrolled: {new Date(student.enrolledDate).toLocaleDateString()}
+                                  </span>
+                                  <span className="text-xs text-gray-600">
+                                    Progress: {student.progress}%
+                                  </span>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => removeStudent(course.id, student.id)}
+                                className="ml-3 bg-red-100 hover:bg-red-200 text-red-600 p-2 rounded-lg transition-colors duration-200"
+                                title="Remove student"
+                              >
+                                <UserMinus className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </>
               )}
             </div>
