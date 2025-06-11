@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CourseCard from '../assets/Models/CourseCard';
 import CourseCategory from '../assets/Models/CourseCategory';
 import Instructors from '../assets/Models/Instructor';
@@ -10,6 +10,7 @@ import { FiSearch } from "react-icons/fi";
 import { FaTimes } from "react-icons/fa";
 import Pagination from '../assets/Models/Pagination'; 
 import Footer from '../components/Footer'
+import axios from 'axios';
 
 export default function Courses() {
   const [search, setSearch] = useState("");
@@ -60,6 +61,15 @@ export default function Courses() {
   const indexOfLastCourse = currentPage * coursesPerPage;
   const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
   const currentCourses = filteredCourses.slice(indexOfFirstCourse, indexOfLastCourse);
+
+const [courseData,setCourseData]=useState([]);
+  useEffect(()=>{
+    axios.get('').then((res)=>{
+      setCourseData(res.data);
+    }).catch((err)=>{
+      console.error("Error fetching courses:",err);
+    })
+  },[])
 
   return (
     <>

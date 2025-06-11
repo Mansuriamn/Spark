@@ -1,4 +1,5 @@
-import React from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 
 function LiveSessionsPage() {
   const liveSessions = [
@@ -33,6 +34,14 @@ function LiveSessionsPage() {
       link: '#'
     },
   ];
+  const [sessionData,setSessionData]=useState([]);
+  useEffect(()=>{
+    axios.get("").then((res)=>{
+      setSessionData(res.data);
+    }).catch((err)=>{
+      console.error("Error feching live sessions:",err);
+    })
+  },[])
 
   return (
     <div className="container mx-auto py-8 md:py-12 space-y-8 md:space-y-12">

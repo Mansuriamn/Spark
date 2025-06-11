@@ -6,7 +6,7 @@ import logo2 from '../assets/img/logo2.svg';
 import { useNavigate } from 'react-router-dom';
 import img from '../assets/img/imgheader.png';
 
-export default function Register() {
+export default function Register({setLogin}) {
   const navigate=useNavigate();
 
   const [formData, setFormData] = useState({

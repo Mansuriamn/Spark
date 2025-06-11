@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import img from '../assets/img/imgheader.png';
 
 
-export default function Login() {
+export default function Login({setLogin}) {
         const navigate =useNavigate();
   const [loginData, setLoginData] = useState({
     email: '',

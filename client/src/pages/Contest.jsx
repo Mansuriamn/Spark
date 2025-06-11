@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { 
   FaTrophy, 
   FaCode, 
@@ -12,6 +12,7 @@ import {
   FaTimes
 } from 'react-icons/fa';
 import Footer from '../components/Footer';
+import axios from 'axios';
 
 const Contest = () => {
   const [activeFilter, setActiveFilter] = useState('all');
@@ -169,6 +170,15 @@ const Contest = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isFilterOpen]);
+  const [ContestData,setContestData]=useState([]);
+  useEffect(()=>{
+    axios.get("").then((res)=>{
+      setContestData(res.data);
+
+    }).catch((err)=>{
+      console.error("Error fetching Contest sessions:",err)
+    })
+  },[])
 
   return (
     <>

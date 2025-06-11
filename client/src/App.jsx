@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import CoursesPage from './pages/Home';
@@ -20,6 +20,7 @@ import PathToProficiency from './components/Practiceinside';
 
 /** hey don;t mind */
 function App() {
+  const [login, setLogin] = useState(false);
    return (
      <Router>
      
@@ -45,8 +46,8 @@ function App() {
            { /* Home page - tracklist dynamic routing */ }
            <Route path="/track/:trackName" element={<Trackdetails />} />
            <Route path ='/progressupdate' element={<MyCoursesPage/>}/>
-           <Route path='/Login' element={<Login />}/>
-           <Route path='/Register' element={<Register />} />
+           <Route path='/Login' element={<Login setLogin={setLogin} />}/>
+           <Route path='/Register' element={<Register setLogin={setLogin} />} />
            <Route path='/profile' element={<UserProfile/>}/>
            <Route path='/video' element={<VideoDashboard/>}></Route>
           

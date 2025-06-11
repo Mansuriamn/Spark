@@ -92,6 +92,16 @@ function Card({ practice, handleClick }) {
     Advanced: "#b91c1c",
   };
 
+  const[practiceData,setPracData]=useState([]);
+  useEffect(()=>{
+    axios.get("").then((res)=>{
+      setPracData(res.data);
+
+    }).catch((err)=>{
+      console.error("Error fetching practice data:",err);
+    })
+  },[])
+
   return (
     <>
     <div className="practice-card">

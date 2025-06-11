@@ -4,8 +4,19 @@ import ProgressCard from '../components/Progresscard';
 import CourseCard from '../components/Course';
 import ScheduleCard from '../components/Schedulecard';
 import Footer from '../components/Footer';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const Dashboard = () => {
+  const [DashData,setDashData]=useState([]);
+  useEffect(()=>{
+    axios.get("").then((res)=>{
+      setDashData(res.data);
+
+    }).catch((err)=>{
+      console.error("Error fetching dashboard data:",err);
+    })
+  },[])
   return (
     <>
       <div className="min-h-screen bg-gray-100 p-4">
