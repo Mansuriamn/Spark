@@ -50,7 +50,7 @@ export default function CourseCard({ course }) {
     </div>
 
     <div className="flex items-center justify-between mt-2">
-      <span className="text-gray-400 line-through">${course.originalPrice}</span>
+      <span className="text-gray-400 ">${course.originalPrice}</span>
       <span className="text-green-600 font-bold">{course.price}</span>
       <button
         onClick={(e) => {

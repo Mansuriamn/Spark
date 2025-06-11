@@ -17,6 +17,7 @@ import VideoDashboard from './components/VideoDashboard';
 import WebRTCMeeting from './components/WebRTCMeeting';
 import Practice from './pages/Practice';
 import PathToProficiency from './components/Practiceinside';
+import InstructorDashboard from './components/Instructorpage';
 
 /** hey don;t mind */
 function App() {
@@ -53,7 +54,7 @@ function App() {
           
           <Route path='/practice' element={<Practice/>}></Route>
           <Route path='/practiceinside' element={<PathToProficiency/>}></Route>
-        
+          <Route path='/instructor' element={<InstructorDashboard/>}></Route>
          </Routes>
         </main>
         

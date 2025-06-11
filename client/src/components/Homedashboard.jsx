@@ -130,9 +130,7 @@ const AchievementCard = ({ achievement }) => {
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200 hover:-translate-y-1 h-full flex flex-col">
       <div className="flex items-center mb-4">
-        <div className={`w-12 h-12 rounded-xl ${achievement.bgColor} flex items-center justify-center mr-3 text-white shadow-lg`}>
-          {achievement.icon}
-        </div>
+        
         <div className="flex-1">
           <h3 className="font-bold text-gray-800 text-lg">{achievement.title}</h3>
           <div className="text-sm text-gray-500">{achievement.count}</div>
