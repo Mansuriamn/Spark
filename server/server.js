@@ -10,24 +10,44 @@ import courseRoutes from './routes/courseRoutes.js';
 import lessonRoutes from './routes/lessonRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import meetingRouter from "./routes/meetingRouter.js"
+import trackRoutes from './routes/trackRoutes.js'
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: 'http://localhost:3001', credentials: true }));
+app.use(cors({ origin: ['http://localhost:3001',  'http://localhost:3002'],credentials: true }));
 app.use(express.json());
 const PORT = process.env.PORT || 5000;
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:3001',
+    origin:['http://localhost:3001', 'http://localhost:3002'], 
     methods: ['GET', 'POST'],
     credentials: true,
   },
 });
+
+
 connectDB();
+/////extra
+app.use((err, _req, res, _next) => {
+  console.error('❌ ERROR:', err.stack);
+  if (err.name === 'CastError') {
+    return res.status(400).json({ message: 'Invalid ID format' });
+  }
+  res.status(500).json({ message: err.message });
+});
+app.use((err, _req, res, _next) => {
+  if (err.name === 'CastError') {
+    return res.status(400).json({ message: 'Invalid ID format' });
+  }
+  console.error(err.stack);
+  res.status(500).json({ message: err.message });
+});
+
 // Example usage in a React component
+app.use(cors({ origin: true, credentials: true }));
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));  // allow nested objects in request body
@@ -75,4 +95,5 @@ app.use('/api/users', userRoutes);  // serve user routes
 app.use('/api/courses', courseRoutes);
 app.use('/api/lessons', lessonRoutes);
 app.use('/api/meetings', meetingRouter)
+app.use('/api/tracks', trackRoutes);
 

@@ -58,7 +58,7 @@ function SuccessStoriesSection() {
     fetchCourses();
   }, []);
 
-  // Optionally, map backend course data to match CourseCard props if needed
+ 
   const renderCourses = Array.isArray(courses)
     ? courses.map((course) => (
         <CourseCard
