@@ -1,12 +1,8 @@
-<<<<<<< Updated upstream
 import { User } from '../models/User.js';
 import { Course } from '../models/Course.js';
 import bcrypt from 'bcrypt';
-=======
->>>>>>> Stashed changes
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
-import { User } from '../models/User.js';
+
 import dotenv from 'dotenv';
 
 export const registerUser = async (req, res) => {
@@ -57,7 +53,6 @@ export const softDeleteUser = async (req, res) => {
   }
 };
 
-<<<<<<< Updated upstream
 // In userController.js
 export const enrollInCourse = async (req, res) => {
   try {
@@ -110,7 +105,6 @@ export const getCompletedCoursesCount = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-=======
 export const changeUserRole = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -138,4 +132,3 @@ export const getAllInstructors = async (req, res) => {
   }
 };
 
->>>>>>> Stashed changes
