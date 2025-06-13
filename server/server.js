@@ -11,6 +11,7 @@ import lessonRoutes from './routes/lessonRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import meetingRouter from "./routes/meetingRouter.js"
 import trackRoutes from './routes/trackRoutes.js'
+import contestRoutes from './routes/contestRoutes.js';
 
 dotenv.config();
 
@@ -96,4 +97,4 @@ app.use('/api/courses', courseRoutes);
 app.use('/api/lessons', lessonRoutes);
 app.use('/api/meetings', meetingRouter)
 app.use('/api/tracks', trackRoutes);
-
+app.use('/api/contests', contestRoutes);
