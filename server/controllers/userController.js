@@ -1,7 +1,16 @@
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import { User } from '../models/User.js';
 import { Course } from '../models/Course.js';
 import bcrypt from 'bcrypt';
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import { User } from '../models/User.js';
+import dotenv from 'dotenv';
 
 export const registerUser = async (req, res) => {
   try {
@@ -51,6 +60,8 @@ export const softDeleteUser = async (req, res) => {
   }
 };
 
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 // In userController.js
 export const enrollInCourse = async (req, res) => {
   try {
@@ -103,3 +114,37 @@ export const getCompletedCoursesCount = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+=======
+=======
+>>>>>>> Stashed changes
+export const changeUserRole = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { role } = req.body;
+    const validRoles = ['user', 'instructor', 'admin'];
+    if (!validRoles.includes(role)) {
+      return res.status(400).json({ message: 'Invalid role specified' });
+    }
+    const user = await User.findByIdAndUpdate(userId, { role }, { new: true });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json({ message: 'User role updated successfully', user });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getAllInstructors = async (req, res) => {
+  try {
+    const instructors = await User.find({ role: 'instructor', deleted: false });
+    res.status(200).json(instructors);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes

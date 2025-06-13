@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import axios from 'axios';
+import React, { useState } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "../assets/style/Practice.css";
 import { useNavigate } from "react-router-dom";
@@ -12,40 +11,121 @@ export default function Practice() {
     navigate("/practiceinside");
   };
 
-  const practiceTopics = [
-    {
-      topic: "Path to Proficiency",
-      difficulty: "Intermediate",
-      progress: "0",
-      totalProblems: 22,
-      about:
-        "Enhance your problem-solving skills with more complex data structures and algorithms.",
-    },
-    {
-      topic: "DSA Mastery",
-      difficulty: "Beginner",
-      progress: "25",
-      totalProblems: 30,
-      about:
-        "Learn core data structures and algorithms from scratch with examples.",
-    },
-    {
-      topic: "Advanced Challenges",
-      difficulty: "Advanced",
-      progress: "0",
-      totalProblems: 18,
-      about:
-        "Challenge yourself with hard-level coding questions for competitive programming.",
-    },
-  ];
+  const [practiceTopics] = useState([
+  {
+    topic: "Path to Proficiency",
+    difficulty: "Intermediate",
+    progress: "0",
+    totalProblems: 22,
+    about: "Enhance your problem-solving skills with more complex data structures and algorithms.",
+  },
+  {
+    topic: "DSA Mastery",
+    difficulty: "Beginner",
+    progress: "25",
+    totalProblems: 30,
+    about: "Learn core data structures and algorithms from scratch with examples.",
+  },
+  {
+    topic: "Advanced Challenges",
+    difficulty: "Advanced",
+    progress: "0",
+    totalProblems: 18,
+    about: "Challenge yourself with hard-level coding questions for competitive programming.",
+  },
+  {
+    topic: "Recursion Fundamentals",
+    difficulty: "Beginner",
+    progress: "10",
+    totalProblems: 15,
+    about: "Understand recursion through visual explanations and step-by-step code walkthroughs.",
+  },
+  {
+    topic: "Sorting Algorithms",
+    difficulty: "Intermediate",
+    progress: "5",
+    totalProblems: 20,
+    about: "Master bubble, quick, merge, and heap sort through practical challenges.",
+  },
+  {
+    topic: "Dynamic Programming",
+    difficulty: "Advanced",
+    progress: "0",
+    totalProblems: 25,
+    about: "Solve complex problems using optimal substructure and memoization.",
+  },
+  {
+    topic: "Graph Theory Essentials",
+    difficulty: "Intermediate",
+    progress: "8",
+    totalProblems: 18,
+    about: "Explore BFS, DFS, and shortest path algorithms with real-world use cases.",
+  },
+  {
+    topic: "String Manipulation",
+    difficulty: "Beginner",
+    progress: "3",
+    totalProblems: 12,
+    about: "Learn how to work efficiently with strings and character arrays.",
+  },
+  {
+    topic: "Bit Manipulation",
+    difficulty: "Intermediate",
+    progress: "0",
+    totalProblems: 10,
+    about: "Dive into bitwise operations and how they help in algorithm optimization.",
+  },
+  {
+    topic: "Greedy Algorithms",
+    difficulty: "Intermediate",
+    progress: "7",
+    totalProblems: 14,
+    about: "Learn to make the best local choice for optimal global results.",
+  },
+  {
+    topic: "Backtracking Techniques",
+    difficulty: "Advanced",
+    progress: "0",
+    totalProblems: 16,
+    about: "Solve constraint-based problems using recursion and pruning.",
+  },
+  {
+    topic: "Searching Algorithms",
+    difficulty: "Beginner",
+    progress: "10",
+    totalProblems: 9,
+    about: "Understand linear and binary search with variations in sorted arrays.",
+  },
+  {
+    topic: "Linked List Mastery",
+    difficulty: "Intermediate",
+    progress: "4",
+    totalProblems: 21,
+    about: "Work with singly, doubly, and circular linked lists effectively.",
+  },
+  {
+    topic: "Tree Traversals",
+    difficulty: "Intermediate",
+    progress: "0",
+    totalProblems: 19,
+    about: "Explore DFS, BFS, inorder, preorder, and postorder traversals.",
+  },
+  {
+    topic: "Stack & Queue",
+    difficulty: "Beginner",
+    progress: "6",
+    totalProblems: 13,
+    about: "Understand and implement stack and queue data structures for various problems.",
+  },
+  {
+    topic: "Sliding Window Problems",
+    difficulty: "Advanced",
+    progress: "2",
+    totalProblems: 17,
+    about: "Learn this powerful technique to solve array and string problems efficiently.",
+  }
+]);
 
-  const sectionTitles = [
-    "Kodnest 75",
-    "Advanced Algorithm Techniques",
-    "SQL Power Play",
-    "Algorithmic Journey",
-    "Sorting Algorithms",
-  ];
 
   const [select, setSelect] = useState("All");
 
@@ -53,11 +133,15 @@ export default function Practice() {
     setSelect(e.target.value);
   };
 
+  const filteredCollection =
+    select === "All"
+      ? practiceTopics
+      : practiceTopics.filter((item) => item.difficulty === select);
+
   return (
     <>
       <div className="filter-wrapper">
         <select className="filter-select" value={select} onChange={handle}>
-          <option value="Difficulty">Select Difficulty</option>
           <option value="All">All</option>
           <option value="Beginner">Beginner</option>
           <option value="Intermediate">Intermediate</option>
@@ -65,16 +149,14 @@ export default function Practice() {
         </select>
       </div>
 
-      {sectionTitles.map((title, idx) => (
-        <div className="practice-container" key={idx}>
-          <h2 className="practice-title">{title}</h2>
-          <div className="card-grid">
-            {practiceTopics.map((practice, index) => (
-              <Card key={index} practice={practice} handleClick={handleClick} />
-            ))}
-          </div>
+      <div className="practice-container">
+        <h2 className="practice-title">Practice Topics</h2>
+        <div className="card-grid">
+          {filteredCollection.map((practice, index) => (
+            <Card key={index} practice={practice} handleClick={handleClick} />
+          ))}
         </div>
-      ))}
+      </div>
     </>
   );
 }
@@ -92,18 +174,7 @@ function Card({ practice, handleClick }) {
     Advanced: "#b91c1c",
   };
 
-  const[practiceData,setPracData]=useState([]);
-  useEffect(()=>{
-    axios.get("").then((res)=>{
-      setPracData(res.data);
-
-    }).catch((err)=>{
-      console.error("Error fetching practice data:",err);
-    })
-  },[])
-
   return (
-    <>
     <div className="practice-card">
       <div className="card-header">
         <div className="card-information">
@@ -136,7 +207,7 @@ function Card({ practice, handleClick }) {
         </div>
         <p className="practice-about">{practice.about}</p>
         <div className="progress-container">
-          <span className="progress-label">{practice.progress}%</span>
+          {/* <span className="progress-label">{practice.progress}%</span> */}
           <div className="progress-bar">
             <div
               className="progress-fill"
@@ -158,7 +229,5 @@ function Card({ practice, handleClick }) {
         </div>
       </div>
     </div>
-    
-    </>
   );
 }
