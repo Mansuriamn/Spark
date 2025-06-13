@@ -208,7 +208,7 @@ function Card({ practice, handleClick }) {
         </div>
         <p className="practice-about">{practice.about}</p>
         <div className="progress-container">
-          <span className="progress-label">{practice.progress}%</span>
+          {/* <span className="progress-label">{practice.progress}%</span> */}
           <div className="progress-bar">
             <div
               className="progress-fill"
