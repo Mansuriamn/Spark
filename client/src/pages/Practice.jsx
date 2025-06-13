@@ -142,7 +142,6 @@ export default function Practice() {
     <>
       <div className="filter-wrapper">
         <select className="filter-select" value={select} onChange={handle}>
-          <option value="All">Select Difficulty</option>
           <option value="All">All</option>
           <option value="Beginner">Beginner</option>
           <option value="Intermediate">Intermediate</option>
