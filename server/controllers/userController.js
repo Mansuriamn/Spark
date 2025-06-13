@@ -1,7 +1,10 @@
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import { User } from '../models/User.js';
 import { Course } from '../models/Course.js';
 import bcrypt from 'bcrypt';
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 import jwt from 'jsonwebtoken';
@@ -58,6 +61,7 @@ export const softDeleteUser = async (req, res) => {
 };
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 // In userController.js
 export const enrollInCourse = async (req, res) => {
   try {
@@ -111,6 +115,8 @@ export const getCompletedCoursesCount = async (req, res) => {
   }
 };
 =======
+=======
+>>>>>>> Stashed changes
 export const changeUserRole = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -138,4 +144,7 @@ export const getAllInstructors = async (req, res) => {
   }
 };
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
