@@ -6,7 +6,7 @@ import NewsletterSection from '../components/Newsletter';
 
 import TrackList from '../components/Finalcoursecard';
 import Footer from '../components/Footer';
-import LearningDashboard from '../components/homedashboard';
+import LearningDashboard from '../components/Homedashboard';
 import axios from 'axios';
 
 function CoursesPage({UserId}) {
