@@ -251,10 +251,10 @@ export default function LearningDashboard({UserId}) {
           totalRes,
           hoursRes
         ] = await Promise.all([
-          axios.get(`http://localhost:5000/api/users/${UserId}/completed-courses-count`),
-          axios.get(`http://localhost:5000/api/users/${UserId}/in-progress-courses-count`),
-          axios.get(`http://localhost:5000/api/users/${UserId}/total-courses-count`),
-          axios.get(`http://localhost:5000/api/users/${UserId}/learning-hours`)
+          axios.get(`api/users/${UserId}/completed-courses-count`),
+          axios.get(`api/users/${UserId}/in-progress-courses-count`),
+          axios.get(`api/users/${UserId}/total-courses-count`),
+          axios.get(`api/users/${UserId}/learning-hours`)
         ]);
 
         setStats([
