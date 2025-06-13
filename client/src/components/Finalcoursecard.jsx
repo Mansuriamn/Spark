@@ -81,16 +81,21 @@ const TrackList = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/tracks")
-      .then((res) => res.json())
-      .then((data) => {
-        setTracks(data);
+    const fetchTracks = async () => {
+      try {
+        const response = await fetch('/api/tracks'); 
+        const data = await response.json();
+        setTracks(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Error");
+        console.error("Error fetching tracks:", error);
+        setTracks([]); //fallback data add karna h
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching tracks:", err);
-        setLoading(false);
-      });
+      }
+    };
+
+    fetchTracks();
   }, []);
 
   return (
@@ -103,13 +108,14 @@ const TrackList = () => {
         <p className="text-center text-gray-500">Loading tracks...</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
-          {tracks.map((track, index) => (
+          {tracks.map((track) => { const{key, ...rest}=track; 
+          return(
             <TrackCard
-              key={index}
-              {...track}
-              icon={iconMap[track.key.toLowerCase()] || <FaCode className="text-gray-400 text-xl" />}
+              key={key}
+              {...rest}
+              icon={iconMap[key.toLowerCase()] || <FaCode className="text-gray-400 text-xl" />}
             />
-          ))}
+          )})}
         </div>
       )}
     </div>

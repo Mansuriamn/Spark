@@ -79,7 +79,7 @@ function SuccessStoriesSection() {
         Success stories
       </h2>
 
-      {/* Main success story */}
+      
       <div className="bg-purple-50 p-6 rounded-lg shadow-md mb-12 flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
         <img
           src="https://randomuser.me/api/portraits/men/7.jpg"
