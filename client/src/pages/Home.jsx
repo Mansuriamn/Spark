@@ -9,7 +9,7 @@ import Footer from '../components/Footer';
 import LearningDashboard from '../components/homedashboard';
 import axios from 'axios';
 
-function CoursesPage() {
+function CoursesPage({UserId}) {
   const [HomeData,setHomeData]=useState([]);
   useEffect(()=>{
     axios.get("").then((res)=>{
@@ -26,7 +26,7 @@ function CoursesPage() {
       </section>
       
       <section className="relative bg-white rounded-xl shadow-lg p-6 md:p-10 container mx-auto">
-        <LearningDashboard/>
+        <LearningDashboard UserId={UserId} />
       </section>
       <section className="relative bg-white rounded-xl shadow-lg p-6 md:p-10 container mx-auto">
         <TrackList />
