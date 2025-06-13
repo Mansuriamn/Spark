@@ -1,4 +1,5 @@
 import { User } from '../models/User.js';
+import { Course } from '../models/Course.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
@@ -45,6 +46,59 @@ export const softDeleteUser = async (req, res) => {
     }
 
     res.status(200).json({ message: 'User soft deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// In userController.js
+export const enrollInCourse = async (req, res) => {
+  try {
+    const { userId, courseId } = req.body;
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $addToSet: { enrolledCourses: courseId } },
+      { new: true }
+    ).populate('enrolledCourses');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// Returns the number of courses a user has enrolled in
+export const getEnrolledCoursesCount = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    const count = user.enrolledCourses.length;
+    res.json({ enrolledCoursesCount: count });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getCompletedCoursesCount = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Get all enrolled courses with their lessons
+    const courses = await Course.find({ _id: { $in: user.enrolledCourses } }).populate('lessons');
+    let completedCount = 0;
+
+    for (const course of courses) {
+      const lessonIds = course.lessons.map(lesson => lesson._id.toString());
+      const completedLessonIds = user.completedLessons ? user.completedLessons.map(id => id.toString()) : [];
+      // Check if every lesson in the course is in user's completedLessons
+      const allLessonsCompleted = lessonIds.every(id => completedLessonIds.includes(id));
+      if (allLessonsCompleted && lessonIds.length > 0) completedCount++;
+    }
+
+    res.json({ completedCoursesCount: completedCount });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

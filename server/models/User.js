@@ -22,6 +22,15 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     }
+    ,enrolledCourses: [
+        { type: mongoose.Schema.Types.ObjectId, ref: 'Course' }
+    ],achievements: [
+        { type: mongoose.Schema.Types.ObjectId, ref: 'Achievement' }
+    ],
+    completedLessons: [
+  { type: mongoose.Schema.Types.ObjectId, ref: 'Lesson' }
+]
+
 });
 
 export const User = mongoose.model('User', userSchema);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import CoursesPage from './pages/Home';
@@ -18,10 +18,15 @@ import WebRTCMeeting from './components/WebRTCMeeting';
 import Practice from './pages/Practice';
 import PathToProficiency from './components/Practiceinside';
 import InstructorDashboard from './components/Instructorpage';
+import axios from 'axios';
 
 /** hey don;t mind */
 function App() {
   const [login, setLogin] = useState(false);
+  const [UserId,setUserId]=useState('684bccd97c61555addc4f460');
+  const [Token,setToken]=useState('');
+
+
    return (
      <Router>
      
@@ -37,7 +42,7 @@ function App() {
              <Route path="/meeting/:roomName" element={<WebRTCMeeting userName="Roshan" />} />
 
         <Route path="/" element={<CoursesPage />} />
-          <Route path="/home" element={<CoursesPage />} />
+          <Route path="/home" element={<CoursesPage UserId={UserId} />} />
           <Route path='/courses' element={<Courses/>}/>
            <Route path="/dashboard" element={<DashboardPage />} />
            <Route path="/live-sessions" element={<LiveSessionsPage />} />
