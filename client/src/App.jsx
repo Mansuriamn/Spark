@@ -31,7 +31,7 @@ function AppWrapper() {
   const [Token, setToken] = useState('');
 
 
-  const hideNavbarRoutes = [ '/', '/login', '/register'];
+  const hideNavbarRoutes = [ '/', '/login', '/Register'];
 
   const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
 
