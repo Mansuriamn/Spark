@@ -53,6 +53,7 @@ export default function Login() {
   };
 
   return (
+   <div className='bg-purple-50 min-h-screen flex items-center justify-center'>
     <div className='contain_both'>
       <img className='contain_both_img' src={img} alt='img' />
       <div className="container1">
@@ -101,6 +102,6 @@ export default function Login() {
           </form>
         </div>
       </div>
-    </div>
+    </div></div>
   );
 }

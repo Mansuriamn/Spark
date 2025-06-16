@@ -8,7 +8,7 @@ export default function HelpAndEarn() {
   return (
     <section className="w-[95%] max-w-2xl mx-auto py-10">
       <h2 className="text-center text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-purple-500 to-pink-500 text-transparent bg-clip-text">
-        KodNest Help and Earn Program
+        LearnoHu Refer and Earn Program
       </h2>
 
       {/* Referral Bonus Card */}
