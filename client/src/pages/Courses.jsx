@@ -315,6 +315,7 @@ import LevelFilter from '../assets/Models/LeaveFilter';// Assuming your file is 
 import { FiSearch } from "react-icons/fi";
 import Pagination from '../assets/Models/Pagination'; // Ensure this path is correct
 import Footer from '../components/Footer'; // Ensure this path is correct
+import axios from 'axios';
 
 export default function Courses() {
   const [search, setSearch] = useState("");
@@ -345,7 +346,7 @@ export default function Courses() {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
         const data = await res.json(); // Parse the JSON response
-        
+       
         // Assuming your API returns data in the format { data: [...] }
         // Adjust `data.data` if your API response structure is different (e.g., just `data`)
         setAllCourses(Array.isArray(data.data) ? data.data : []); 
@@ -357,6 +358,10 @@ export default function Courses() {
       }
     };
     fetchCourses();
+
+
+   
+
   }, []); // Empty dependency array ensures this runs only once on mount
 
   // Handles changes from filter components (e.g., category, instructor, price)
@@ -394,6 +399,7 @@ export default function Courses() {
 
   // Calculate total pages for pagination based on filtered courses
   const totalPages = Math.ceil(filteredCourses.length / coursesPerPage);
+ 
 
   // Determine which courses to display on the current page
   const indexOfLastCourse = currentPage * coursesPerPage;
@@ -445,7 +451,7 @@ export default function Courses() {
               currentCourses.map((course) => (
                 
                 // Use `_id` as key if your API provides it, otherwise fallback to `id`
-                <CourseCard key={course._id || course.id} course={course}  /> 
+                <CourseCard key={course._id || course.id} course={course}  totalPages={totalPages}/> 
               ))
             ) : (
               // Message if no courses are found after loading/filtering

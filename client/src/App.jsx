@@ -29,6 +29,7 @@ function App() {
 
 
 <<<<<<< Updated upstream
+
    return (
      <Router>
      
@@ -45,6 +46,7 @@ function App() {
 =======
   const hideNavbarRoutes = [ '/', '/Login', '/Register'];
 >>>>>>> Stashed changes
+
 
         <Route path="/" element={<CoursesPage />} />
           <Route path="/home" element={<CoursesPage UserId={UserId} />} />

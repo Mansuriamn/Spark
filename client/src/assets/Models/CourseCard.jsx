@@ -2,7 +2,7 @@ import React from 'react';
 import { FaClock, FaUsers, FaChartBar, FaBook } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import '../style/CourseCard.css'
-export default function CourseCard({ course }) {
+export default function CourseCard({ course , totalPages}) {
   const navigate = useNavigate();
 
   const handleNavigation = () => {
@@ -44,7 +44,7 @@ export default function CourseCard({ course }) {
         </div>
         <div className="flex items-center gap-1">
           <FaBook className="text-orange-500" />
-          <span>{course.lessons} Lessons</span>
+          <span> Lessons :  { totalPages}</span>
         </div>
       </div>
     </div>
