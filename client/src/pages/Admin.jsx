@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User, Save, X, Edit3 } from 'lucide-react';
-
+import '../assets/style/Admin.css';
 export default function Admin() {
          // State declarations should be at the top of the component
          const [instructors, setInstructors] = useState([
