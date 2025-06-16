@@ -12,6 +12,8 @@ changeUserRole, getAllInstructors,
 getInProgressCoursesCount,
  getTotalCoursesCount,
 } from '../controllers/userController.js';
+
+import { changeUserRole, getAllInstructors } from '../controllers/userController.js';
 import { loginUser } from '../controllers/loginController.js'
 
 const router = express.Router();

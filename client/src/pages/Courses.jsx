@@ -64,8 +64,8 @@ export default function Courses() {
 
 const [courseData,setCourseData]=useState([]);
   useEffect(()=>{
-    axios.get('').then((res)=>{
-      setCourseData(res.data);
+    axios.get('http://localhost:5000/api/lessons').then((res)=>{
+      setCourseData("Data get successfully",res.data);
     }).catch((err)=>{
       console.error("Error fetching courses:",err);
     })

@@ -1,8 +1,11 @@
-
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import { User } from '../models/User.js';
 import { Course } from '../models/Course.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import { User } from '../models/User.js';
 import dotenv from 'dotenv';
 
 export const registerUser = async (req, res) => {
@@ -53,7 +56,8 @@ export const softDeleteUser = async (req, res) => {
   }
 };
 
-
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 // In userController.js
 export const enrollInCourse = async (req, res) => {
   try {
