@@ -1,15 +1,15 @@
-import React, { useState,useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import '../assets/style/Login.css';
 import logo4 from '../assets/img/logo4.jpg';
 import logo3 from '../assets/img/logo3.jpg';
 import logo2 from '../assets/img/logo2.svg';
 import { useNavigate } from 'react-router-dom';
 import img from '../assets/img/imgheader.png';
-import { AuthContext } from '../pages/AuthContext'; 
+import { AuthContext } from '../pages/AuthContext';
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext); 
+  const { login } = useContext(AuthContext);
 
   const [loginData, setLoginData] = useState({
     email: '',
@@ -33,9 +33,17 @@ export default function Login() {
       const data = await res.json();
 
       if (res.ok) {
-        login(data.user, data.token); 
-        alert('Login successful!');
-        navigate('/');
+        login(data.user, data.token);
+
+        const selectedRole = localStorage.getItem('selectedRole');
+
+        if (selectedRole === 'student') {
+          navigate('/home');
+        } else if (selectedRole === 'instructor') {
+          navigate('/home');
+        } else {
+          navigate('/Main');
+        }
       } else {
         alert(data.message || 'Login failed');
       }
@@ -43,6 +51,7 @@ export default function Login() {
       alert('Error: ' + err.message);
     }
   };
+
   return (
     <div className='contain_both'>
       <img className='contain_both_img' src={img} alt='img' />

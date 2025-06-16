@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect,useContext } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate ,useLocation} from 'react-router-dom';
 import { FaBell, FaBars, FaTimes, FaCog, FaUser, FaSignOutAlt, FaChevronRight } from 'react-icons/fa';
 import UserProfile from './Userprofile';
 import {AuthContext} from '../pages/AuthContext'; 
@@ -9,9 +9,10 @@ import { Bell, Menu, X, Settings, User, LogOut, ChevronRight } from 'lucide-reac
 export default function Navbar() {
 
     const {
-    user,
-    logout
-  } = useContext(AuthContext); 
+    user,logout} = useContext(AuthContext); 
+    
+const location = useLocation();
+const role = localStorage.getItem('selectedRole');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [helpEarnOpen, setHelpEarnOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -28,26 +29,6 @@ export default function Navbar() {
   const settingsRef = useRef(null);
   const navigate = useNavigate();
 
-  //auth banana h 
-  useEffect(() => {
-    const checkUserAuth = () => {
-      try {
-        const userData = localStorage.getItem('userData');
-        const token = localStorage.getItem('authToken');
-        
-        if (userData && token) {
-          setUser(JSON.parse(userData));
-        }
-      } catch (error) {
-        console.error('Error parsing user data:', error);
-        
-        localStorage.removeItem('userData');
-        localStorage.removeItem('authToken');
-      }
-    };
-    
-    checkUserAuth();
-  }, []);
 
   useEffect(() => {
     const close = (e) => {
@@ -81,7 +62,7 @@ export default function Navbar() {
   };
 
   const handleSignup = () => {
-    // Navigate to signup page
+    
     navigate('/register');
     console.log('Navigating to signup page');
   };
@@ -93,6 +74,16 @@ export default function Navbar() {
     setUser(null);
     setDropdownOpen(false);
     console.log('User logged out');
+  };
+
+  // Handle profile navigation based on role
+  const handleProfileNavigation = () => {
+    setDropdownOpen(false);
+    if (role === 'instructor') {
+      navigate('/instructor');
+    } else {
+      navigate('/profile');
+    }
   };
 
  
@@ -299,12 +290,13 @@ export default function Navbar() {
                     <div className="py-2">
                       <button
                         className="w-full flex items-center justify-between px-4 py-3 text-sm hover:bg-gray-50 transition-colors"
-                        
-                        onClick={() => { setDropdownOpen(false); navigate('/profile'); }}
+                        onClick={handleProfileNavigation}
                       >
                         <div className="flex items-center space-x-3">
                           <User className="text-gray-500" />
-                          <span className="text-gray-700">My Profile</span>
+                          <span className="text-gray-700">
+                            {role === 'instructor' ? 'Instructor Profile' : 'My Profile'}
+                          </span>
                         </div>
                         <ChevronRight className="text-gray-400 text-xs" />
                       </button>
@@ -501,11 +493,13 @@ export default function Navbar() {
                 </div>
                        <button
                     className="w-full flex items-center justify-between px-4 py-3 text-sm hover:bg-gray-50 transition-colors"
-                    onClick={() => { setDropdownOpen(false); navigate('/profile'); }}
+                    onClick={handleProfileNavigation}
                   >
                     <div className="flex items-center space-x-3">
                       <FaUser className="text-gray-500" />
-                      <span className="text-gray-700">My Profile</span>
+                      <span className="text-gray-700">
+                        {role === 'instructor' ? 'Instructor Profile' : 'My Profile'}
+                      </span>
                     </div>
                     <FaChevronRight className="text-gray-400 text-xs" />
                   </button>
