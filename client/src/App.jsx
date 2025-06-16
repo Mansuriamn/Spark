@@ -28,7 +28,7 @@ function App() {
   const [Token,setToken]=useState('');
 
 
-<<<<<<< Updated upstream
+
 
    return (
      <Router>
@@ -43,9 +43,8 @@ function App() {
              * http://localhost:3001/meeting/lms-123456
             */}
              <Route path="/meeting/:roomName" element={<WebRTCMeeting userName="Roshan" />} />
-=======
-  const hideNavbarRoutes = [ '/', '/Login', '/Register'];
->>>>>>> Stashed changes
+
+ 
 
 
         <Route path="/" element={<CoursesPage />} />
