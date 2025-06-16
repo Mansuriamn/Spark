@@ -1,20 +1,17 @@
 import express from 'express';
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
+
 import { 
+  getLearningHours ,
 registerUser,
 updateUser, 
 softDeleteUser,
 getEnrolledCoursesCount, 
 getCompletedCoursesCount ,
- enrollInCourse
+enrollInCourse,
+changeUserRole, getAllInstructors,
+getInProgressCoursesCount,
+ getTotalCoursesCount,
 } from '../controllers/userController.js';
-=======
-import { registerUser, updateUser, softDeleteUser, changeUserRole, getAllInstructors } from '../controllers/userController.js';
->>>>>>> Stashed changes
-=======
-import { registerUser, updateUser, softDeleteUser, changeUserRole, getAllInstructors } from '../controllers/userController.js';
->>>>>>> Stashed changes
 import { loginUser } from '../controllers/loginController.js'
 
 const router = express.Router();
@@ -26,11 +23,12 @@ router.put('/users/:userId', updateUser);
 router.delete('/users/:userId', softDeleteUser);
 router.patch('/users/:userId/role', changeUserRole);
 router.get('/instructors', getAllInstructors);
-<<<<<<< Updated upstream
 
 
 // Route to enroll a user in a course
 router.post('/enroll', enrollInCourse);
+
+router.get('/:id/in-progress-courses-count', getInProgressCoursesCount);
 
 // Route to get number of enrolled courses
 router.get('/:userId/enrolled-courses-count', getEnrolledCoursesCount);
@@ -38,7 +36,7 @@ router.get('/:userId/enrolled-courses-count', getEnrolledCoursesCount);
 // Route to get number of completed courses
 router.get('/:userId/completed-courses-count', getCompletedCoursesCount);
 
-=======
->>>>>>> Stashed changes
+router.get('/:id/total-courses-count', getTotalCoursesCount);
 
+router.get('/:id/learning-hours', getLearningHours);
 export default router;

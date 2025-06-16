@@ -83,7 +83,7 @@ const TrackList = () => {
   useEffect(() => {
     const fetchTracks = async () => {
       try {
-        const response = await fetch('/api/tracks'); 
+        const response = await fetch('/api/courses'); 
         const data = await response.json();
         setTracks(Array.isArray(data) ? data : []);
       } catch (error) {
