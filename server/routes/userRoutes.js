@@ -1,4 +1,5 @@
 import express from 'express';
+<<<<<<< Updated upstream
 import { 
 registerUser,
 updateUser, 
@@ -7,6 +8,9 @@ getEnrolledCoursesCount,
 getCompletedCoursesCount ,
  enrollInCourse
 } from '../controllers/userController.js';
+=======
+import { registerUser, updateUser, softDeleteUser, changeUserRole, getAllInstructors } from '../controllers/userController.js';
+>>>>>>> Stashed changes
 import { changeUserRole, getAllInstructors } from '../controllers/userController.js';
 import { loginUser } from '../controllers/loginController.js'
 
@@ -19,6 +23,7 @@ router.put('/users/:userId', updateUser);
 router.delete('/users/:userId', softDeleteUser);
 router.patch('/users/:userId/role', changeUserRole);
 router.get('/instructors', getAllInstructors);
+<<<<<<< Updated upstream
 
 
 // Route to enroll a user in a course
@@ -30,5 +35,7 @@ router.get('/:userId/enrolled-courses-count', getEnrolledCoursesCount);
 // Route to get number of completed courses
 router.get('/:userId/completed-courses-count', getCompletedCoursesCount);
 
+=======
+>>>>>>> Stashed changes
 
 export default router;
