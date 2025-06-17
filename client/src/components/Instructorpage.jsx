@@ -1,8 +1,10 @@
 import Footer from './Footer';
 import React, { useState } from 'react';
 import { User, Edit3, Users, DollarSign, BookOpen, Plus, X, Save, TrendingUp, Award, Calendar, Eye, UserMinus, ChevronDown, ChevronUp } from 'lucide-react';
-
+import Student from './Seestudent';
+import { useNavigate } from 'react-router-dom';
 export default function InstructorDashboard() {
+  const navigate = useNavigate();
   const [courses, setCourses] = useState([
     {
       id: 1,
@@ -456,11 +458,20 @@ export default function InstructorDashboard() {
                               <div className="flex-1">
                                 <div className="flex items-center space-x-3">
                                   <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                                    <User className="w-4 h-4 text-indigo-600" />
+                                    <User className="w-4 h-4 text-indigo-600"  />
                                   </div>
                                   <div>
-                                    <p className="font-medium text-sm text-gray-800">{student.name}</p>
-                                    <p className="text-xs text-gray-500">{student.email}</p>
+                                    <span>
+                      <span
+                        className="font-medium text-blue-600 cursor-pointer hover:underline"
+                       onClick={() => navigate('/student', {
+    state: { courseId: course.id }
+  })}
+                      >
+                        {student.name || "Unnamed Student"}
+                      </span>
+                      {student.email && <span className="text-gray-500 ml-2">({student.email})</span>}
+                    </span>
                                   </div>
                                 </div>
                                 <div className="mt-2 flex items-center justify-between">

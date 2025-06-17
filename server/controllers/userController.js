@@ -1,5 +1,4 @@
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
+
 import { User } from '../models/User.js';
 import { Course } from '../models/Course.js';
 import bcrypt from 'bcrypt';
@@ -54,10 +53,7 @@ export const softDeleteUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-};
-
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
+}
 // In userController.js
 export const enrollInCourse = async (req, res) => {
   try {
