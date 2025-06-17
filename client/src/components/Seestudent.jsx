@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import React, { useState } from 'react';
 import { UserMinus } from 'lucide-react';
 
@@ -59,3 +60,37 @@ export default function StudentPage() {
     </div>
   );
 }
+=======
+import React from "react";
+
+
+
+const EnrolledStudentsList = ({ courses }) => (
+  <div className="max-w-2xl mx-auto py-8">
+    <h2 className="text-2xl font-bold mb-6 text-center">Enrolled Students by Course</h2>
+    {courses && courses.length > 0 ? (
+      courses.map(course => (
+        <div key={course._id} className="mb-8 bg-white rounded shadow p-4">
+          <h3 className="text-lg font-semibold mb-2">{course.title}</h3>
+          {course.students && course.students.length > 0 ? (
+            <ul className="list-disc pl-6">
+              {course.students.map(student => (
+                <li key={student._id || student.email} className="mb-1">
+                  <span className="font-medium">{student.name || "Unnamed Student"}</span>
+                  {student.email && <span className="text-gray-500 ml-2">({student.email})</span>}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500">No students enrolled.</p>
+          )}
+        </div>
+      ))
+    ) : (
+      <p className="text-center text-gray-500">No courses found.</p>
+    )}
+  </div>
+);
+
+export default EnrolledStudentsList;
+>>>>>>> Stashed changes

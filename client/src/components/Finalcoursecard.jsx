@@ -78,6 +78,7 @@ const TrackCard = ({ icon, title, description, courses, lessons, duration }) => 
 
 const TrackList = () => {
   const [tracks, setTracks] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -85,11 +86,11 @@ const TrackList = () => {
       try {
         const response = await fetch('/api/courses'); 
         const data = await response.json();
-        setTracks(Array.isArray(data) ? data : []);
+        setCourses(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Error");
         console.error("Error fetching tracks:", error);
-        setTracks([]); //fallback data add karna h
+        setCourses([]); //fallback data add karna h
       } finally {
         setLoading(false);
       }
@@ -108,7 +109,7 @@ const TrackList = () => {
         <p className="text-center text-gray-500">Loading tracks...</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
-          {tracks.map((track) => { const{key, ...rest}=track; 
+          {courses.map((Courses) => { const{key, ...rest}=courses; 
           return(
             <TrackCard
               key={key}

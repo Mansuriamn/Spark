@@ -23,7 +23,11 @@ import { useNavigate } from 'react-router-dom';
 
 import axios from 'axios';
 import WelcomePage from './pages/Mainpage';
+<<<<<<< Updated upstream
 import Student from './components/Seestudent';
+=======
+import Seestudent from './components/Seestudent';
+>>>>>>> Stashed changes
 
 function AppWrapper() {
   const location = useLocation();
@@ -58,8 +62,13 @@ function AppWrapper() {
           <Route path="/practice" element={<Practice />} />
           <Route path="/practiceinside" element={<PathToProficiency />} />
           <Route path="/instructor" element={<InstructorDashboard />} />
+<<<<<<< Updated upstream
           <Route path="/Main" element={<WelcomePage />} />
           <Route path='/student' element ={<Student/>}></Route>
+=======
+          <Route path ='/student' element ={<Seestudent/>}></Route>
+          
+>>>>>>> Stashed changes
         </Routes>
       </main>
     </div>
