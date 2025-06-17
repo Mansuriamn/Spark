@@ -15,7 +15,7 @@ export const registerUser = async (req, res) => {
     await user.save();
 
     const token = jwt.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '1h'});
-    console.log(✅ New user registered: ${name} (${email}));
+    console.log(`✅ New user registered: ${name} (${email}`);
     res.status(201).json({user, token});
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -169,8 +169,8 @@ export const getLearningHours = async (req, res) => {
     });
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
-    res.json({ hours: ${hours}h ${minutes}m });
+    res.json(`{hours: ${hours}h ${minutes}m }`);
   } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+    res.status(500).json({ message: err.message});
+}
 };
