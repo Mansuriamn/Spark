@@ -12,11 +12,14 @@ const UserProfile = () => {
     email: '',
     role: ''
   });
+  
 
   useEffect(() => {
     if (user) {
       setUserInfo(user);
     }
+    
+    
   }, [user]);
 
   const handleEditToggle = () => setIsEditing(!isEditing);
