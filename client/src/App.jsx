@@ -27,6 +27,7 @@ function App() {
   const [UserId,setUserId]=useState('684bccd97c61555addc4f460');
   const [Token,setToken]=useState('');
 
+     const hideNavbarRoutes = [ '/', '/Login', '/Register'];
 
 
 
