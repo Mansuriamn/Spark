@@ -15,7 +15,7 @@ export const registerUser = async (req, res) => {
     await user.save();
 
     const token = jwt.sign({id: user._id, role: user.role}, process.env.JWT_SECRET, {expiresIn: '1h'});
-    console.log(`✅ New user registered: ${name} (${email})`);
+    console.log(✅ New user registered: ${name} (${email}));
     res.status(201).json({user, token});
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -51,8 +51,7 @@ export const softDeleteUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-};
-
+}
 // In userController.js
 export const enrollInCourse = async (req, res) => {
   try {
@@ -124,10 +123,54 @@ export const changeUserRole = async (req, res) => {
 };
 
 export const getAllInstructors = async (req, res) => {
-  try {
+  /**try {
     const instructors = await User.find({ role: 'instructor', deleted: false });
     res.status(200).json(instructors);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }*/
+};
+
+export const getInProgressCoursesCount = async (req, res) => {
+  const userId = req.params.id;
+  // Replace with your actual logic:
+  const count = await Course.countDocuments({ createdBy: userId, status: 'in-progress' });
+  res.json({ count });
+};
+
+export const getTotalCoursesCount = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    // Count all courses created by this user (adjust filter as needed)
+    const count = await Course.countDocuments({ createdBy: userId });
+    res.json({ count });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
+};
+
+
+
+export const getLearningHours = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    // Example: sum all course durations for this user
+    // You may need to adjust this logic based on your schema
+    const courses = await Course.find({ createdBy: userId });
+    // Assuming each course has a duration field like "4h 30m"
+    let totalMinutes = 0;
+    courses.forEach(course => {
+      if (course.duration) {
+        const match = course.duration.match(/(\d+)h\s*(\d+)?m?/);
+        if (match) {
+          totalMinutes += parseInt(match[1] || 0) * 60 + parseInt(match[2] || 0);
+        }
+      }
+    });
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    res.json({ hours: ${hours}h ${minutes}m });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
