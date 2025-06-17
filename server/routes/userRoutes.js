@@ -1,14 +1,18 @@
 import express from 'express';
+
 import { 
+  getLearningHours ,
 registerUser,
 updateUser, 
 softDeleteUser,
 getEnrolledCoursesCount, 
 getCompletedCoursesCount ,
- enrollInCourse
+enrollInCourse,
+changeUserRole, getAllInstructors,
+getInProgressCoursesCount,
+ getTotalCoursesCount,
 } from '../controllers/userController.js';
 
-import { changeUserRole, getAllInstructors } from '../controllers/userController.js';
 import { loginUser } from '../controllers/loginController.js'
 
 const router = express.Router();
@@ -25,11 +29,15 @@ router.get('/instructors', getAllInstructors);
 // Route to enroll a user in a course
 router.post('/enroll', enrollInCourse);
 
+router.get('/:id/in-progress-courses-count', getInProgressCoursesCount);
+
 // Route to get number of enrolled courses
 router.get('/:userId/enrolled-courses-count', getEnrolledCoursesCount);
 
 // Route to get number of completed courses
 router.get('/:userId/completed-courses-count', getCompletedCoursesCount);
 
+router.get('/:id/total-courses-count', getTotalCoursesCount);
 
-export default router;
+router.get('/:id/learning-hours', getLearningHours);
+export default router;
