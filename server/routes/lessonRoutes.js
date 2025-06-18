@@ -9,6 +9,9 @@ import {
 
 import {protect, checkRole } from '../middlewares/authMiddleware.js'; // make sure this file exports the function
 
+import { uploadToCloudinary } from '../middleware/uploadCloud.js';
+import { addLessonVideoCloud } from '../controllers/lessonController.js';
+
 const router = express.Router();
 
 // Public Routes
@@ -19,5 +22,9 @@ router.get('/:id', getLessonById);           // GET a single lesson by ID
 router.post('/', protect, checkRole(['Admin', 'Mentor']), createLesson);
 router.put('/:id', protect, checkRole(['Admin', 'Mentor']), updateLesson);
 router.delete('/:id', protect, checkRole(['Admin', 'Mentor']), deleteLesson);
+
+// Route to upload video to Cloudinary
+router.post('/:id/upload-video', protect, uploadToCloudinary.single('video'), addLessonVideoCloud);
+
 
 export default router;

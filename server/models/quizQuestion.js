@@ -5,6 +5,10 @@ export const QuizQuestionSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    topic: {
+        type: String,
+        required: true
+    },
     options: {
         type: [String],
         required: true

@@ -17,17 +17,17 @@ import WebRTCMeeting from './components/WebRTCMeeting';
 import Practice from './pages/Practice';
 import PathToProficiency from './components/Practiceinside';
 import InstructorDashboard from './components/Instructorpage';
+import FreeCourseDetails from './components/Freecourse'
 
 
 import { useNavigate } from 'react-router-dom';
 
 import axios from 'axios';
 import WelcomePage from './pages/Mainpage';
-<<<<<<< Updated upstream
+
 import Student from './components/Seestudent';
-=======
-import Seestudent from './components/Seestudent';
->>>>>>> Stashed changes
+import Admin from './pages/Admin';
+
 
 function AppWrapper() {
   const location = useLocation();
@@ -47,13 +47,13 @@ function AppWrapper() {
         <Routes>
           <Route path="/meeting/:roomName" element={<WebRTCMeeting userName="Roshan" />} />
           <Route path="/" element={<WelcomePage />} />
-          <Route path="/home" element={<CoursesPage UserId={UserId} />} />
+          <Route path="/home" element={<CoursesPage  />} />
           <Route path="/courses" element={<Courses />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/live-sessions" element={<LiveSessionsPage />} />
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/contest" element={<Contest />} />
-          <Route path="/track/:trackName" element={<Trackdetails />} />
+          {/*<Route path="/track/:trackName" element={<Trackdetails />} />*/}
           <Route path="/progressupdate" element={<MyCoursesPage />} />
           <Route path="/login" element={<Login setLogin={setLogin} />} />
           <Route path="/Register" element={<Register setLogin={setLogin} />} />
@@ -62,13 +62,12 @@ function AppWrapper() {
           <Route path="/practice" element={<Practice />} />
           <Route path="/practiceinside" element={<PathToProficiency />} />
           <Route path="/instructor" element={<InstructorDashboard />} />
-<<<<<<< Updated upstream
+
           <Route path="/Main" element={<WelcomePage />} />
           <Route path='/student' element ={<Student/>}></Route>
-=======
-          <Route path ='/student' element ={<Seestudent/>}></Route>
-          
->>>>>>> Stashed changes
+          <Route path ='/student' element ={<Student/>}></Route>
+          <Route path='/admin' element ={<Admin/>}></Route>
+          <Route path='/track/:trackName' element={<FreeCourseDetails/>}></Route>
         </Routes>
       </main>
     </div>

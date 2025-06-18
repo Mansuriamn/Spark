@@ -23,6 +23,18 @@ export const getQuizQuestionById = async (req, res) => {
 };
 
 // Update a quiz question
+
+export const getQuizQuestionByTopic = async (req, res) => {
+    try{
+        const quizQuestion = await QuizQuestion.find({topic: req.params.topic});
+        if (!quizQuestion) return res.status(404).json({ message: 'Quiz question not found' });
+        res.json(quizQuestion);
+    }
+    catch(error) {
+        res.status(500).json({ message: 'Error fetching quiz question', error: error.message });
+    }
+}
+
 export const updateQuizQuestion = async (req, res) => {
     try {
         const updatedQuizQuestion = await QuizQuestion.findByIdAndUpdate(req.params.id, req.body, { new: true });

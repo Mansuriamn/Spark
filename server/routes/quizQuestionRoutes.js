@@ -14,4 +14,6 @@ router.put('/:id', quizQuestionController.updateQuizQuestion);
 // Delete a quiz question
 router.delete('/:id', quizQuestionController.deleteQuizQuestion);
 
+router.get('/:topic', quizQuestionController.getQuizQuestionByTopic)
+
 module.exports = router;

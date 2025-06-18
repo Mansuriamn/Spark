@@ -36,3 +36,28 @@ export const deleteLesson = asyncHandler(async (req, res) => {
   if (!lesson) return res.status(404).json({ message: 'Lesson not found' });
   res.status(204).send();
 });
+
+export const addLessonVideoCloud = async (req, res) => {
+  const lessonId = req.params.id;
+
+  const videoData = {
+    title: req.body.title || req.file.originalname,
+    url: req.file.path,  // Cloudinary-hosted URL
+    description: req.body.description || '',
+    duration: parseInt(req.body.duration) || 0,
+  };
+
+  try {
+    const lesson = await Lesson.findByIdAndUpdate(
+      lessonId,
+      { $push: { videos: videoData } },
+      { new: true }
+    );
+
+    if (!lesson) return res.status(404).json({ message: 'Lesson not found' });
+
+    res.status(200).json({ message: 'Video uploaded to Cloudinary', lesson });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
