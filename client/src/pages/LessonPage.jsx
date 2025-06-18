@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import LessonVideoPlayer from '../components/LessonVideoPlayer';
+
 
 const LessonPage = ({ lessonId }) => {
   const [lesson, setLesson] = useState(null);
