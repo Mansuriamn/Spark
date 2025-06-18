@@ -2,13 +2,14 @@ import React, { use, useEffect } from 'react';
 import { FaClock, FaUsers, FaChartBar, FaBook } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import '../style/CourseCard.css'
+import axios from 'axios';
 export default function CourseCard({ course }) {
- 
+  console.log(course)
   const navigate = useNavigate();
  const  lessonsCount = course.lessons ? Object.keys(course.lessons).length : 0;
   
-  const handleNavigation = () => {
-    navigate(`/track/${course.id}`); // Replace with the correct path
+  const handleNavigation = (id) => {
+    navigate(`/courses/${id}`); 
   };
 
   return (
@@ -60,7 +61,8 @@ export default function CourseCard({ course }) {
       <button
         onClick={(e) => {
           e.stopPropagation();
-          handleNavigation();
+          handleNavigation(course._id);
+         
         }}
         className="text-sm text-blue-600 hover:underline"
       >
