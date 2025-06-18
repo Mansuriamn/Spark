@@ -39,7 +39,7 @@ function SchedulePage() {
             </p>
           </div>
 
-          {/* Daily Events */}
+         
           <div className="md:w-2/3 bg-gray-50 p-6 rounded-lg shadow-sm">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               Events for {new Date(selectedDate).toDateString()}
@@ -49,7 +49,7 @@ function SchedulePage() {
                 {currentDayEvents.map((event, index) => (
                   <li key={index} className="bg-white p-4 rounded-md shadow-sm border border-purple-100">
                     <p className="font-semibold text-gray-800">{event.time} - {event.title}</p>
-                    {/* Add more event details here if needed */}
+                   
                   </li>
                 ))}
               </ul>

@@ -55,7 +55,7 @@ export default function Admin() {
     <div className='Admin_Container'>
       <h2 id='admin_h2'>Admin Page</h2>
 
-      {/* Profile Section */}
+      {/*profile section */}
       <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-8 border border-white/20">
         <div className="flex flex-col lg:flex-row items-center justify-between">
           <div className="flex items-center space-x-6 mb-6 lg:mb-0">
@@ -135,7 +135,7 @@ export default function Admin() {
         </div>
       </div>
 
-      {/* Instructors Section */}
+      {/*instructors Section*/}
       <div className="p-6 bg-gray-50 min-h-screen">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">Instructor List</h2>
         {instructors.map((instructor) => (

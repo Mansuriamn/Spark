@@ -17,14 +17,13 @@ function CourseCard({ course = {} }) {
   } = course;
 
 
-  // Get lesson count
+  // lesson count
   const lessonCount = Array.isArray(lesson) ? lesson.length : 0;
   console.log(lessonCount);
   const handleClick = () => {
     alert(`You clicked on ${title}`);
   };
 
-  // Optional: Early return if course is invalid
   if (!course || Object.keys(course).length === 0) {
     return <div className="text-gray-500 text-center">No course data available</div>;
   }
@@ -44,10 +43,10 @@ function CourseCard({ course = {} }) {
         />
       )}
       
-      {/* Course Title */}
+     
       <h3 className="text-xl font-semibold text-gray-800 mb-2">{title}</h3>
       
-      {/* Instructor Information */}
+      {/* Instructor Info*/}
       <div className="flex items-center justify-center space-x-2 mb-4">
         {instructorImage && (
           <img
@@ -59,7 +58,7 @@ function CourseCard({ course = {} }) {
         <p className="text-gray-600 text-sm">{instructor}</p>
       </div>
       
-      {/* Star Rating Display */}
+      {/* Star  */}
       <div className="flex items-center text-yellow-500 mb-1">
         {[...Array(5)].map((_, i) => (
           <svg
@@ -91,17 +90,17 @@ function CourseCard({ course = {} }) {
         Price: {price}
       </p>
 
-      {/* Number of Lessons */}
+      {/* lesson*/}
       <p className="text-gray-800 font-bold text-sm mb-1">
         Total Lessons: {totalPages}
       </p>
 
-      {/* Number of Students */}
+      {/* no. of student*/}
       {typeof students === 'number' && (
         <p className="text-gray-500 text-xs mt-1">{students} students</p>
       )}
 
-      {/* View Details Button */}
+      {/* button */}
       <button className="mt-4 px-5 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">
         View Details
       </button>

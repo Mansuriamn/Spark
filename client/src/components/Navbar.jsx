@@ -65,7 +65,7 @@ const role = localStorage.getItem('selectedRole');
   };
 
   const handleLogout = () => {
-    // Clear user data from localStorage
+  
    logout();
     navigate('/login')
     setUser(null);
@@ -73,7 +73,6 @@ const role = localStorage.getItem('selectedRole');
     console.log('User logged out');
   };
 
-  // Handle profile navigation based on role
   const handleProfileNavigation = () => {
     setDropdownOpen(false);
     if (role === 'instructor') {
@@ -181,7 +180,7 @@ const role = localStorage.getItem('selectedRole');
                 )}
               </div>
 
-              {/* Notification */}
+              {/* notification */}
               <div className="relative">
                 <button
                   onClick={() => setNotificationOpen(!notificationOpen)}

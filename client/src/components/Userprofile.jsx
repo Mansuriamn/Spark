@@ -39,7 +39,7 @@ const UserProfile = () => {
   const handleSave = async () => {
     setLoading(true);
     try {
-      // Update user profile via API
+      // api
       const response = await fetch('http://localhost:5000/api/user/profile', {
         method: 'PUT',
         headers: {
@@ -58,7 +58,7 @@ const UserProfile = () => {
       }
 
       const updatedUser = await response.json();
-      login(updatedUser, token); // Update context with new user data
+      login(updatedUser, token); 
       setIsEditing(false);
       alert('Profile updated successfully!');
     } catch (error) {
@@ -93,7 +93,7 @@ const UserProfile = () => {
       const updatedCart = cartCourses.filter(course => course.id !== courseId);
       updateCartCourses(updatedCart);
 
-      // Optional: Update cart on backend
+      //Update cart on backend
       await fetch('http://localhost:5000/api/cart/remove', {
         method: 'DELETE',
         headers: {
@@ -142,8 +142,7 @@ const UserProfile = () => {
   };
 
   const calculateProgress = (courseId) => {
-    // This would typically come from your learning progress API
-    // For now, returning random progress
+   
     return Math.floor(Math.random() * 100);
   };
 
@@ -168,7 +167,7 @@ const UserProfile = () => {
     <>
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-4xl mx-auto">
-          {/* Header */}
+         
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Profile</h1>
             <p className="text-gray-600">Manage your account information and enrolled courses</p>
@@ -194,7 +193,7 @@ const UserProfile = () => {
                     )}
                   </div>
 
-                  {/* Upload Overlay */}
+                  {/* Upload */}
                   {isEditing && (
                     <div className="absolute inset-0 bg-black bg-opacity-50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center cursor-pointer">
                       <label htmlFor="profile-upload" className="cursor-pointer">
@@ -210,11 +209,11 @@ const UserProfile = () => {
                     </div>
                   )}
 
-                  {/* Online Status */}
+                  {/* Online*/}
                   <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white"></div>
                 </div>
 
-                {/* User Info */}
+                {/* User info*/}
                 <div className="flex-1">
                   {isEditing ? (
                     <div className="space-y-4">
@@ -253,7 +252,7 @@ const UserProfile = () => {
                 </div>
               </div>
 
-              {/* Edit Button */}
+              {/*edit button*/}
               <div className="flex space-x-3">
                 {isEditing ? (
                   <>
@@ -361,7 +360,7 @@ const UserProfile = () => {
             </div>
           )}
 
-          {/* Cart Courses */}
+          {/*cart Courses*/}
           {cartCourses && cartCourses.length > 0 && (
             <div className="mb-8">
               <div className="flex items-center space-x-3 mb-6">
@@ -431,7 +430,7 @@ const UserProfile = () => {
             </div>
           )}
 
-          {/* Empty States */}
+          {/*empty states*/}
           {(!enrolledCourses || enrolledCourses.length === 0) && (!cartCourses || cartCourses.length === 0) && (
             <div className="text-center py-12">
               <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />

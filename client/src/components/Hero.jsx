@@ -16,7 +16,7 @@ function HeroSection() {
 
   return (
     <div className="relative flex flex-col md:flex-row items-center justify-between text-center md:text-left p-6">
-      {/* Background Bubbles */}
+      {/* bg */}
       <div className="absolute -top-10 -right-10 w-48 h-48 bg-purple-200 rounded-full opacity-10 blur-xl hidden md:block"></div>
       <div className="absolute top-10 -left-10 w-48 h-48 bg-orange-200 rounded-full opacity-10 blur-xl hidden md:block"></div>
 

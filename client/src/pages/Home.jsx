@@ -6,12 +6,12 @@ import NewsletterSection from '../components/Newsletter';
 import TrackList from '../components/Finalcoursecard';
 import Footer from '../components/Footer';
 import LearningDashboard from '../components/Homedashboard';
-import { AuthContext } from '../pages/AuthContext'; // Import your AuthContext
+import { AuthContext } from '../pages/AuthContext'; 
 import axios from 'axios';
 
 function CoursesPage({UserId}) {
   const [HomeData, setHomeData] = useState([]);
-  const { isAuthenticated,enrolledCourses, user } = useContext(AuthContext); // Get auth state from context
+  const { isAuthenticated,enrolledCourses, user } = useContext(AuthContext); 
   
 
   useEffect(() => {
@@ -28,7 +28,6 @@ function CoursesPage({UserId}) {
         <HeroSection />
       </section>
       
-      {/* Only show LearningDashboard if user is authenticated */}
       {isAuthenticated &&  enrolledCourses.length > 0 && (
         <section className="relative bg-white rounded-xl shadow-lg p-6 md:p-10 container mx-auto">
           <LearningDashboard userId={user?.id || UserId} />

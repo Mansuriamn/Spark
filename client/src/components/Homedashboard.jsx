@@ -16,8 +16,7 @@ import {
 } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { AuthContext } from '../pages/AuthContext'; // Update this path
-
+import { AuthContext } from '../pages/AuthContext';
 const achievements = [
   {
     title: 'Course Explorer',
@@ -233,7 +232,6 @@ export default function LearningDashboard({ UserId }) {
     }
   }, [UserId]);
 
-  // Calculate local stats from enrolled courses
   useEffect(() => {
     if (enrolledCourses && enrolledCourses.length > 0) {
       const completedCount = enrolledCourses.filter(course => course.status === 'completed').length;
@@ -243,7 +241,7 @@ export default function LearningDashboard({ UserId }) {
         return total + hours;
       }, 0);
 
-      // Update stats with local data if API calls fail or for immediate display
+    
       setStats(prevStats => [
         { ...prevStats[0], value: enrolledCourses.length },
         { ...prevStats[1], value: completedCount },

@@ -10,7 +10,7 @@ function SuccessStoriesSection() {
       try {
         const response = await fetch('/api/courses');
         const data = await response.json();
-        // Use data.data because backend returns { count, data: [...] }
+        
         setCourses(Array.isArray(data.data) ? data.data : []);
       } catch (error) {
         console.error("Error fetching courses:", error);
@@ -91,12 +91,12 @@ function SuccessStoriesSection() {
             "Firiiiding a perfect class was easy. I learned at my own pace. Great platform"
           </p>
           <p className="mt-4 text-gray-600 font-semibold">
-            {/* Name or additional info */}
+            {/* info*/}
           </p>
         </div>
       </div>
 
-      {/* Course Cards Grid */}
+      {/* course grid*/}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {renderCourses}
       </div>

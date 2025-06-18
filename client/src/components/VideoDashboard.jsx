@@ -179,7 +179,7 @@ const VideoDashboard = () => {
                   </div>
                 </div>
 
-                {/* Course Sections */}
+                {/*course*/}
                 <div className="space-y-4">
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">Course Content</h2>
                   {videoSections.map((section) => (
@@ -213,7 +213,7 @@ const VideoDashboard = () => {
                           </div>
                         </div>
                         
-                        {/* Video List */}
+                        {/*video*/}
                         <div className="space-y-2">
                           {section.videos.map((video) => (
                             <div
@@ -275,7 +275,7 @@ const VideoDashboard = () => {
                     </div>
                   </div>
                   
-                  {/* Weekly Activity Chart */}
+                  {/*chart*/}
                   <div className="mt-8">
                     <h3 className="text-lg font-semibold mb-4">Weekly Activity</h3>
                     <div className="flex items-end space-x-2 h-40">
@@ -336,9 +336,9 @@ const VideoDashboard = () => {
             )}
           </div>
 
-          {/* Sidebar */}
+          {/*sidebar */}
           <div className="space-y-6">
-            {/* Overall Progress */}
+            {/*Overall Progress*/}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h3 className="text-lg font-semibold mb-4">Overall Progress</h3>
               <div className="text-center mb-4">
@@ -355,7 +355,7 @@ const VideoDashboard = () => {
               </div>
             </div>
 
-            {/* Quick Stats */}
+            {/*quick*/}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h3 className="text-lg font-semibold mb-4">Course Stats</h3>
               <div className="space-y-4">
@@ -383,7 +383,7 @@ const VideoDashboard = () => {
               </div>
             </div>
 
-            {/* Recent Achievement */}
+            {/*achivement*/}
             <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-6 border border-yellow-200">
               <div className="flex items-center space-x-3 mb-3">
                 <div className="bg-yellow-100 rounded-full p-2">

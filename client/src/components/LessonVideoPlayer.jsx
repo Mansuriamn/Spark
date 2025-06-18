@@ -1,4 +1,4 @@
-// 📁 components/LessonVideoPlayer.jsx
+
 import React from 'react';
 
 const LessonVideoPlayer = ({ videos }) => {

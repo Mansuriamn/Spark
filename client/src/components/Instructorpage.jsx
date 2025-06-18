@@ -67,7 +67,7 @@ export default function InstructorDashboard() {
 
 const createCourse = async () => {
 try {
-// 1. Upload lessons and collect their IDs
+
 const lessonIds = [];
 
 
@@ -87,7 +87,7 @@ for (const lesson of newCourse.lessons) {
   lessonIds.push(data._id);
 }
 
-// 2. Prepare FormData for the course
+
 const formData = new FormData();
 formData.append('title', newCourse.title);
 formData.append('description', newCourse.description);
@@ -105,7 +105,6 @@ if (newCourse.picture) {
   formData.append('picture', newCourse.picture);
 }
 
-// 3. Submit the course
 const response = await fetch('http://localhost:5000/api/courses', {
   method: 'POST',
   headers: {

@@ -76,7 +76,7 @@ const Contest = () => {
     return matchesSearch && matchesCategory && matchesActiveFilter;
   });
 
-  // Reset all filters
+  // reset all filters
   const resetFilters = () => {
     setSearchTerm('');
     setSelectedCategories([]);
@@ -135,7 +135,7 @@ const Contest = () => {
             </div>
           </header>
 
-          {/* Filter Summary */}
+          {/* filter Summary */}
           {(searchTerm || selectedCategories.length > 0 || activeFilter !== 'all') && (
             <div className="mb-6 p-4 bg-white rounded-lg border border-gray-200 shadow-sm flex flex-wrap items-center animate-fadeIn">
               <span className="text-gray-700 font-medium mr-3">Active filters:</span>
@@ -271,7 +271,7 @@ const Contest = () => {
               </div>
             </div>
 
-            {/* Prize and CTA */}
+            {/* prize and CTA */}
             <div className="border-t border-gray-100 group-hover:border-indigo-100 transition-colors pt-4 mt-4">
               <div className="flex justify-between items-center">
                 <div className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">

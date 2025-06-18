@@ -9,7 +9,6 @@ import img from '../assets/img/imgheader.png';
 export default function Register({setLogin} = {}) {
   const navigate = useNavigate();
 
-  // Use fullName in state to match input, but send as name to backend
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -39,7 +38,7 @@ export default function Register({setLogin} = {}) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: formData.fullName, // send as 'name' to backend
+          name: formData.fullName,
           email: formData.email,
           password: formData.password
         })

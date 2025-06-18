@@ -228,21 +228,21 @@ const Dashboard = () => {
       setLoading(true);
       setError(null);
       
-      // Replace with your actual API endpoint
+      // api
       const response = await axios.get('/api/courses');
       
-      // If API call fails, use fallback data
+      //use fallback data
       if (response.data && response.data.length > 0) {
         setCoursesData(response.data);
       } else {
-        // Use fallback data if API returns empty
+        // fallback
         setCoursesData(fallbackCoursesData);
       }
     } catch (err) {
       console.error("Error fetching courses:", err);
       setError("Failed to load courses");
       
-      // Use fallback data on error
+      // error
       setCoursesData(fallbackCoursesData);
     } finally {
       setLoading(false);
@@ -254,7 +254,7 @@ const Dashboard = () => {
     return course.status === filter;
   });
 
-  // Loading state for courses
+  // loading state for courses
   const renderCoursesContent = () => {
     if (loading) {
       return (
@@ -312,7 +312,7 @@ const Dashboard = () => {
   return (
     <>
       <div className="min-h-screen bg-gray-100 p-4">
-        {/* Original Dashboard Grid */}
+        {/*dashboard grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
           <div className="col-span-1">
             <ActivityCard />
@@ -330,9 +330,9 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* My Courses Section */}
+        {/* courses Section */}
         <div className="mt-12 max-w-6xl mx-auto">
-          {/* Filter Section */}
+          {/*filter Section */}
           <div className="bg-white rounded-2xl shadow-sm p-6 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between border border-gray-100">
             <h2 className="text-2xl font-bold text-gray-900 mb-4 sm:mb-0 flex items-center gap-2">
               <BookOpen className="text-purple-500 w-6 h-6" /> My Courses
@@ -369,7 +369,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Course Cards with Loading/Error States */}
+          {/* render*/}
           {renderCoursesContent()}
         </div>
       </div>
