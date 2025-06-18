@@ -9,7 +9,7 @@ import {
 
 import {protect, checkRole } from '../middlewares/authMiddleware.js'; // make sure this file exports the function
 
-import { uploadToCloudinary } from '../middleware/uploadCloud.js';
+import { uploadToCloudinary } from '../middlewares/uploadCloud.js';
 import { addLessonVideoCloud } from '../controllers/lessonController.js';
 
 const router = express.Router();
