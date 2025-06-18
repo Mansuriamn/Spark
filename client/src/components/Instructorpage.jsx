@@ -65,32 +65,79 @@ export default function InstructorDashboard() {
     }
   };
 
-  const createCourse = async () => {
-    try {
-      const formData = new FormData();
-      formData.append('title', newCourse.title);
-      formData.append('description', newCourse.description);
-      formData.append('duration', newCourse.duration);
-      formData.append('topics', newCourse.topics);
-      formData.append('level', newCourse.level);
-      formData.append('price', newCourse.price);
-      formData.append('category', newCourse.category);
-      formData.append('createdBy', user.id);
-      formData.append('lessons', JSON.stringify(newCourse.lessons));
-      
-      if (newCourse.picture) {
-        formData.append('picture', newCourse.picture);
-      }
+const createCourse = async () => {
+try {
+// 1. Upload lessons and collect their IDs
+const lessonIds = [];
 
-      const response = await fetch('http://localhost:5000/api/courses', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formData,
-      });
 
-   function PostData(){
+for (const lesson of newCourse.lessons) {
+  const res = await fetch('http://localhost:5000/api/lessons', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(lesson),
+  });
+
+  if (!res.ok) throw new Error('Lesson creation failed');
+
+  const data = await res.json();
+  lessonIds.push(data._id);
+}
+
+// 2. Prepare FormData for the course
+const formData = new FormData();
+formData.append('title', newCourse.title);
+formData.append('description', newCourse.description);
+formData.append('duration', newCourse.duration);
+formData.append('topics', newCourse.topics);
+formData.append('level', newCourse.level);
+formData.append('price', newCourse.price);
+formData.append('category', newCourse.category);
+formData.append('createdBy', user.id);
+lessonIds.forEach(id => {
+formData.append('lessons[]', id);
+});
+
+if (newCourse.picture) {
+  formData.append('picture', newCourse.picture);
+}
+
+// 3. Submit the course
+const response = await fetch('http://localhost:5000/api/courses', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+  },
+  body: formData,
+});
+
+if (!response.ok) {
+  throw new Error('Failed to create course');
+}
+
+const createdCourse = await response.json();
+setCourses([...courses, createdCourse]);
+setNewCourse({
+  title: '',
+  description: '',
+  duration: '',
+  topics: '',
+  level: 'Beginner',
+  price: '',
+  category: '',
+  picture: null,
+  lessons: [{ title: '', content: '', duration: '' }],
+});
+setShowAddForm(false);
+setError('');
+} catch (err) {
+setError('Failed to create course: ' + err.message);
+}
+};
+   function PostCourse(){
     axios.post(`http://localhost:5000/api/courses`, {
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -102,30 +149,6 @@ export default function InstructorDashboard() {
       console.error("Error",err)
     })
    }
-
-      if (!response.ok) {
-        throw new Error('Failed to create course');
-      }
-
-      const createdCourse = await response.json();
-      setCourses([...courses, createdCourse]);
-      setNewCourse({
-        title: '',
-        description: '',
-        duration: '',
-        topics: '',
-        level: 'Beginner',
-        price: '',
-        category: '',
-        picture: null,
-        lessons: [{ title: '', content: '', duration: '' }]
-      });
-      setShowAddForm(false);
-      setError('');
-    } catch (err) {
-      setError('Failed to create course: ' + err.message);
-    }
-  };
 
   const updateCourse = async (courseId, updatedData) => {
     try {
@@ -248,6 +271,7 @@ export default function InstructorDashboard() {
   };
 
   const handleSubmit = () => {
+    
     if (newCourse.title && newCourse.description && newCourse.duration && newCourse.topics && newCourse.price) {
       // Validate lessons
       const validLessons = newCourse.lessons.filter(lesson => 
@@ -260,7 +284,7 @@ export default function InstructorDashboard() {
       }
 
       createCourse();
-      PostData();
+     
     } else {
       setError('Please fill in all required fields');
     }
