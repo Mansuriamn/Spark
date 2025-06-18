@@ -4,6 +4,7 @@ import { User, Edit3, Users, DollarSign, BookOpen, Plus, X, Save, TrendingUp, Aw
 import Student from './Seestudent';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../pages/AuthContext'; 
+import axios from 'axios';
 
 export default function InstructorDashboard() {
   const navigate = useNavigate();
@@ -88,6 +89,19 @@ export default function InstructorDashboard() {
         },
         body: formData,
       });
+
+   function PostData(){
+    axios.post(`http://localhost:5000/api/courses`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      data: formData
+    }).then((res)=>{
+      console.log("Data push done ",res.data)
+    }).catch((err)=>{
+      console.error("Error",err)
+    })
+   }
 
       if (!response.ok) {
         throw new Error('Failed to create course');
@@ -246,6 +260,7 @@ export default function InstructorDashboard() {
       }
 
       createCourse();
+      PostData();
     } else {
       setError('Please fill in all required fields');
     }
