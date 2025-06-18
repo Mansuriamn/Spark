@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
+
     name: {
         type: String,
         required: true
@@ -8,6 +9,10 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true
+    },
+     profilePic: { // <-- Add this field
+        type: String,
+        default: "https://www.picwand.ai/images/index/banner-pic3.png" // or you can set a default profile image URL
     },
     password: {
         type: String,
