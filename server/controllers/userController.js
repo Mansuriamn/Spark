@@ -1,10 +1,8 @@
 
 import { User } from '../models/User.js';
 import { Course } from '../models/Course.js';
-import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import { User } from '../models/User.js';
 import dotenv from 'dotenv';
 
 export const registerUser = async (req, res) => {
