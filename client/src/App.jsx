@@ -69,6 +69,7 @@ function AppWrapper() {
           <Route path ='/student' element ={<Student/>}></Route>
           <Route path='/admin' element ={<Admin/>}></Route>
           <Route path='/track/:trackName' element={<FreeCourseDetails/>}></Route>
+          <Route path='/courses/:courseId' element={<FreeCourseDetails />} />
         </Routes>
       </main>
     </div>
