@@ -77,20 +77,86 @@ const TrackCard = ({ icon, title, description, courses, lessons, duration }) => 
 };
 
 const TrackList = () => {
-  const [tracks, setTracks] = useState([]);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Fallback data
+  const fallbackData = [
+    {
+      key: "front-end",
+      title: "Front-End Development",
+      description: "Learn HTML, CSS, JavaScript, React, and more to build modern web applications.",
+      courses: 6,
+      lessons: 18,
+      duration: "25h 30m",
+      students: [
+        { _id: "stu1", name: "Alice Johnson", email: "alice@example.com" },
+        { _id: "stu2", name: "Bob Smith", email: "bob@example.com" }
+      ]
+    },
+    {
+      key: "back-end",
+      title: "Back-End Development",
+      description: "Master server-side development with Node.js, Express, databases, and API design.",
+      courses: 5,
+      lessons: 15,
+      duration: "20h 10m",
+      students: [
+        { _id: "stu3", name: "Charlie Brown", email: "charlie@example.com" }
+      ]
+    },
+    {
+      key: "android",
+      title: "Android Development",
+      description: "Build native Android apps using Kotlin, Android Studio, and mobile development best practices.",
+      courses: 4,
+      lessons: 12,
+      duration: "18h 00m",
+      students: []
+    },{
+      key: "front-end",
+      title: "Front-End Development",
+      description: "Learn HTML, CSS, JavaScript, React, and more to build modern web applications.",
+      courses: 6,
+      lessons: 18,
+      duration: "25h 30m",
+      students: [
+        { _id: "stu1", name: "Alice Johnson", email: "alice@example.com" },
+        { _id: "stu2", name: "Bob Smith", email: "bob@example.com" }
+      ]
+    },
+    {
+      key: "back-end",
+      title: "Back-End Development",
+      description: "Master server-side development with Node.js, Express, databases, and API design.",
+      courses: 5,
+      lessons: 15,
+      duration: "20h 10m",
+      students: [
+        { _id: "stu3", name: "Charlie Brown", email: "charlie@example.com" }
+      ]
+    },
+    {
+      key: "android",
+      title: "Android Development",
+      description: "Build native Android apps using Kotlin, Android Studio, and mobile development best practices.",
+      courses: 4,
+      lessons: 12,
+      duration: "18h 00m",
+      students: []
+    }
+  ];
 
   useEffect(() => {
     const fetchTracks = async () => {
       try {
         const response = await fetch('/api/courses'); 
         const data = await response.json();
-        setCourses(Array.isArray(data) ? data : []);
+        setCourses(Array.isArray(data) ? data : fallbackData);
       } catch (error) {
-        console.error("Error");
         console.error("Error fetching tracks:", error);
-        setCourses([]); //fallback data add karna h
+        // Use fallback data when API fails
+        setCourses(fallbackData);
       } finally {
         setLoading(false);
       }
@@ -106,17 +172,22 @@ const TrackList = () => {
         Develop your mind and skills with our intensive tracks covering all essential development areas.
       </p>
       {loading ? (
-        <p className="text-center text-gray-500">Loading tracks...</p>
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+          <p className="ml-4 text-gray-500">Loading tracks...</p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
-          {courses.map((Courses) => { const{key, ...rest}=courses; 
-          return(
-            <TrackCard
-              key={key}
-              {...rest}
-              icon={iconMap[key.toLowerCase()] || <FaCode className="text-gray-400 text-xl" />}
-            />
-          )})}
+          {courses.map((course) => {
+            const { key, ...rest } = course;
+            return (
+              <TrackCard
+                key={key}
+                {...rest}
+                icon={iconMap[key.toLowerCase()] || <FaCode className="text-gray-400 text-xl" />}
+              />
+            );
+          })}
         </div>
       )}
     </div>

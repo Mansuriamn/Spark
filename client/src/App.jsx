@@ -19,7 +19,7 @@ import PathToProficiency from './components/Practiceinside';
 import InstructorDashboard from './components/Instructorpage';
 import FreeCourseDetails from './components/Freecourse'
 
-import LessonPage from './pages/LessonPage';
+import LessonPageWrapper from './pages/LessonPage';
 import { useNavigate } from 'react-router-dom';
 
 import axios from 'axios';
@@ -36,7 +36,7 @@ function AppWrapper() {
   const [Token, setToken] = useState('');
 
  
-  const hideNavbarRoutes = ['/', ,'/Login','/login',  '/Register'];
+  const hideNavbarRoutes = ['/' ,'/Login','/login',  '/Register'];
 
   const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
 
