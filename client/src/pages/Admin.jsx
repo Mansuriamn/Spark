@@ -13,7 +13,7 @@ export default function Admin() {
     bio: ''
   });
 
-  
+
   const [profileImage, setProfileImage] = useState(null);
   const [instructors, setInstructors] = useState([
     { id: 1, name: 'Dr. Meena Joshi', email: 'meena@edu.com', joinedDate: '2023-12-01' },

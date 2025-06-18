@@ -41,8 +41,10 @@ export default function Login() {
           navigate('/home');
         } else if (selectedRole === 'instructor') {
           navigate('/home');
+        } else if (selectedRole === 'admin') {
+          navigate('/home');
         } else {
-          navigate('/Main');
+          navigate('/');
         }
       } else {
         alert(data.message || 'Login failed');

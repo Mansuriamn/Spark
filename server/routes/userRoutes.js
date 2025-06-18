@@ -40,4 +40,3 @@ router.get('/:userId/completed-courses-count', getCompletedCoursesCount);
 router.get('/:id/total-courses-count', getTotalCoursesCount);
 
 router.get('/:id/learning-hours', getLearningHours);
-export default router;
