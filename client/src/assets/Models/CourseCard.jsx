@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { use, useEffect } from 'react';
 import { FaClock, FaUsers, FaChartBar, FaBook } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import '../style/CourseCard.css'
-export default function CourseCard({ course , totalPages}) {
+export default function CourseCard({ course }) {
+ 
   const navigate = useNavigate();
-
+ const  lessonsCount = course.lessons ? Object.keys(course.lessons).length : 0;
+  
   const handleNavigation = () => {
     navigate(`/track/${course.id}`); // Replace with the correct path
   };
@@ -17,7 +19,10 @@ export default function CourseCard({ course , totalPages}) {
 >
   {/* Left Image Section */}
   <div className="relative w-full sm:w-1/2 h-48 sm:h-auto">
-    <img src={course.image} alt={course.title} className="w-full h-full object-cover" />
+    <img style={{
+      height:"100%",
+      width:"100%"
+    }} src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover" />
     <span className="absolute top-2 left-2 bg-black text-white text-xs px-2 py-1 rounded">
       {course.category}
     </span>
@@ -44,7 +49,7 @@ export default function CourseCard({ course , totalPages}) {
         </div>
         <div className="flex items-center gap-1">
           <FaBook className="text-orange-500" />
-          <span> Lessons :  { totalPages}</span>
+          <span> Lessons :  { lessonsCount}</span>
         </div>
       </div>
     </div>

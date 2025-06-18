@@ -398,7 +398,7 @@ export default function Courses() {
   });
 
   // Calculate total pages for pagination based on filtered courses
-  const totalPages = Math.ceil(filteredCourses.length / coursesPerPage);
+  
  
 
   // Determine which courses to display on the current page
@@ -451,7 +451,7 @@ export default function Courses() {
               currentCourses.map((course) => (
                 
                 // Use `_id` as key if your API provides it, otherwise fallback to `id`
-                <CourseCard key={course._id || course.id} course={course}  totalPages={totalPages}/> 
+                <CourseCard key={course._id || course.id} course={course} /> 
               ))
             ) : (
               // Message if no courses are found after loading/filtering
@@ -463,7 +463,7 @@ export default function Courses() {
           <div className='mt-8 '>
             {filteredCourses.length > 0 && ( // Only show pagination if there are courses to paginate
               <Pagination
-                totalPages={totalPages}
+               
                 currentPage={currentPage}
                 onPageChange={handlePageChange}
               />
