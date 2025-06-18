@@ -5,7 +5,6 @@ import UserProfile from './Userprofile';
 import {AuthContext} from '../pages/AuthContext'; 
 import { Bell, Menu, X, Settings, User, LogOut, ChevronRight } from 'lucide-react';
 
-
 export default function Navbar() {
 
     const {
@@ -22,13 +21,11 @@ const role = localStorage.getItem('selectedRole');
   const [selectedLanguage, setSelectedLanguage] = useState('Eng');
   const [notificationStatus, setNotificationStatus] = useState('Allow');
 
-
   const dropdownRef = useRef(null);
   const helpEarnRef = useRef(null);
   const notificationRef = useRef(null);
   const settingsRef = useRef(null);
   const navigate = useNavigate();
-
 
   useEffect(() => {
     const close = (e) => {
@@ -101,7 +98,7 @@ const role = localStorage.getItem('selectedRole');
             <a
               key={item}
               href={`/${item.toLowerCase()}`}
-              className="px-4 py-1 rounded-full text-sm font-medium border border-transparent text-gray-800 hover:border-black transition"
+              className="px-4 py-1 rounded-full text-sm font-medium border border-transparent text-gray-800 hover:border-black hover:bg-black hover:text-white transition"
             >
               {item}
             </a>
@@ -424,7 +421,6 @@ const role = localStorage.getItem('selectedRole');
             </div>
           </div>
         )}
-
 
         {/* Mobile menu button */}
         <button
