@@ -1,55 +1,27 @@
 import Footer from './Footer';
-import React, { useState } from 'react';
-import { User, Edit3, Users, DollarSign, BookOpen, Plus, X, Save, TrendingUp, Award, Calendar, Eye, UserMinus, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useState, useEffect, useContext } from 'react';
+import { User, Edit3, Users, DollarSign, BookOpen, Plus, X, Save, TrendingUp, Award, Calendar, Eye, UserMinus, ChevronDown, ChevronUp, Upload, Trash2 } from 'lucide-react';
 import Student from './Seestudent';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../pages/AuthContext'; 
+
 export default function InstructorDashboard() {
   const navigate = useNavigate();
-  const [courses, setCourses] = useState([
-    {
-      id: 1,
-      title: 'Full Stack Development',
-      level: 'Intermediate',
-      duration: '10 weeks',
-      students: 120,
-      revenue: 24000,
-      price: 200,
-      topics: 'HTML, CSS, React, Node.js',
-      rating: 4.8,
-      completion: 85,
-      enrolledStudents: [
-        { id: 1, name: 'Rahul Sharma', email: 'rahul@email.com', enrolledDate: '2024-01-15', progress: 75 },
-        { id: 2, name: 'Priya Patel', email: 'priya@email.com', enrolledDate: '2024-01-18', progress: 92 },
-        { id: 3, name: 'Amit Kumar', email: 'amit@email.com', enrolledDate: '2024-01-20', progress: 68 },
-        { id: 4, name: 'Sneha Singh', email: 'sneha@email.com', enrolledDate: '2024-01-22', progress: 84 },
-        { id: 5, name: 'Vikash Gupta', email: 'vikash@email.com', enrolledDate: '2024-01-25', progress: 56 }
-      ]
-    },
-    {
-      id: 2,
-      title: 'Intro to AI',
-      level: 'Beginner',
-      duration: '8 weeks',
-      students: 80,
-      revenue: 16000,
-      price: 200,
-      topics: 'Machine Learning, Python, NLP',
-      rating: 4.6,
-      completion: 78,
-      enrolledStudents: [
-        { id: 6, name: 'Anita Desai', email: 'anita@email.com', enrolledDate: '2024-02-01', progress: 82 },
-        { id: 7, name: 'Rajesh Mehta', email: 'rajesh@email.com', enrolledDate: '2024-02-03', progress: 65 },
-        { id: 8, name: 'Kavya Nair', email: 'kavya@email.com', enrolledDate: '2024-02-05', progress: 91 }
-      ]
-    },
-  ]);
+  const { user, token, updateUser } = useContext(AuthContext); 
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const [newCourse, setNewCourse] = useState({
     title: '',
+    description: '',
     duration: '',
     topics: '',
     level: 'Beginner',
     price: '',
+    category: '',
+    picture: null,
+    lessons: [{ title: '', content: '', duration: '' }]
   });
 
   const [editingCourse, setEditingCourse] = useState(null);
@@ -57,14 +29,199 @@ export default function InstructorDashboard() {
   const [profileEdit, setProfileEdit] = useState(false);
   const [expandedCourse, setExpandedCourse] = useState(null);
   const [profile, setProfile] = useState({
-    name: 'Pragati Mishra',
-    email: 'p@gmail.com',
-    bio: 'Passionate educator with 5+ years of experience in tech training',
+    name: user?.name || '',
+    email: user?.email || '',
+    bio: user?.bio || '',
   });
 
+  // Fetch courses on component mount
+  useEffect(() => {
+    if (user?.id) {
+      fetchCourses();
+    }
+  }, [user]);
+
+  // API Functions
+  const fetchCourses = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`http://localhost:5000/api/courses/instructor/${user.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch courses');
+      }
+      
+      const data = await response.json();
+      setCourses(data);
+    } catch (err) {
+      setError('Failed to load courses: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createCourse = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('title', newCourse.title);
+      formData.append('description', newCourse.description);
+      formData.append('duration', newCourse.duration);
+      formData.append('topics', newCourse.topics);
+      formData.append('level', newCourse.level);
+      formData.append('price', newCourse.price);
+      formData.append('category', newCourse.category);
+      formData.append('createdBy', user.id);
+      formData.append('lessons', JSON.stringify(newCourse.lessons));
+      
+      if (newCourse.picture) {
+        formData.append('picture', newCourse.picture);
+      }
+
+      const response = await fetch('http://localhost:5000/api/courses', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create course');
+      }
+
+      const createdCourse = await response.json();
+      setCourses([...courses, createdCourse]);
+      setNewCourse({
+        title: '',
+        description: '',
+        duration: '',
+        topics: '',
+        level: 'Beginner',
+        price: '',
+        category: '',
+        picture: null,
+        lessons: [{ title: '', content: '', duration: '' }]
+      });
+      setShowAddForm(false);
+      setError('');
+    } catch (err) {
+      setError('Failed to create course: ' + err.message);
+    }
+  };
+
+  const updateCourse = async (courseId, updatedData) => {
+    try {
+      const formData = new FormData();
+      Object.keys(updatedData).forEach(key => {
+        if (key === 'lessons') {
+          formData.append(key, JSON.stringify(updatedData[key]));
+        } else if (updatedData[key] !== null && updatedData[key] !== undefined) {
+          formData.append(key, updatedData[key]);
+        }
+      });
+
+      const response = await fetch(`http://localhost:5000/api/courses/${courseId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update course');
+      }
+
+      const updatedCourse = await response.json();
+      setCourses(courses.map(course => 
+        course.id === courseId ? updatedCourse : course
+      ));
+      setEditingCourse(null);
+      setError('');
+    } catch (err) {
+      setError('Failed to update course: ' + err.message);
+    }
+  };
+
+  const deleteCourse = async (courseId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/courses/${courseId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete course');
+      }
+
+      setCourses(courses.filter(course => course.id !== courseId));
+      setError('');
+    } catch (err) {
+      setError('Failed to delete course: ' + err.message);
+    }
+  };
+
+  const updateProfile = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/users/profile`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profile),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
+      }
+
+      const updatedUser = await response.json();
+      updateUser(updatedUser); // Updated user in AuthContext
+      setProfileEdit(false);
+      setError('');
+    } catch (err) {
+      setError('Failed to update profile: ' + err.message);
+    }
+  };
+
+  // Lesson management functions
+  const addLesson = () => {
+    if (newCourse.lessons.length < 5) {
+      setNewCourse({
+        ...newCourse,
+        lessons: [...newCourse.lessons, { title: '', content: '', duration: '' }]
+      });
+    }
+  };
+
+  const removeLesson = (index) => {
+    if (newCourse.lessons.length > 1) {
+      const updatedLessons = newCourse.lessons.filter((_, i) => i !== index);
+      setNewCourse({ ...newCourse, lessons: updatedLessons });
+    }
+  };
+
+  const updateLesson = (index, field, value) => {
+    const updatedLessons = newCourse.lessons.map((lesson, i) => 
+      i === index ? { ...lesson, [field]: value } : lesson
+    );
+    setNewCourse({ ...newCourse, lessons: updatedLessons });
+  };
+
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setNewCourse({ ...newCourse, [name]: value });
+    const { name, value, files } = e.target;
+    if (name === 'picture') {
+      setNewCourse({ ...newCourse, [name]: files[0] });
+    } else {
+      setNewCourse({ ...newCourse, [name]: value });
+    }
   };
 
   const handleEditChange = (e, courseId) => {
@@ -77,34 +234,31 @@ export default function InstructorDashboard() {
   };
 
   const handleSubmit = () => {
-    if (newCourse.title && newCourse.duration && newCourse.topics && newCourse.price) {
-      const price = parseFloat(newCourse.price);
-      setCourses([
-        ...courses,
-        {
-          ...newCourse,
-          id: Date.now(),
-          students: 0,
-          revenue: 0,
-          price: price,
-          rating: 0,
-          completion: 0,
-          enrolledStudents: []
-        },
-      ]);
-      setNewCourse({ title: '', duration: '', topics: '', level: 'Beginner', price: '' });
-      setShowAddForm(false);
+    if (newCourse.title && newCourse.description && newCourse.duration && newCourse.topics && newCourse.price) {
+      // Validate lessons
+      const validLessons = newCourse.lessons.filter(lesson => 
+        lesson.title.trim() && lesson.content.trim()
+      );
+      
+      if (validLessons.length === 0) {
+        setError('Please add at least one valid lesson');
+        return;
+      }
+
+      createCourse();
+    } else {
+      setError('Please fill in all required fields');
     }
   };
 
   const handleProfileSave = () => {
-    setProfileEdit(false);
+    updateProfile();
   };
 
   const removeStudent = (courseId, studentId) => {
     setCourses(courses.map(course => {
       if (course.id === courseId) {
-        const updatedStudents = course.enrolledStudents.filter(student => student.id !== studentId);
+        const updatedStudents = course.enrolledStudents?.filter(student => student.id !== studentId) || [];
         return {
           ...course,
           enrolledStudents: updatedStudents,
@@ -120,15 +274,39 @@ export default function InstructorDashboard() {
     setExpandedCourse(expandedCourse === courseId ? null : courseId);
   };
 
-  const totalStudents = courses.reduce((sum, course) => sum + course.students, 0);
-  const totalRevenue = courses.reduce((sum, course) => sum + course.revenue, 0);
-  const avgRating = courses.length > 0 ? (courses.reduce((sum, course) => sum + course.rating, 0) / courses.length).toFixed(1) : 0;
+  const totalStudents = courses.reduce((sum, course) => sum + (course.students || 0), 0);
+  const totalRevenue = courses.reduce((sum, course) => sum + (course.revenue || 0), 0);
+  const avgRating = courses.length > 0 ? (courses.reduce((sum, course) => sum + (course.rating || 0), 0) / courses.length).toFixed(1) : 0;
+
+  /*if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading courses...</p>
+        </div>
+      </div>
+    );
+  }*/
 
   return (
     <>
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4">
       <div className="max-w-7xl mx-auto">
         
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl mb-6">
+            {error}
+            <button 
+              onClick={() => setError('')}
+              className="float-right font-bold"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
+        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 text-white">
             <div className="flex items-center justify-between">
@@ -168,6 +346,7 @@ export default function InstructorDashboard() {
           </div>
         </div>
 
+        {/* Profile Section */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-8 border border-white/20">
           <div className="flex flex-col lg:flex-row items-center justify-between">
             <div className="flex items-center space-x-6 mb-6 lg:mb-0">
@@ -194,13 +373,14 @@ export default function InstructorDashboard() {
                       onChange={(e) => setProfile({...profile, bio: e.target.value})}
                       className="block text-gray-500 text-sm bg-transparent border-b border-gray-300 focus:outline-none focus:border-indigo-500 resize-none"
                       rows="2"
+                      placeholder="Tell us about yourself..."
                     />
                   </div>
                 ) : (
                   <>
                     <h2 className="text-3xl font-bold text-gray-800">{profile.name}</h2>
                     <p className="text-gray-600">{profile.email}</p>
-                    <p className="text-gray-500 text-sm mt-1">{profile.bio}</p>
+                    <p className="text-gray-500 text-sm mt-1">{profile.bio || 'No bio added yet'}</p>
                     <span className="inline-block text-sm bg-indigo-100 text-indigo-700 px-4 py-2 rounded-full mt-2 font-medium">
                       Senior Instructor
                     </span>
@@ -213,7 +393,7 @@ export default function InstructorDashboard() {
                 <>
                   <button
                     onClick={handleProfileSave}
-                    className="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-200 flex items-center space-x-2 shadow-lg"
+                    className="bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700 transition-all duration-200 flex items-center space-x-2 shadow-lg"
                   >
                     <Save className="w-4 h-4" />
                     <span>Save</span>
@@ -239,7 +419,7 @@ export default function InstructorDashboard() {
           </div>
         </div>
 
-       
+        {/* Course Header */}
         <div className="flex justify-between items-center mb-8">
           <h3 className="text-2xl font-bold text-gray-800">Your Courses</h3>
           <button
@@ -251,7 +431,7 @@ export default function InstructorDashboard() {
           </button>
         </div>
 
-        
+        {/* Add Course Form */}
         {showAddForm && (
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-8 border border-white/20">
             <div className="flex justify-between items-center mb-6">
@@ -266,52 +446,143 @@ export default function InstructorDashboard() {
                 <X className="w-6 h-6" />
               </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <input
-                type="text"
-                name="title"
-                placeholder="Course Title"
-                className="p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                value={newCourse.title}
+            
+            <div className="space-y-6">
+              {/* Basic Course Info */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <input
+                  type="text"
+                  name="title"
+                  placeholder="Course Title"
+                  className="p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  value={newCourse.title}
+                  onChange={handleChange}
+                />
+                <input
+                  type="text"
+                  name="duration"
+                  placeholder="Duration (e.g., 8 weeks)"
+                  className="p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  value={newCourse.duration}
+                  onChange={handleChange}
+                />
+                <input
+                  type="number"
+                  name="price"
+                  placeholder="Course Price (₹)"
+                  className="p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  value={newCourse.price}
+                  onChange={handleChange}
+                />
+                <select
+                  name="level"
+                  className="p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  value={newCourse.level}
+                  onChange={handleChange}
+                >
+                  <option value="Beginner">Beginner</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="Advanced">Advanced</option>
+                </select>
+                <input
+                  type="text"
+                  name="category"
+                  placeholder="Category ID"
+                  className="p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  value={newCourse.category}
+                  onChange={handleChange}
+                />
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="file"
+                    name="picture"
+                    accept="image/*"
+                    onChange={handleChange}
+                    className="p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all flex-1"
+                  />
+                  <Upload className="w-5 h-5 text-gray-400" />
+                </div>
+              </div>
+              
+              <textarea
+                name="description"
+                placeholder="Course Description"
+                className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                rows="3"
+                value={newCourse.description}
                 onChange={handleChange}
               />
-              <input
-                type="text"
-                name="duration"
-                placeholder="Duration (e.g., 8 weeks)"
-                className="p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                value={newCourse.duration}
-                onChange={handleChange}
-              />
-              <input
-                type="number"
-                name="price"
-                placeholder="Course Price (₹)"
-                className="p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                value={newCourse.price}
-                onChange={handleChange}
-              />
-              <select
-                name="level"
-                className="p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                value={newCourse.level}
-                onChange={handleChange}
-              >
-                <option value="Beginner">Beginner</option>
-                <option value="Intermediate">Intermediate</option>
-                <option value="Advanced">Advanced</option>
-              </select>
+              
               <input
                 type="text"
                 name="topics"
                 placeholder="Topics (comma separated)"
-                className="p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all md:col-span-2"
+                className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                 value={newCourse.topics}
                 onChange={handleChange}
               />
+
+              {/* Lessons Section */}
+              <div className="border-t pt-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h5 className="text-lg font-semibold text-gray-800">Course Lessons</h5>
+                  <button
+                    type="button"
+                    onClick={addLesson}
+                    disabled={newCourse.lessons.length >= 5}
+                    className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-all duration-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Add Lesson ({newCourse.lessons.length}/5)</span>
+                  </button>
+                </div>
+                
+                <div className="space-y-4">
+                  {newCourse.lessons.map((lesson, index) => (
+                    <div key={index} className="bg-gray-50 p-4 rounded-xl border">
+                      <div className="flex justify-between items-center mb-3">
+                        <h6 className="font-medium text-gray-700">Lesson {index + 1}</h6>
+                        {newCourse.lessons.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeLesson(index)}
+                            className="text-red-600 hover:text-red-800 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <input
+                          type="text"
+                          placeholder="Lesson Title"
+                          className="p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                          value={lesson.title}
+                          onChange={(e) => updateLesson(index, 'title', e.target.value)}
+                        />
+                        <input
+                          type="text"
+                          placeholder="Duration (e.g., 30 mins)"
+                          className="p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                          value={lesson.duration}
+                          onChange={(e) => updateLesson(index, 'duration', e.target.value)}
+                        />
+                        <input
+                          type="text"
+                          placeholder="Content/Description"
+                          className="p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                          value={lesson.content}
+                          onChange={(e) => updateLesson(index, 'content', e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <button
                 onClick={handleSubmit}
-                className="bg-purple-600 hover:bg-purple-500 text-white px-8 py-4 rounded-xl transition-all duration-200 font-medium md:col-span-2 shadow-lg"
+                className="w-full bg-purple-600 hover:bg-purple-500 text-white px-8 py-4 rounded-xl transition-all duration-200 font-medium shadow-lg"
               >
                 Create Course
               </button>
@@ -319,7 +590,7 @@ export default function InstructorDashboard() {
           </div>
         )}
 
-        
+        {/* Courses Grid */}
         <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
           {courses.map((course) => (
             <div
@@ -334,9 +605,18 @@ export default function InstructorDashboard() {
                 }`}>
                   {course.level}
                 </span>
-                <div className="flex items-center space-x-2 text-sm text-gray-500">
-                  <Calendar className="w-4 h-4" />
-                  <span>{course.duration}</span>
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 text-sm text-gray-500">
+                    <Calendar className="w-4 h-4" />
+                    <span>{course.duration}</span>
+                  </div>
+                  <button
+                    onClick={() => deleteCourse(course.id)}
+                    className="text-red-500 hover:text-red-700 transition-colors"
+                    title="Delete Course"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
 
@@ -365,8 +645,8 @@ export default function InstructorDashboard() {
                   />
                   <div className="flex space-x-2">
                     <button
-                      onClick={() => setEditingCourse(null)}
-                      className="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-2 rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 flex items-center justify-center space-x-1"
+                      onClick={() => updateCourse(course.id, course)}
+                      className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-all duration-200 flex items-center justify-center space-x-1"
                     >
                       <Save className="w-4 h-4" />
                       <span>Save</span>
@@ -385,6 +665,9 @@ export default function InstructorDashboard() {
                   <h4 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors">
                     {course.title}
                   </h4>
+                  <p className="text-sm text-gray-600 mb-2">
+                    {course.description}
+                  </p>
                   <p className="text-sm text-gray-600 mb-4">
                     <span className="font-medium">Topics:</span> {course.topics}
                   </p>
@@ -393,10 +676,10 @@ export default function InstructorDashboard() {
                     <div className="flex justify-between items-center">
                       <span className="flex items-center space-x-2 text-sm text-gray-600">
                         <Users className="w-4 h-4" />
-                        <span>{course.students} students</span>
+                        <span>{course.students || 0} students</span>
                       </span>
                       <span className="flex items-center space-x-2 text-sm font-medium text-green-600">
-                        <span>₹{course.revenue.toLocaleString()}</span>
+                        <span>₹{(course.revenue || 0).toLocaleString()}</span>
                       </span>
                     </div>
                     
@@ -424,6 +707,14 @@ export default function InstructorDashboard() {
                         </div>
                       </div>
                     )}
+
+                    {/* Lessons Count */}
+                    {course.lessons && course.lessons.length > 0 && (
+                      <div className="flex items-center space-x-2 text-sm text-gray-600">
+                        <BookOpen className="w-4 h-4" />
+                        <span>{course.lessons.length} lessons</span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -448,8 +739,8 @@ export default function InstructorDashboard() {
                   {/* Student List */}
                   {expandedCourse === course.id && (
                     <div className="mt-4 space-y-3 border-t pt-4">
-                      <h5 className="font-medium text-gray-800 mb-3">Enrolled Students ({course.enrolledStudents.length})</h5>
-                      {course.enrolledStudents.length === 0 ? (
+                      <h5 className="font-medium text-gray-800 mb-3">Enrolled Students ({(course.enrolledStudents || []).length})</h5>
+                      {(!course.enrolledStudents || course.enrolledStudents.length === 0) ? (
                         <p className="text-gray-500 text-sm">No students enrolled yet.</p>
                       ) : (
                         <div className="max-h-60 overflow-y-auto space-y-2">
@@ -458,28 +749,28 @@ export default function InstructorDashboard() {
                               <div className="flex-1">
                                 <div className="flex items-center space-x-3">
                                   <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                                    <User className="w-4 h-4 text-indigo-600"  />
+                                    <User className="w-4 h-4 text-indigo-600" />
                                   </div>
                                   <div>
                                     <span>
-                      <span
-                        className="font-medium text-blue-600 cursor-pointer hover:underline"
-                       onClick={() => navigate('/student', {
-    state: { courseId: course.id }
-  })}
-                      >
-                        {student.name || "Unnamed Student"}
-                      </span>
-                      {student.email && <span className="text-gray-500 ml-2">({student.email})</span>}
-                    </span>
+                                      <span
+                                        className="font-medium text-blue-600 cursor-pointer hover:underline"
+                                        onClick={() => navigate('/student', {
+                                          state: { courseId: course.id }
+                                        })}
+                                      >
+                                        {student.name || "Unnamed Student"}
+                                      </span>
+                                      {student.email && <span className="text-gray-500 ml-2">({student.email})</span>}
+                                    </span>
                                   </div>
                                 </div>
                                 <div className="mt-2 flex items-center justify-between">
                                   <span className="text-xs text-gray-500">
-                                    Enrolled: {new Date(student.enrolledDate).toLocaleDateString()}
+                                    Enrolled: {student.enrolledDate ? new Date(student.enrolledDate).toLocaleDateString() : 'N/A'}
                                   </span>
                                   <span className="text-xs text-gray-600">
-                                    Progress: {student.progress}%
+                                    Progress: {student.progress || 0}%
                                   </span>
                                 </div>
                               </div>
@@ -496,14 +787,57 @@ export default function InstructorDashboard() {
                       )}
                     </div>
                   )}
+
+                  {/* Lessons Preview */}
+                  {course.lessons && course.lessons.length > 0 && (
+                    <div className="mt-4 border-t pt-4">
+                      <h5 className="font-medium text-gray-800 mb-3">Course Lessons</h5>
+                      <div className="space-y-2 max-h-40 overflow-y-auto">
+                        {course.lessons.map((lesson, index) => (
+                          <div key={index} className="bg-gray-50 rounded-lg p-3">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h6 className="font-medium text-sm text-gray-800">
+                                  Lesson {index + 1}: {lesson.title}
+                                </h6>
+                                <p className="text-xs text-gray-600 mt-1">
+                                  {lesson.content}
+                                </p>
+                              </div>
+                              {lesson.duration && (
+                                <span className="text-xs text-gray-500 ml-2">
+                                  {lesson.duration}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </>
               )}
             </div>
           ))}
         </div>
+
+        {/* Empty State */}
+        {courses.length === 0 && !loading && (
+          <div className="text-center py-12">
+            <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-xl font-medium text-gray-500 mb-2">No courses yet</h3>
+            <p className="text-gray-400 mb-6">Create your first course to get started</p>
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="bg-purple-600 hover:bg-purple-500 text-white px-6 py-3 rounded-xl transition-all duration-200"
+            >
+              Create Your First Course
+            </button>
+          </div>
+        )}
       </div>
     </div>
-      <Footer />
+    <Footer />
     </>
   );
 }
