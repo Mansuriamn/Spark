@@ -163,7 +163,20 @@ export const getTotalCoursesCount = async (req, res) => {
   }
 };
 
-
+export const getUserProfile = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    // Populate enrolledCourses and achievements if you want more details
+    const user = await User.findById(userId)
+      .select('-password -__v'); // Exclude password and __v
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 export const getLearningHours = async (req, res) => {
   try {

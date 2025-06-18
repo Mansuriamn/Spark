@@ -11,7 +11,8 @@ enrollInCourse,
 changeUserRole, getAllInstructors,
 getInProgressCoursesCount,
 getTotalCoursesCount,
-getUserById
+getUserById,
+getUserProfile
 } from '../controllers/userController.js';
 
 import { loginUser } from '../controllers/loginController.js'
@@ -43,5 +44,5 @@ router.get('/:id/total-courses-count', getTotalCoursesCount);
 
 router.get('/:id/learning-hours', getLearningHours);
 
-
+router.get('/profile/:userId', getUserProfile);
 export default router;
