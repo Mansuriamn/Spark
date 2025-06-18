@@ -19,7 +19,7 @@ import PathToProficiency from './components/Practiceinside';
 import InstructorDashboard from './components/Instructorpage';
 import FreeCourseDetails from './components/Freecourse'
 
-
+import LessonPage from './pages/LessonPage';
 import { useNavigate } from 'react-router-dom';
 
 import axios from 'axios';
@@ -52,6 +52,7 @@ function AppWrapper() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/live-sessions" element={<LiveSessionsPage />} />
           <Route path="/schedule" element={<Schedule />} />
+          <Route path="/lesson/:lessonId" element={<LessonPageWrapper />} />
           <Route path="/contest" element={<Contest />} />
           {/*<Route path="/track/:trackName" element={<Trackdetails />} />*/}
           <Route path="/progressupdate" element={<MyCoursesPage />} />
