@@ -8,7 +8,7 @@ export default function CourseCard({ course }) {
  const  lessonsCount = course.lessons ? Object.keys(course.lessons).length : 0;
   
   const handleNavigation = () => {
-    navigate(`/track/${course.id}`); // Replace with the correct path
+    navigate(`/paidcourse`); // Replace with the correct path
   };
 
   return (

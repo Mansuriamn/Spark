@@ -54,7 +54,7 @@ function AppWrapper() {
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/lesson/:lessonId" element={<LessonPageWrapper />} />
           <Route path="/contest" element={<Contest />} />
-          {/*<Route path="/track/:trackName" element={<Trackdetails />} />*/}
+          <Route path="/paidcourse" element={<Trackdetails />} />
           <Route path="/progressupdate" element={<MyCoursesPage />} />
           <Route path="/login" element={<Login setLogin={setLogin} />} />
           <Route path="/Register" element={<Register setLogin={setLogin} />} />

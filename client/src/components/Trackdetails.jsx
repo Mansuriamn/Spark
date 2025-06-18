@@ -1,14 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Clock, Star, User, BookOpen, Play, Download, Smartphone, Award, Calendar, Users, Globe, ChevronDown, ChevronUp, Heart, Share, Gift, Tag } from 'lucide-react';
 import Footer from './Footer';
+import { AuthContext } from '../pages/AuthContext';
 
 const Trackdetails = () => {
+  const {
+    isAuthenticated,
+    enrolledCourses,
+    cartCourses,
+    updateCartCourses
+  } = useContext(AuthContext);
+
   const [expandedSection, setExpandedSection] = useState(null);
   const [selectedTab, setSelectedTab] = useState('Personal');
   const [couponCode, setCouponCode] = useState('');
   const [isWishlisted, setIsWishlisted] = useState(false);
 
+  // Define course object first
   const course = {
+    id: 'python-bootcamp-100-days', // Added unique ID
     title: '100 Days of Code: The Complete Python Pro Bootcamp',
     subtitle: 'Master Python by building 100 projects in 100 days. Learn data science, automation, build websites, games and apps!',
     image: 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
@@ -89,12 +99,20 @@ const Trackdetails = () => {
     ]
   };
 
+  // Now check enrollment and cart status after course is defined
+  const isAlreadyEnrolled = enrolledCourses.some(c => c.id === course.id) || false;
+  const isInCart = cartCourses.some(c => c.id === course.id) || false;
+
   const handleEnroll = () => {
     alert('Redirecting to enrollment page...');
   };
 
   const handleAddToCart = () => {
-    alert('Added to cart successfully!');
+    if (!isAlreadyEnrolled && !isInCart) {
+      const updatedCart = [...cartCourses, course];
+      updateCartCourses(updatedCart);
+      alert('Added to cart successfully!');
+    }
   };
 
   const handleBuyNow = () => {
@@ -345,9 +363,20 @@ const Trackdetails = () => {
                     <div className="space-y-2">
                       <button
                         onClick={handleAddToCart}
-                        className="w-full border-2 border-purple-600 text-purple-600 py-3 px-4 rounded-lg font-semibold hover:bg-purple-50 transition-colors"
+                        className={`w-full border-2 py-3 px-4 rounded-lg font-semibold transition-colors ${
+                          isAlreadyEnrolled
+                            ? 'border-green-600 text-green-600 bg-green-50 cursor-not-allowed'
+                            : isInCart
+                            ? 'border-yellow-500 text-yellow-500 bg-yellow-50 cursor-not-allowed'
+                            : 'border-purple-600 text-purple-600 hover:bg-purple-50'
+                        }`}
+                        disabled={isAlreadyEnrolled || isInCart}
                       >
-                        Add to cart
+                        {isAlreadyEnrolled
+                          ? 'Enrolled'
+                          : isInCart
+                          ? 'In Cart'
+                          : 'Add to Cart'}
                       </button>
                       <button
                         onClick={handleBuyNow}
@@ -376,7 +405,7 @@ const Trackdetails = () => {
                     <p>Full Lifetime Access</p>
                   </div>
 
-                  <div className="flex justify-center space-x-4 mb-4">
+                  <div className="flex flex-wrap justify-center gap-2 mb-4">
                     <button onClick={handleShare} className="text-purple-600 hover:underline flex items-center text-sm">
                       <Share className="h-4 w-4 mr-1" />
                       Share
