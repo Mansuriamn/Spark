@@ -17,6 +17,7 @@ import WebRTCMeeting from './components/WebRTCMeeting';
 import Practice from './pages/Practice';
 import PathToProficiency from './components/Practiceinside';
 import InstructorDashboard from './components/Instructorpage';
+import FreeCourseDetails from './components/Freecourse'
 
 
 import { useNavigate } from 'react-router-dom';
@@ -52,7 +53,7 @@ function AppWrapper() {
           <Route path="/live-sessions" element={<LiveSessionsPage />} />
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/contest" element={<Contest />} />
-          <Route path="/track/:trackName" element={<Trackdetails />} />
+          {/*<Route path="/track/:trackName" element={<Trackdetails />} />*/}
           <Route path="/progressupdate" element={<MyCoursesPage />} />
           <Route path="/login" element={<Login setLogin={setLogin} />} />
           <Route path="/Register" element={<Register setLogin={setLogin} />} />
@@ -66,6 +67,7 @@ function AppWrapper() {
           <Route path='/student' element ={<Student/>}></Route>
           <Route path ='/student' element ={<Student/>}></Route>
           <Route path='/admin' element ={<Admin/>}></Route>
+          <Route path='/track/:trackName' element={<FreeCourseDetails/>}></Route>
         </Routes>
       </main>
     </div>
