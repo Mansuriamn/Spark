@@ -6,6 +6,7 @@ import { AuthContext } from '../pages/AuthContext';
 
 export default function Navbar() {
   const { user, logout } = useContext(AuthContext);
+  console.log(user);
   const location = useLocation();
   const role = localStorage.getItem('selectedRole');
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -108,6 +109,10 @@ export default function Navbar() {
       navigate('/profile');
     }
   };
+
+
+
+
 
   return (
     <header className="min-h-[90px] flex flex-col justify-start py-6 bg-white shadow-sm">
@@ -272,7 +277,7 @@ export default function Navbar() {
 
               <div className="relative">
                 <img
-                  src={user.avatar || 'https://flowbite.com/docs/images/people/profile-picture-5.jpg'}
+                src={user.profilePic}
                   alt="profile"
                   className="h-9 w-9 rounded-full cursor-pointer hover:ring-2 hover:ring-purple-300 transition-all object-cover"
                   onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -284,8 +289,9 @@ export default function Navbar() {
                   >
                     <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
                       <div className="flex items-center space-x-3">
+                        {user.img}
                         <img
-                          src={user.avatar || 'https://flowbite.com/docs/images/people/profile-picture-5.jpg'}
+                          src={user.profilePic}
                           alt="profile"
                           className="h-10 w-10 rounded-full object-cover"
                         />

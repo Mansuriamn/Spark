@@ -17,29 +17,43 @@ const UserProfile = () => {
   } = useContext(AuthContext);
   
   const [isEditing, setIsEditing] = useState(false);
-  const [profileImage, setProfileImage] = useState(null);
+  const [profilePic, setProfilePic] = useState(null);
   const [userInfo, setUserInfo] = useState({
     name: '',
     email: '',
-    role: ''
+    role: '',
+    profilePic: '',
   });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
-      setUserInfo(user);
-      if (user.profileImage) {
-        setProfileImage(user.profileImage);
-      }
+      setUserInfo({
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        profilePic: user.profilePic,
+      });
+      setProfilePic(user.profilePic);
     }
   }, [user]);
 
-  const handleEditToggle = () => setIsEditing(!isEditing);
+  const handleEditToggle = () => {
+    setIsEditing(!isEditing);
+  };
 
   const handleSave = async () => {
+    if (!userInfo.name.trim() || !userInfo.email.trim()) {
+      alert('Name and email are required');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userInfo.email)) {
+      alert('Please enter a valid email');
+      return;
+    }
+
     setLoading(true);
     try {
-      // api
       const response = await fetch('http://localhost:5000/api/user/profile', {
         method: 'PUT',
         headers: {
@@ -49,12 +63,13 @@ const UserProfile = () => {
         body: JSON.stringify({
           name: userInfo.name,
           email: userInfo.email,
-          profileImage: profileImage
+          profilePic: profilePic,
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update profile');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update profile');
       }
 
       const updatedUser = await response.json();
@@ -63,7 +78,7 @@ const UserProfile = () => {
       alert('Profile updated successfully!');
     } catch (error) {
       console.error('Profile update failed:', error);
-      alert('Failed to update profile. Please try again.');
+      alert(error.message);
     } finally {
       setLoading(false);
     }
@@ -72,14 +87,13 @@ const UserProfile = () => {
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      // Check file size (limit to 5MB)
       if (file.size > 5 * 1024 * 1024) {
         alert('Please select an image smaller than 5MB');
         return;
       }
 
       const reader = new FileReader();
-      reader.onload = (e) => setProfileImage(e.target.result);
+      reader.onload = (e) => setProfilePic(e.target.result);
       reader.readAsDataURL(file);
     }
   };
@@ -93,7 +107,6 @@ const UserProfile = () => {
       const updatedCart = cartCourses.filter(course => course.id !== courseId);
       updateCartCourses(updatedCart);
 
-      //Update cart on backend
       await fetch('http://localhost:5000/api/cart/remove', {
         method: 'DELETE',
         headers: {
@@ -112,15 +125,12 @@ const UserProfile = () => {
 
   const handleEnrollFromCart = async (course) => {
     try {
-      // Add to enrolled courses
       const updatedEnrolled = [...enrolledCourses, course];
       updateEnrolledCourses(updatedEnrolled);
 
-      // Remove from cart
       const updatedCart = cartCourses.filter(c => c.id !== course.id);
       updateCartCourses(updatedCart);
 
-      // Backend API call
       await fetch('http://localhost:5000/api/enroll', {
         method: 'POST',
         headers: {
@@ -142,7 +152,6 @@ const UserProfile = () => {
   };
 
   const calculateProgress = (courseId) => {
-   
     return Math.floor(Math.random() * 100);
   };
 
@@ -167,22 +176,19 @@ const UserProfile = () => {
     <>
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-4xl mx-auto">
-         
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Profile</h1>
             <p className="text-gray-600">Manage your account information and enrolled courses</p>
           </div>
 
-          {/* Profile Card */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-8">
             <div className="flex items-start justify-between mb-6">
               <div className="flex items-center space-x-6">
-                {/* Profile Picture */}
                 <div className="relative group">
                   <div className="w-24 h-24 rounded-2xl overflow-hidden shadow-lg">
-                    {profileImage ? (
+                    {profilePic ? (
                       <img
-                        src={profileImage}
+                        src={profilePic}
                         alt="Profile"
                         className="w-full h-full object-cover"
                       />
@@ -192,8 +198,6 @@ const UserProfile = () => {
                       </div>
                     )}
                   </div>
-
-                  {/* Upload */}
                   {isEditing && (
                     <div className="absolute inset-0 bg-black bg-opacity-50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center cursor-pointer">
                       <label htmlFor="profile-upload" className="cursor-pointer">
@@ -208,12 +212,8 @@ const UserProfile = () => {
                       />
                     </div>
                   )}
-
-                  {/* Online*/}
                   <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white"></div>
                 </div>
-
-                {/* User info*/}
                 <div className="flex-1">
                   {isEditing ? (
                     <div className="space-y-4">
@@ -251,8 +251,6 @@ const UserProfile = () => {
                   )}
                 </div>
               </div>
-
-              {/*edit button*/}
               <div className="flex space-x-3">
                 {isEditing ? (
                   <>
@@ -284,7 +282,6 @@ const UserProfile = () => {
             </div>
           </div>
 
-          {/* Enrolled Courses */}
           {enrolledCourses && enrolledCourses.length > 0 && (
             <div className="mb-8">
               <div className="flex items-center space-x-3 mb-6">
@@ -294,7 +291,6 @@ const UserProfile = () => {
                   {enrolledCourses.length}
                 </span>
               </div>
-
               <div className="grid md:grid-cols-2 gap-6">
                 {enrolledCourses.map((course) => {
                   const progress = calculateProgress(course.id);
@@ -360,7 +356,6 @@ const UserProfile = () => {
             </div>
           )}
 
-          {/*cart Courses*/}
           {cartCourses && cartCourses.length > 0 && (
             <div className="mb-8">
               <div className="flex items-center space-x-3 mb-6">
@@ -370,7 +365,6 @@ const UserProfile = () => {
                   {cartCourses.length}
                 </span>
               </div>
-
               <div className="space-y-4">
                 {cartCourses.map((course) => (
                   <div key={course.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
@@ -430,7 +424,6 @@ const UserProfile = () => {
             </div>
           )}
 
-          {/*empty states*/}
           {(!enrolledCourses || enrolledCourses.length === 0) && (!cartCourses || cartCourses.length === 0) && (
             <div className="text-center py-12">
               <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
