@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import CoursesPage from './pages/Home';
@@ -17,59 +17,48 @@ import WebRTCMeeting from './components/WebRTCMeeting';
 import Practice from './pages/Practice';
 import PathToProficiency from './components/Practiceinside';
 import InstructorDashboard from './components/Instructorpage';
-import FreeCourseDetails from './components/Freecourse'
-
+import FreeCourseDetails from './components/Freecourse';
 import LessonPageWrapper from './pages/LessonPage';
-import { useNavigate } from 'react-router-dom';
-
-import axios from 'axios';
 import WelcomePage from './pages/Mainpage';
-
 import Student from './components/Seestudent';
 import Admin from './pages/Admin';
-
+import ProtectedRoute from './components/ProtectedRout';
+const StudentDashboard = () => <div>Student Dashboard</div>;
+const AdminDashboard = () => <div>Admin Dashboard</div>;
 
 function AppWrapper() {
   const location = useLocation();
-  const [login, setLogin] = useState(false);
-  const [UserId, setUserId] = useState('684bccd97c61555addc4f460');
-  const [Token, setToken] = useState('');
-
- 
-  const hideNavbarRoutes = ['/' ,'/Login','/login',  '/Register'];
-
-  const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
-
+  const hideNavbarRoutes = ['/', '/login', '/Register'];
+  const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname.toLowerCase());
+  const selectedRole=localStorage.getItem("selectedRole");
   return (
     <div className="min-h-screen bg-purple-50 font-sans text-gray-800">
       {shouldShowNavbar && <Navbar />}
       <main>
         <Routes>
+          <Route path='/' element={<WelcomePage />}/>
+          <Route path="/login" element={<Login />} />
+          <Route path="/Register" element={<Register />} />
           <Route path="/meeting/:roomName" element={<WebRTCMeeting userName="Roshan" />} />
-          <Route path="/" element={<WelcomePage />} />
-          <Route path="/home" element={<CoursesPage  />} />
-          <Route path="/courses" element={<Courses />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/live-sessions" element={<LiveSessionsPage />} />
-          <Route path="/schedule" element={<Schedule />} />
-          <Route path="/lesson/:lessonId" element={<LessonPageWrapper />} />
-          <Route path="/contest" element={<Contest />} />
-          <Route path="/paidcourse" element={<Trackdetails />} />
-          <Route path="/progressupdate" element={<MyCoursesPage />} />
-          <Route path="/login" element={<Login setLogin={setLogin} />} />
-          <Route path="/Register" element={<Register setLogin={setLogin} />} />
-          <Route path="/profile" element={<UserProfile />} />
-          <Route path="/video" element={<VideoDashboard />} />
-          <Route path="/practice" element={<Practice />} />
-          <Route path="/practiceinside" element={<PathToProficiency />} />
-          <Route path="/instructor" element={<InstructorDashboard />} />
-
-          <Route path="/Main" element={<WelcomePage />} />
-          <Route path='/student' element ={<Student/>}></Route>
-          <Route path ='/student' element ={<Student/>}></Route>
-          <Route path='/admin' element ={<Admin/>}></Route>
-          <Route path='/track/:trackName' element={<FreeCourseDetails/>}></Route>
-          <Route path='/courses/:courseId' element={<FreeCourseDetails />} />
+          <Route path="/home" element={<ProtectedRoute allowedRoles={['student']}><CoursesPage /></ProtectedRoute>} />
+          <Route path="/courses" element={<ProtectedRoute allowedRoles={['student']}><Courses /></ProtectedRoute>} />
+          <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['student']}><DashboardPage /></ProtectedRoute>} />
+          <Route path="/live-sessions" element={<ProtectedRoute allowedRoles={['student']}><LiveSessionsPage /></ProtectedRoute>} />
+          <Route path="/schedule" element={<ProtectedRoute allowedRoles={['student']}><Schedule /></ProtectedRoute>} />
+          <Route path="/lesson/:lessonId" element={<ProtectedRoute allowedRoles={['student']}><LessonPageWrapper /></ProtectedRoute>} />
+          <Route path="/contest" element={<ProtectedRoute allowedRoles={['student']}><Contest /></ProtectedRoute>} />
+          <Route path="/progressupdate" element={<ProtectedRoute allowedRoles={['student']}><MyCoursesPage /></ProtectedRoute>} />
+          <Route path="/video" element={<ProtectedRoute allowedRoles={['student']}><VideoDashboard /></ProtectedRoute>} />
+          <Route path="/practice" element={<ProtectedRoute allowedRoles={['student']}><Practice /></ProtectedRoute>} />
+          <Route path="/practiceinside" element={<ProtectedRoute allowedRoles={['student']}><PathToProficiency /></ProtectedRoute>} />
+          <Route path="/student" element={<ProtectedRoute allowedRoles={['student']}><Student /></ProtectedRoute>} />
+          <Route path="/student-dashboard" element={<ProtectedRoute allowedRoles={['student']}><StudentDashboard /></ProtectedRoute>} />
+          <Route path="/track/:trackName" element={<ProtectedRoute allowedRoles={['student']}><FreeCourseDetails /></ProtectedRoute>} />
+          <Route path="/courses/:courseId" element={<ProtectedRoute allowedRoles={['student']}><FreeCourseDetails /></ProtectedRoute>} />
+          <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']}><Admin /></ProtectedRoute>} />
+          <Route path="/admin-dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/instructor" element={<ProtectedRoute allowedRoles={['instructor']}><InstructorDashboard /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute allowedRoles={['student','admin','instructor']}><UserProfile /></ProtectedRoute>} />
         </Routes>
       </main>
     </div>

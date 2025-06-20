@@ -7,7 +7,7 @@ export default function WelcomePage() {
 
   
  const handleAdminLogin=()=>{
-  localStorage.setItem('selectedRole', 'student'); 
+  localStorage.setItem('selectedRole', 'admin'); 
   navigate('/login'); 
  }
 

@@ -31,20 +31,23 @@ export default function Login() {
       });
 
       const data = await res.json();
+      // console.log('Login response:', data); // Debug
 
       if (res.ok) {
+        localStorage.setItem('authToken', data.token);
+        const selectedRole=localStorage.getItem("selectedRole");
         login(data.user, data.token);
 
-        const selectedRole = localStorage.getItem('selectedRole');
-
+        
         if (selectedRole === 'student') {
           navigate('/home');
         } else if (selectedRole === 'instructor') {
-          navigate('/home');
+          navigate('/instructor');
         } else if (selectedRole === 'admin') {
-          navigate('/home');
+          navigate('/admin');
         } else {
-          navigate('/');
+          alert('Invalid role');
+          navigate('/login');
         }
       } else {
         alert(data.message || 'Login failed');
@@ -55,55 +58,50 @@ export default function Login() {
   };
 
   return (
-   <div className='bg-purple-50 min-h-screen flex items-center justify-center'>
-    <div className='contain_both'>
-      <img className='contain_both_img' src={img} alt='img' />
-      <div className="container1">
-        <div className="wrapper1">
-          <form onSubmit={handleSubmit}>
-            <h1>Login</h1>
-
-            <div className="login_img1">
-              <img src={logo4} alt="Logo 1" />
-              <img src={logo3} alt="Logo 2" />
-              <img src={logo2} alt="Logo 3" />
-            </div>
-
-            <div className="input-box1">
-              <input
-                name="email"
-                type="email"
-                placeholder="Email"
-                value={loginData.email}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="input-box1">
-              <input
-                name="password"
-                type="password"
-                placeholder="Password"
-                value={loginData.password}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <br />
-
-            <button type="submit" className="btn1">Login</button>
-
-            <div className="register-link1">
-              <a href="#">Forget password?</a>
-            </div>
-            <div className="register-link1">
-              <p>Don't have an account? <a onClick={() => navigate("/Register")}>Register</a></p>
-            </div>
-          </form>
+    <div className='bg-purple-50 min-h-screen flex items-center justify-center'>
+      <div className='contain_both'>
+        <img className='contain_both_img' src={img} alt='img' />
+        <div className="container1">
+          <div className="wrapper1">
+            <form onSubmit={handleSubmit}>
+              <h1>Login</h1>
+              <div className="login_img1">
+                <img src={logo4} alt="Logo 1" />
+                <img src={logo3} alt="Logo 2" />
+                <img src={logo2} alt="Logo 3" />
+              </div>
+              <div className="input-box1">
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="Email"
+                  value={loginData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="input-box1">
+                <input
+                  name="password"
+                  type="password"
+                  placeholder="Password"
+                  value={loginData.password}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <br />
+              <button type="submit" className="btn1">Login</button>
+              <div className="register-link1">
+                <a href="#">Forget password?</a>
+              </div>
+              <div className="register-link1">
+                <p>Don't have an account? <a onClick={() => navigate("/Register")}>Register</a></p>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </div></div>
+    </div>
   );
 }

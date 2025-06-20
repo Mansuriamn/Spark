@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import '../style/CourseCard.css'
 import axios from 'axios';
 export default function CourseCard({ course }) {
-  console.log(course)
+  
   const navigate = useNavigate();
  const  lessonsCount = course.lessons ? Object.keys(course.lessons).length : 0;
   

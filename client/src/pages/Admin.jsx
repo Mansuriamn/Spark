@@ -21,7 +21,7 @@ export default function Admin() {
   ]);
   const [expandedInstructor, setExpandedInstructor] = useState(null);
   const [profileEdit, setProfileEdit] = useState(false);
-
+  const selectedRole=localStorage.getItem("selectedRole");
   useEffect(() => {
     if (user) {
       setProfile(user);

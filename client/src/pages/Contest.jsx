@@ -28,7 +28,7 @@ const Contest = () => {
         const response = await axios.get("http://localhost:5000/api/contests");
         if (response.data && Array.isArray(response.data)) {
           setContestData(response.data);
-          console.log(response.data);
+          // console.log(response.data);
         } else {
           console.error("No contest data returned");
         }

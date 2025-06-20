@@ -19,7 +19,7 @@ function CourseCard({ course = {} }) {
 
   // lesson count
   const lessonCount = Array.isArray(lesson) ? lesson.length : 0;
-  console.log(lessonCount);
+  // console.log(lessonCount);
   const handleClick = () => {
     alert(`You clicked on ${title}`);
   };
