@@ -62,7 +62,7 @@ export default function Admin() {
             <div className="relative">
               {profileImage ? (
                 <img
-                  src={profileImage}
+                  src={profile.profilePic}
                   alt="Profile"
                   className="profile_image"
                 />
@@ -102,7 +102,7 @@ export default function Admin() {
                 <>
                   <h2 className="text-3xl font-bold text-gray-800">{profile.name}</h2>
                   <p className="text-gray-600">{profile.email}</p>
-                  <p className="text-gray-500 text-sm mt-1">{profile.role}</p>
+                  
                   <span className="inline-block text-sm bg-indigo-100 text-indigo-700 px-4 py-2 rounded-full mt-2 font-medium">
                     Administrator
                   </span>

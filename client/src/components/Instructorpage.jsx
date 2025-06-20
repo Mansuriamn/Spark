@@ -418,7 +418,6 @@ setError('Failed to create course: ' + err.message);
                   <>
                     <h2 className="text-3xl font-bold text-gray-800">{profile.name}</h2>
                     <p className="text-gray-600">{profile.email}</p>
-                    <p className="text-gray-500 text-sm mt-1">{profile.bio || 'No bio added yet'}</p>
                     <span className="inline-block text-sm bg-indigo-100 text-indigo-700 px-4 py-2 rounded-full mt-2 font-medium">
                       Senior Instructor
                     </span>
