@@ -3,7 +3,7 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { FaBell, FaBars, FaTimes, FaCog, FaUser, FaSignOutAlt, FaChevronRight } from 'react-icons/fa';
 import { Bell, Menu, X, Settings, User, LogOut, ChevronRight } from 'lucide-react';
 import { AuthContext } from '../pages/AuthContext';
-
+import logo5 from '../assets/img/logo5.png'
 export default function Navbar() {
   const { user, logout } = useContext(AuthContext);
   
@@ -118,7 +118,15 @@ export default function Navbar() {
     <header className="min-h-[90px] flex flex-col justify-start py-6 bg-white shadow-sm">
       <div className="w-[95%] max-w-[1280px] flex items-center mx-auto">
         <a href="/" className="flex items-center space-x-2">
-          <h1 className="text-xl font-bold text-gray-900">Spark</h1>
+          {/* <h1 className="text-xl font-bold text-gray-900">Spark</h1> */}
+          <img
+          style={{
+            width:"50px",
+            height:"50px",
+            cursor:"pointer",
+           
+          }}
+           src={logo5} alt='Logo' />
         </a>
 
         <nav className="hidden md:flex items-center space-x-4 ml-8">
