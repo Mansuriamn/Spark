@@ -16,6 +16,13 @@ const UserProfile = () => {
     token 
   } = useContext(AuthContext);
   
+  const { userProfile, updateUserProfile } = useContext(AuthContext);
+
+const saveProfile = async (newProfileData) => {
+  // maybe call API first, then update
+  updateUserProfile(newProfileData);
+};
+
   const [isEditing, setIsEditing] = useState(false);
   const [profilePic, setProfilePic] = useState(null);
   const [userInfo, setUserInfo] = useState({
@@ -54,7 +61,7 @@ const UserProfile = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/user/profile', {
+      const response = await fetch('http://localhost:5000/api/user/67f0b81f2fc577093ad382b6', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

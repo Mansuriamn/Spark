@@ -28,7 +28,7 @@ const AdminDashboard = () => <div>Admin Dashboard</div>;
 
 function AppWrapper() {
   const location = useLocation();
-  const hideNavbarRoutes = ['/', '/login', '/Register'];
+  const hideNavbarRoutes = ['/','/login ', '/Register' ,'/Login'];
   const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname.toLowerCase());
   const selectedRole=localStorage.getItem("selectedRole");
   return (
