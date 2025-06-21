@@ -10,21 +10,28 @@ const iconMap = {
   android: <FaAndroid className="text-green-500 text-xl" />,
 };
 
-const TrackCard = ({ icon, title, description, courses, lessons, duration }) => {
+const TrackCard = (course) => {
+  const [courseData,setCourseData]=useState({});
+  useEffect(()=>{
+    if(course){
+      setCourseData(course.course);
+    }
+ console.log(courseData)
+  })
   const [saved, setSaved] = useState(false);
   const [shared, setShared] = useState(false);
   const navigate = useNavigate();
 
   const handleCardClick = () => {
-    navigate(`/track/${title.toLowerCase()}`);
+    navigate(`/track/${courseData.title.toLowerCase()}`);
   };
 
   const handleShare = async (e) => {
     e.stopPropagation();
-    const shareUrl = window.location.origin + `/track/${title.toLowerCase()}`;
+    const shareUrl = window.location.origin + `/track/${courseData.title.toLowerCase()}`;
     try {
       if (navigator.share) {
-        await navigator.share({ title: `Check out this track: ${title}`, url: shareUrl });
+        await navigator.share({ title: `Check out this track: ${courseData.title}`, url: shareUrl });
       } else {
         await navigator.clipboard.writeText(shareUrl);
         alert("Link copied to clipboard!");
@@ -42,16 +49,16 @@ const TrackCard = ({ icon, title, description, courses, lessons, duration }) => 
     >
       <div className="relative h-48 w-full bg-gray-200 rounded-lg mb-4 overflow-hidden flex items-center justify-center">
         <img
-          src="https://images.unsplash.com/photo-1518770660439-4636190af475"
-          alt="Track"
+          src={courseData.pictureUrl}
+          alt="Loading.."
           className="absolute top-0 left-0 w-full h-full object-cover opacity-60 group-hover:opacity-70 transition-opacity"
         />
         <BsPlayCircle className="text-white text-4xl relative z-10" />
       </div>
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          {icon}
-          <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+          {iconMap[courseData.key]}
+          <h3 className="text-lg font-semibold text-gray-800">{courseData.title}</h3>
         </div>
         <div className="flex items-center gap-3 text-gray-500 z-20" onClick={(e) => e.stopPropagation()}>
           <FiShare2
@@ -66,97 +73,30 @@ const TrackCard = ({ icon, title, description, courses, lessons, duration }) => 
           />
         </div>
       </div>
-      <p className="text-sm text-gray-600 mb-4">{description}</p>
+      <p className="text-sm text-gray-600 mb-4">{courseData.description}</p>
       <div className="flex justify-between text-sm text-gray-700 font-medium">
-        <span>{courses} Courses</span>
-        <span>{lessons} Lessons</span>
-        <span>{duration}</span>
+        {/* <span>{courseData.courses} Courses</span>
+        <span>{courseData.lessons} Lessons</span>
+        <span>{courseData.duration}</span> */}
       </div>
     </div>
   );
 };
 
 const TrackList = () => {
+  const count=0;
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // Fallback data
-  const fallbackData = [
-    {
-      key: "front-end",
-      title: "Front-End Development",
-      description: "Learn HTML, CSS, JavaScript, React, and more to build modern web applications.",
-      courses: 6,
-      lessons: 18,
-      duration: "25h 30m",
-      students: [
-        { _id: "stu1", name: "Alice Johnson", email: "alice@example.com" },
-        { _id: "stu2", name: "Bob Smith", email: "bob@example.com" }
-      ]
-    },
-    {
-      key: "back-end",
-      title: "Back-End Development",
-      description: "Master server-side development with Node.js, Express, databases, and API design.",
-      courses: 5,
-      lessons: 15,
-      duration: "20h 10m",
-      students: [
-        { _id: "stu3", name: "Charlie Brown", email: "charlie@example.com" }
-      ]
-    },
-    {
-      key: "android",
-      title: "Android Development",
-      description: "Build native Android apps using Kotlin, Android Studio, and mobile development best practices.",
-      courses: 4,
-      lessons: 12,
-      duration: "18h 00m",
-      students: []
-    },{
-      key: "front-end",
-      title: "Front-End Development",
-      description: "Learn HTML, CSS, JavaScript, React, and more to build modern web applications.",
-      courses: 6,
-      lessons: 18,
-      duration: "25h 30m",
-      students: [
-        { _id: "stu1", name: "Alice Johnson", email: "alice@example.com" },
-        { _id: "stu2", name: "Bob Smith", email: "bob@example.com" }
-      ]
-    },
-    {
-      key: "back-end",
-      title: "Back-End Development",
-      description: "Master server-side development with Node.js, Express, databases, and API design.",
-      courses: 5,
-      lessons: 15,
-      duration: "20h 10m",
-      students: [
-        { _id: "stu3", name: "Charlie Brown", email: "charlie@example.com" }
-      ]
-    },
-    {
-      key: "android",
-      title: "Android Development",
-      description: "Build native Android apps using Kotlin, Android Studio, and mobile development best practices.",
-      courses: 4,
-      lessons: 12,
-      duration: "18h 00m",
-      students: []
-    }
-  ];
 
   useEffect(() => {
     const fetchTracks = async () => {
       try {
-        const response = await fetch('/api/courses'); 
+        const response = await fetch("/api/courses");
         const data = await response.json();
-        setCourses(Array.isArray(data) ? data : fallbackData);
+        setCourses(data.data);
       } catch (error) {
         console.error("Error fetching tracks:", error);
-        // Use fallback data when API fails
-        setCourses(fallbackData);
+        setCourses([]);
       } finally {
         setLoading(false);
       }
@@ -178,16 +118,13 @@ const TrackList = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
-          {courses.map((course) => {
-            const { key, ...rest } = course;
-            return (
-              <TrackCard
-                key={key}
-                {...rest}
-                icon={iconMap[key.toLowerCase()] || <FaCode className="text-gray-400 text-xl" />}
-              />
-            );
-          })}
+          {courses.length > 0 ? (
+            courses.slice(0, 6).map((course) => (
+              <TrackCard key={course._id} course={course} />
+            ))
+          ) : (
+            <p className="text-gray-500 text-center">No courses available.</p>
+          )}
         </div>
       )}
     </div>
@@ -195,3 +132,4 @@ const TrackList = () => {
 };
 
 export default TrackList;
+

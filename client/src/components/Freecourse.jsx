@@ -240,15 +240,15 @@ const FreeCourseDetails = () => {
               )}
             </div>
           </div>
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/-eFqg8JnohY" 
+        title="YouTube video player" frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen></iframe>
 
           {/* Course Preview Image */}
           <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-8">
             <div className="relative">
-              <img
-                src={course.image}
-                alt={course.title}
-                className="w-full h-64 md:h-80 object-cover"
-              />
+              
               <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
                 <button className="bg-white rounded-full p-4 hover:bg-gray-100 transition-colors">
                   <Play className="h-8 w-8 text-gray-800" />
