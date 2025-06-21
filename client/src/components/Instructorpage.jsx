@@ -409,13 +409,7 @@ setError('Failed to create course: ' + err.message);
                       onChange={(e) => setProfile({...profile, email: e.target.value})}
                       className="block text-gray-600 bg-transparent border-b border-gray-300 focus:outline-none focus:border-indigo-500"
                     />
-                    <textarea
-                      value={profile.bio}
-                      onChange={(e) => setProfile({...profile, bio: e.target.value})}
-                      className="block text-gray-500 text-sm bg-transparent border-b border-gray-300 focus:outline-none focus:border-indigo-500 resize-none"
-                      rows="2"
-                      placeholder="Tell us about yourself..."
-                    />
+                    
                   </div>
                 ) : (
                   <>
