@@ -6,7 +6,7 @@ import { AuthContext } from '../pages/AuthContext';
 
 export default function Navbar() {
   const { user, logout } = useContext(AuthContext);
-  console.log(user);
+  
   const location = useLocation();
   const role = localStorage.getItem('selectedRole');
   const [dropdownOpen, setDropdownOpen] = useState(false);
