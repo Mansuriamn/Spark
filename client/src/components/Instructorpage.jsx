@@ -115,6 +115,9 @@ const response = await fetch('http://localhost:5000/api/courses', {
 
 if (!response.ok) {
   throw new Error('Failed to create course');
+}else{
+  window.alert("Course create successfully");
+  
 }
 
 const createdCourse = await response.json();

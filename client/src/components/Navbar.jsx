@@ -50,7 +50,7 @@ export default function Navbar() {
     }
     switch (role) {
       case 'student':
-        return ['Home', 'Courses', 'Dashboard', 'Live Sessions', 'Schedule', 'Contest', 'Practice', 'Progress Update'];
+        return ['Home', 'Courses',  'Contest', 'Practice', 'Progress Update'];
       case 'admin':
         return ['Admin', 'Admin Dashboard'];
       case 'instructor':
@@ -118,8 +118,7 @@ export default function Navbar() {
     <header className="min-h-[90px] flex flex-col justify-start py-6 bg-white shadow-sm">
       <div className="w-[95%] max-w-[1280px] flex items-center mx-auto">
         <a href="/" className="flex items-center space-x-2">
-          <span className="text-purple-600 text-2xl font-black">✖</span>
-          <h1 className="text-xl font-bold text-gray-900">LearnoHub</h1>
+          <h1 className="text-xl font-bold text-gray-900">Spark</h1>
         </a>
 
         <nav className="hidden md:flex items-center space-x-4 ml-8">

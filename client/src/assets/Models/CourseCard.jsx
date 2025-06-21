@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import '../style/CourseCard.css'
 import axios from 'axios';
 export default function CourseCard({ course }) {
-  
+   console.log(course);
   const navigate = useNavigate();
  const  lessonsCount = course.lessons ? Object.keys(course.lessons).length : 0;
   
@@ -40,7 +40,7 @@ export default function CourseCard({ course }) {
       <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-2">
         <div className="flex items-center gap-1">
           <FaClock className="text-orange-500" />
-          <span>{course.duration}</span>
+          <span>{course.estimatedDuration} Minutes</span>
         </div>
         <div className="flex items-center gap-1">
           <FaUsers className="text-orange-500" />
@@ -58,7 +58,7 @@ export default function CourseCard({ course }) {
     </div>
 
     <div className="flex items-center justify-between mt-2">
-      <span className="text-gray-400 ">${course.originalPrice}</span>
+      <span className="text-gray-400 ">₹{course.originalPrice}</span>
       <span className="text-green-600 font-bold">{course.price}</span>
       <button
         onClick={(e) => {
