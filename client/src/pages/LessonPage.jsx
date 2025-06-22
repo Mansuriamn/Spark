@@ -5,7 +5,7 @@ const LessonPage = ({ lessonId }) => {
   const [lesson, setLesson] = useState(null);
 
   useEffect(() => {
-    fetch(`/api/lessons/${lessonId}`)
+    fetch(`/api/lessons/${lesson._id}`)
       .then(res => res.json())
       .then(data => setLesson(data));
   }, [lessonId]);

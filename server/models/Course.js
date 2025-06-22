@@ -85,7 +85,7 @@ const CourseSchema = new mongoose.Schema({
   thumbnailUrl: String,
   pictureUrl: String,               // <‑‑ banner / cover image
   lessons: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Lesson' }],
-  prerequisites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
+  prerequisites: [String],
   version: { type: Number, default: 1 },
   versionHistory: [VersionHistorySchema],
   status: { type: String, enum: ['draft','published','archived'], default: 'draft' },

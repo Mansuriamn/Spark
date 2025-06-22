@@ -1,125 +1,158 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Clock, Star, User, BookOpen, Play, Download, Smartphone, Award, Calendar, Users, Globe, ChevronDown, ChevronUp } from 'lucide-react';
 import { AuthContext } from '../pages/AuthContext';
 import Footer from './Footer';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+
+
+const coursedata = {
+  id: 'free-python-basics',
+  title: 'Python Programming Fundamentals - Free Course',
+  subtitle: 'Learn Python basics with hands-on projects. Perfect for beginners starting their programming journey!',
+  image: 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+  rating: 4.5,
+  totalRatings: 15420,
+  students: 89250,
+  instructor: 'Sarah Johnson',
+  instructorRole: 'Python Developer & Educator',
+  lastUpdated: '5/2025',
+  languages: ['English', 'Spanish [Auto]', '12 more'],
+  free: true,
+  duration: '8h 15m',
+  sections: 12,
+  lectures: 45,
+
+  whatYouLearn: [
+    'Understand Python syntax and basic programming concepts',
+    'Work with variables, data types, and control structures',
+    'Create simple programs and solve basic coding challenges',
+    'Use functions and understand scope in Python',
+    'Handle errors and exceptions in your code',
+    'Build a foundation for advanced Python development',
+    'Practice with real coding exercises and mini-projects',
+    'Get comfortable with Python development environment'
+  ],
+
+  courseIncludes: [
+    { icon: Play, text: '8 hours on-demand video' },
+    { icon: BookOpen, text: '15 coding exercises' },
+    { icon: Download, text: '25 downloadable resources' },
+    { icon: Smartphone, text: 'Access on mobile and TV' },
+    { icon: Award, text: 'Certificate of completion' }
+  ],
+
+  requirements: [
+    'No programming experience required',
+    'A computer with internet connection',
+    'Willingness to learn and practice'
+  ],
+
+  topics: ['Python', 'Programming Fundamentals', 'Beginner Programming'],
+
+  reviews: [
+    {
+      name: 'Amit K.',
+      comment: 'Perfect introduction to Python! Clear explanations and great examples.',
+      rating: 5
+    },
+    {
+      name: 'Lisa M.',
+      comment: 'Excellent free course. Helped me get started with programming.',
+      rating: 5
+    },
+    {
+      name: 'David R.',
+      comment: 'Well-structured lessons. Great for absolute beginners.',
+      rating: 4
+    }
+  ],
+
+  courseContent: [
+    {
+      section: 1,
+      title: 'Getting Started with Python',
+      lectures: 5,
+      duration: '45min',
+      lessons: [
+        { title: 'Welcome to Python Programming', duration: '05:30', preview: true },
+        { title: 'Installing Python and Setting Up Your Environment', duration: '08:45' },
+        { title: 'Your First Python Program', duration: '06:20', preview: true },
+        { title: 'Understanding the Python Interpreter', duration: '12:15' },
+        { title: 'Python Syntax and Indentation', duration: '12:45' }
+      ]
+    },
+    {
+      section: 2,
+      title: 'Variables and Data Types',
+      lectures: 6,
+      duration: '1hr 10min',
+      lessons: [
+        { title: 'Python Variables Explained', duration: '10:30' },
+        { title: 'Numbers and Mathematical Operations', duration: '15:20' },
+        { title: 'Working with Strings', duration: '18:45' },
+        { title: 'Boolean Values and Comparisons', duration: '08:30' },
+        { title: 'Lists and Basic Operations', duration: '12:15' },
+        { title: 'Practice Exercise: Calculator Project', duration: '05:40' }
+      ]
+    },
+    {
+      section: 3,
+      title: 'Control Flow and Decision Making',
+      lectures: 4,
+      duration: '50min',
+      lessons: [
+        { title: 'If, Elif, and Else Statements', duration: '15:30' },
+        { title: 'Loops: For and While', duration: '18:20' },
+        { title: 'Break and Continue Statements', duration: '08:45' },
+        { title: 'Practice: Number Guessing Game', duration: '07:25' }
+      ]
+    }
+  ]
+};
+
 
 const FreeCourseDetails = () => {
   const navigate = useNavigate();
+
+  const [course, setCourse] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const { id } = useParams();
   const [expandedSection, setExpandedSection] = useState(null);
-  
+
   const {
     isAuthenticated,
     enrolledCourses,
     updateEnrolledCourses,
     user,
     token,
+    enrolledCourseIds
   } = useContext(AuthContext);
 
-  const course = {
-    id: 'free-python-basics',
-    title: 'Python Programming Fundamentals - Free Course',
-    subtitle: 'Learn Python basics with hands-on projects. Perfect for beginners starting their programming journey!',
-    image: 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-    rating: 4.5,
-    totalRatings: 15420,
-    students: 89250,
-    instructor: 'Sarah Johnson',
-    instructorRole: 'Python Developer & Educator',
-    lastUpdated: '5/2025',
-    languages: ['English', 'Spanish [Auto]', '12 more'],
-    free: true,
-    duration: '8h 15m',
-    sections: 12,
-    lectures: 45,
-    
-    whatYouLearn: [
-      'Understand Python syntax and basic programming concepts',
-      'Work with variables, data types, and control structures',
-      'Create simple programs and solve basic coding challenges',
-      'Use functions and understand scope in Python',
-      'Handle errors and exceptions in your code',
-      'Build a foundation for advanced Python development',
-      'Practice with real coding exercises and mini-projects',
-      'Get comfortable with Python development environment'
-    ],
+  useEffect(() => {
+    setLoading(true);
+    axios.get(`/api/courses/${enrolledCourseIds}`)
+      .then(res => {
+        setCourse(res.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setCourse(coursedata);
+        setError("Showing fallback course data.");
+        setLoading(false);
+      });
+  }, [id]);
 
-    courseIncludes: [
-      { icon: Play, text: '8 hours on-demand video' },
-      { icon: BookOpen, text: '15 coding exercises' },
-      { icon: Download, text: '25 downloadable resources' },
-      { icon: Smartphone, text: 'Access on mobile and TV' },
-      { icon: Award, text: 'Certificate of completion' }
-    ],
 
-    requirements: [
-      'No programming experience required',
-      'A computer with internet connection',
-      'Willingness to learn and practice'
-    ],
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading course details...</div>;
+  }
 
-    topics: ['Python', 'Programming Fundamentals', 'Beginner Programming'],
-    
-    reviews: [
-      {
-        name: 'Amit K.',
-        comment: 'Perfect introduction to Python! Clear explanations and great examples.',
-        rating: 5
-      },
-      {
-        name: 'Lisa M.',
-        comment: 'Excellent free course. Helped me get started with programming.',
-        rating: 5
-      },
-      {
-        name: 'David R.',
-        comment: 'Well-structured lessons. Great for absolute beginners.',
-        rating: 4
-      }
-    ],
-
-    courseContent: [
-      {
-        section: 1,
-        title: 'Getting Started with Python',
-        lectures: 5,
-        duration: '45min',
-        lessons: [
-          { title: 'Welcome to Python Programming', duration: '05:30', preview: true },
-          { title: 'Installing Python and Setting Up Your Environment', duration: '08:45' },
-          { title: 'Your First Python Program', duration: '06:20', preview: true },
-          { title: 'Understanding the Python Interpreter', duration: '12:15' },
-          { title: 'Python Syntax and Indentation', duration: '12:45' }
-        ]
-      },
-      {
-        section: 2,
-        title: 'Variables and Data Types',
-        lectures: 6,
-        duration: '1hr 10min',
-        lessons: [
-          { title: 'Python Variables Explained', duration: '10:30' },
-          { title: 'Numbers and Mathematical Operations', duration: '15:20' },
-          { title: 'Working with Strings', duration: '18:45' },
-          { title: 'Boolean Values and Comparisons', duration: '08:30' },
-          { title: 'Lists and Basic Operations', duration: '12:15' },
-          { title: 'Practice Exercise: Calculator Project', duration: '05:40' }
-        ]
-      },
-      {
-        section: 3,
-        title: 'Control Flow and Decision Making',
-        lectures: 4,
-        duration: '50min',
-        lessons: [
-          { title: 'If, Elif, and Else Statements', duration: '15:30' },
-          { title: 'Loops: For and While', duration: '18:20' },
-          { title: 'Break and Continue Statements', duration: '08:45' },
-          { title: 'Practice: Number Guessing Game', duration: '07:25' }
-        ]
-      }
-    ]
-  };
+  if (!course) {
+    return <div className="min-h-screen flex items-center justify-center text-red-500">Course not found.</div>;
+  }
 
   const isAlreadyEnrolled = enrolledCourses.some(c => c.id === course.id);
 
@@ -132,7 +165,7 @@ const FreeCourseDetails = () => {
     if (!isAlreadyEnrolled && user) {
       const updatedCourses = [...enrolledCourses, course];
       updateEnrolledCourses(updatedCourses);
-      
+
       // Optional backend API call
       try {
         const response = await fetch('http://localhost:5000/api/enroll', {
@@ -239,26 +272,22 @@ const FreeCourseDetails = () => {
                 </div>
               )}
             </div>
-          </div>
-      <iframe width="560" height="315" src="https://www.youtube.com/embed/-eFqg8JnohY" 
-        title="YouTube video player" frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen></iframe>
 
-          {/* Course Preview Image */}
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-8">
-            <div className="relative">
-              
-              <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                <button className="bg-white rounded-full p-4 hover:bg-gray-100 transition-colors">
-                  <Play className="h-8 w-8 text-gray-800" />
-                </button>
-              </div>
-              <div className="absolute bottom-4 right-4 bg-black bg-opacity-70 text-white px-3 py-2 rounded text-sm">
-                Preview this course
-              </div>
-            </div>
+
           </div>
+
+
+          <div className="w-full aspect-video rounded overflow-hidden mb-5">
+            <iframe
+              src="https://www.youtube.com/embed/rjfchLPJ3m8"
+              title={course.title}
+              allowFullScreen
+              className="w-full h-full rounded"
+            ></iframe>
+          </div>
+
+
+
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* What You'll Learn */}
@@ -312,7 +341,7 @@ const FreeCourseDetails = () => {
             <p className="text-gray-600 mb-4">
               {course.sections} sections • {course.lectures} lectures • {course.duration} total length
             </p>
-            
+
             {course.courseContent.map((section, index) => (
               <div key={index} className="border rounded-lg mb-4">
                 <button
@@ -333,7 +362,7 @@ const FreeCourseDetails = () => {
                     )}
                   </div>
                 </button>
-                
+
                 {expandedSection === index && (
                   <div className="border-t">
                     {section.lessons.map((lesson, lessonIndex) => (

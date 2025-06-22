@@ -1,5 +1,5 @@
 import { Lesson } from '../models/Lesson.js';
-
+import mongoose from 'mongoose';
 const asyncHandler = (fn) => (req, res, next) =>
   Promise.resolve(fn(req, res, next)).catch(next);
 
@@ -10,13 +10,19 @@ export const getAllLessons = asyncHandler(async (req, res) => {
   res.status(200).json({ count: lessons.length, data: lessons });
 });
 
-export const getLessonById = asyncHandler(async (req, res) => {
-  const lesson = await Lesson.findById(req.params.id)
-    .populate('module', 'title');
-  if (!lesson) return res.status(404).json({ message: 'Lesson not found' });
-  res.status(200).json(lesson);
-});
-
+export const getLessonById = async (req, res) => {
+  const { id } = req.params;
+  if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: 'Invalid or missing lesson ID' });
+  }
+  try {
+    const lesson = await Lesson.findById(id);
+    if (!lesson) return res.status(404).json({ message: 'Lesson not found' });
+    res.json(lesson);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 export const createLesson = asyncHandler(async (req, res) => {
   const lesson = await Lesson.create(req.body);
   res.status(201).json(lesson);
