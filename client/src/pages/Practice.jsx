@@ -4,7 +4,7 @@ import "../assets/style/Practice.css";
 import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import axios from "axios";
-
+import {motion} from "framer-motion"
 export default function Practice() {
   const navigate = useNavigate();
 
@@ -158,6 +158,7 @@ export default function Practice() {
           ))}
         </div>
       </div>
+      <Footer></Footer>
     </>
   );
 }
