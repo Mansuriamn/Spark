@@ -23,8 +23,9 @@ const TrackCard = (course) => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
-    navigate(`/track/${courseData.title.toLowerCase()}`);
+    navigate(`/track/${courseData._id}`);
   };
+  
 
   const handleShare = async (e) => {
     e.stopPropagation();

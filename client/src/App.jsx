@@ -53,8 +53,8 @@ function AppWrapper() {
           <Route path="/practiceinside" element={<ProtectedRoute allowedRoles={['student']}><PathToProficiency /></ProtectedRoute>} />
           <Route path="/student" element={<ProtectedRoute allowedRoles={['student']}><Student /></ProtectedRoute>} />
           <Route path="/student-dashboard" element={<ProtectedRoute allowedRoles={['student']}><StudentDashboard /></ProtectedRoute>} />
-          <Route path="/track/:trackName" element={<ProtectedRoute allowedRoles={['student']}><FreeCourseDetails /></ProtectedRoute>} />
-          <Route path="/courses/:courseId" element={<ProtectedRoute allowedRoles={['student']}><FreeCourseDetails /></ProtectedRoute>} />
+          <Route path="/track/:trackName" element={<ProtectedRoute allowedRoles={['student']}><Trackdetails /></ProtectedRoute>} />
+          <Route path="/courses/:courseId" element={<ProtectedRoute allowedRoles={['student']}><Trackdetails/></ProtectedRoute>} />
           <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']}><Admin /></ProtectedRoute>} />
           <Route path="/admin-dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
           <Route path="/instructor" element={<ProtectedRoute allowedRoles={['instructor']}><InstructorDashboard /></ProtectedRoute>} />

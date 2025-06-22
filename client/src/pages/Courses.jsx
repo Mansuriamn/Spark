@@ -330,7 +330,7 @@ export default function Courses() {
   const coursesPerPage = 10; // Number of courses to display per page
 
   // State to hold the courses fetched from the API
-  const [allCourses, setAllCourses] = useState([]); 
+  const [allCourses, setAllCourses] = useState([]);
   const [loading, setLoading] = useState(true); // Add loading state
   const [error, setError] = useState(null); // Add error state
 
@@ -346,10 +346,10 @@ export default function Courses() {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
         const data = await res.json(); // Parse the JSON response
-       
+
         // Assuming your API returns data in the format { data: [...] }
         // Adjust `data.data` if your API response structure is different (e.g., just `data`)
-        setAllCourses(Array.isArray(data.data) ? data.data : []); 
+        setAllCourses(Array.isArray(data.data) ? data.data : []);
       } catch (err) {
         console.error('Failed to fetch courses:', err);
         setError('Failed to load courses. Please try again later.'); // User-friendly error message
@@ -360,7 +360,7 @@ export default function Courses() {
     fetchCourses();
 
 
-   
+
 
   }, []); // Empty dependency array ensures this runs only once on mount
 
@@ -398,13 +398,19 @@ export default function Courses() {
   });
 
   // Calculate total pages for pagination based on filtered courses
-  
- 
+
+
 
   // Determine which courses to display on the current page
   const indexOfLastCourse = currentPage * coursesPerPage;
   const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
   const currentCourses = filteredCourses.slice(indexOfFirstCourse, indexOfLastCourse);
+
+  if (currentCourses) {
+    currentCourses.map((v, i) => {
+      console.log(v);
+    })
+  }
 
   return (
     <>
@@ -447,29 +453,31 @@ export default function Courses() {
             ) : error ? (
               <p className="text-red-500 text-center text-lg mt-15">{error}</p>
             ) : currentCourses.length > 0 ? (
-              // Map through `currentCourses` and render a CourseCard for each
-              currentCourses.map((course) => (
-                
-                // Use `_id` as key if your API provides it, otherwise fallback to `id`
-                <CourseCard key={course._id || course.id} course={course} /> 
-              ))
+              currentCourses.map((course, i) => {
+                if (!course) return null;
+                return (
+                  <div key={i}>
+                    <CourseCard course={course} />
+                  </div>
+                );
+              })
             ) : (
               // Message if no courses are found after loading/filtering
               <p className="text-gray-500 text-center text-lg mt-15">No results found</p>
             )}
           </div>
-          
+
           {/* Pagination Controls */}
           <div className='mt-8 '>
             {filteredCourses.length > 0 && ( // Only show pagination if there are courses to paginate
               <Pagination
-               
+
                 currentPage={currentPage}
                 onPageChange={handlePageChange}
               />
             )}
           </div>
-          
+
         </div>
       </div>
       <Footer /> {/* Your footer component */}
