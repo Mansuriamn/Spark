@@ -4,9 +4,9 @@ import logo4 from '../assets/img/logo4.jpg';
 import logo3 from '../assets/img/logo3.jpg';
 import logo2 from '../assets/img/logo2.svg';
 import { useNavigate } from 'react-router-dom';
-import img from '../assets/img/imgheader.png';
+import { motion } from 'framer-motion'; // ✅ import motion
 
-export default function Register({setLogin} = {}) {
+export default function Register({ setLogin } = {}) {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -57,10 +57,19 @@ export default function Register({setLogin} = {}) {
   };
 
   return (
-    <div className='contain_both'>
-      <img className='contain_both_img' src={img} alt='img' />
+    <motion.div
+      className='contain_both'
+      initial={{ opacity: 0, y: -40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+    >
       <div className="container1">
-        <div className="wrapper1">
+        <motion.div
+          className="wrapper1"
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+        >
           <form onSubmit={handleSubmit}>
             <h1>Register</h1>
 
@@ -115,17 +124,27 @@ export default function Register({setLogin} = {}) {
 
             <br />
 
-            <button type="submit" className="btn1">Register</button>
+            <motion.button
+              type="submit"
+              className="btn1"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Register
+            </motion.button>
 
             <div className="register-link1">
               <a href="#">Forget password?</a>
             </div>
             <div className="register-link1">
-              <p>Already have an account? <a onClick={() => navigate("/Login")}>Login</a></p>
+              <p>
+                Already have an account?{' '}
+                <a onClick={() => navigate("/Login")}>Login</a>
+              </p>
             </div>
           </form>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }

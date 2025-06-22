@@ -1,8 +1,4 @@
-body {
- 
-  background-color:white;
- 
-}
+
 .loginpage{
   width: 100%;
 }
@@ -13,7 +9,6 @@ body {
   width: 90%;
   height: 600px;
   border-radius: 10px;
-
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -147,9 +142,7 @@ body {
 
 }
 
-.container1 {
-  margin-left: auto;
-}
+
 
 
 @media screen and (max-width: 1024px) {

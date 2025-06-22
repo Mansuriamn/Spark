@@ -6,6 +6,7 @@ import logo2 from '../assets/img/logo2.svg';
 import { useNavigate } from 'react-router-dom';
 import img from '../assets/img/imgheader.png';
 import { AuthContext } from '../pages/AuthContext';
+import { motion } from 'framer-motion'; // ✅ import motion
 
 export default function Login() {
   const navigate = useNavigate();
@@ -31,14 +32,12 @@ export default function Login() {
       });
 
       const data = await res.json();
-      // console.log('Login response:', data); // Debug
 
       if (res.ok) {
         localStorage.setItem('authToken', data.token);
-        const selectedRole=localStorage.getItem("selectedRole");
+        const selectedRole = localStorage.getItem("selectedRole");
         login(data.user, data.token);
 
-        
         if (selectedRole === 'student') {
           navigate('/home');
         } else if (selectedRole === 'instructor') {
@@ -59,10 +58,19 @@ export default function Login() {
 
   return (
     <div className='bg-purple-50 min-h-screen flex items-center justify-center'>
-      <div className='contain_both'>
-        <img className='contain_both_img' src={img} alt='img' />
+      <motion.div
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
+        className='contain_both'
+      >
         <div className="container1">
-          <div className="wrapper1">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="wrapper1"
+          >
             <form onSubmit={handleSubmit}>
               <h1>Login</h1>
               <div className="login_img1">
@@ -91,7 +99,14 @@ export default function Login() {
                 />
               </div>
               <br />
-              <button type="submit" className="btn1">Login</button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                type="submit"
+                className="btn1"
+              >
+                Login
+              </motion.button>
               <div className="register-link1">
                 <a href="#">Forget password?</a>
               </div>
@@ -99,9 +114,9 @@ export default function Login() {
                 <p>Don't have an account? <a onClick={() => navigate("/Register")}>Register</a></p>
               </div>
             </form>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

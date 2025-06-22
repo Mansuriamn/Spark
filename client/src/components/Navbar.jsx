@@ -6,7 +6,7 @@ import { AuthContext } from '../pages/AuthContext';
 import logo5 from '../assets/img/logo5.png'
 export default function Navbar() {
   const { user, logout } = useContext(AuthContext);
-  
+
   const location = useLocation();
   const role = localStorage.getItem('selectedRole');
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -50,7 +50,7 @@ export default function Navbar() {
     }
     switch (role) {
       case 'student':
-        return ['Home', 'Courses',  'Contest', 'Practice', 'Progress Update'];
+        return ['Home', 'Courses', 'Contest', 'Practice', 'Progress Update'];
       case 'admin':
         return ['Admin', 'Admin Dashboard'];
       case 'instructor':
@@ -120,13 +120,12 @@ export default function Navbar() {
         <a href="/" className="flex items-center space-x-2">
           {/* <h1 className="text-xl font-bold text-gray-900">Spark</h1> */}
           <img
-          style={{
-            width:"50px",
-            height:"50px",
-            cursor:"pointer",
-           
-          }}
-           src={logo5} alt='Logo' />
+            src={logo5}
+            alt="Logo"
+            onClick={() => navigate('/')}
+            className="w-24 h-16 cursor-pointer hover:scale-105 transition-transform duration-300"
+          />
+
         </a>
 
         <nav className="hidden md:flex items-center space-x-4 ml-8">
@@ -245,8 +244,8 @@ export default function Navbar() {
                           <button
                             onClick={() => setNotificationStatus('Allow')}
                             className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${notificationStatus === 'Allow'
-                                ? 'bg-green-100 text-green-800 border border-green-300'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                              ? 'bg-green-100 text-green-800 border border-green-300'
+                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                               }`}
                           >
                             Allow
@@ -254,8 +253,8 @@ export default function Navbar() {
                           <button
                             onClick={() => setNotificationStatus('Mute')}
                             className={`px-3 py-1 text-xs font-medium rounded-full transition Colors ${notificationStatus === 'Mute'
-                                ? 'bg-red-100 text-red-800 border border-red-300'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                              ? 'bg-red-100 text-red-800 border border-red-300'
+                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                               }`}
                           >
                             Mute
@@ -347,8 +346,8 @@ export default function Navbar() {
                         </div>
                         <span
                           className={`px-2 py-1 text-xs font-medium rounded-full ${notificationStatus === 'Allow'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-600'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-600'
                             }`}
                         >
                           {notificationStatus}
