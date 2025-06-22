@@ -1,6 +1,6 @@
 import { Course } from '../models/Course.js';
 import { User } from '../models/User.js';
-
+import  Category  from '../models/Category.js';
 const asyncHandler = (fn) => (req, res, next) =>
   Promise.resolve(fn(req, res, next)).catch(next);
 
@@ -92,3 +92,39 @@ export const getCoursesByCategory = asyncHandler(async (req, res) => {
   res.status(200).json({ count: courses.length, data: courses });
 });
 
+
+
+// Create a new category
+export const createCategory = async (req, res) => {
+  try {
+    const { name, description } = req.body;
+    const category = new Category({ name, description });
+    await category.save();
+    res.status(201).json(category);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// Update an existing category
+export const updateCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    const updates = req.body;
+    const category = await Category.findByIdAndUpdate(categoryId, updates, { new: true });
+    if (!category) return res.status(404).json({ message: 'Category not found' });
+    res.json(category);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// View (get) all categories
+export const getAllCategories = async (req, res) => {
+  try {
+    const categories = await Category.find();
+    res.json(categories);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
