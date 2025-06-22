@@ -1,6 +1,8 @@
 import { Course } from '../models/Course.js';
 import { User } from '../models/User.js';
 import  Category  from '../models/Category.js';
+import { Lesson } from '../models/Lesson.js';
+
 const asyncHandler = (fn) => (req, res, next) =>
   Promise.resolve(fn(req, res, next)).catch(next);
 
@@ -124,6 +126,38 @@ export const getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find();
     res.json(categories);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+export const getLessonsOfCourse = async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id)
+      .populate('lessons'); // This will populate the lessons array with lesson documents
+    if (!course) return res.status(404).json({ message: 'Course not found' });
+    res.json({ lessons: course.lessons });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getSingleLessonFromCourse = async (req, res) => {
+  try {
+    const { courseId, lessonId } = req.params;
+    const course = await Course.findById(courseId);
+    if (!course) return res.status(404).json({ message: 'Course not found' });
+
+    // Check if lessonId is in the course's lessons array
+    if (!course.lessons.includes(lessonId)) {
+      return res.status(404).json({ message: 'Lesson not found in this course' });
+    }
+
+    const lesson = await Lesson.findById(lessonId);
+    if (!lesson) return res.status(404).json({ message: 'Lesson not found' });
+
+    res.json(lesson);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
