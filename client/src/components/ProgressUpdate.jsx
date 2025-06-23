@@ -18,8 +18,8 @@ const coursesData = [
     level: 'Advanced',
     image: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     category: 'Language',
-    price: '$19.99',
-    originalPrice: '$99.99',
+    price: '₹19.99',
+    originalPrice: '₹99.99',
     progressColor: 'bg-purple-500'
   },
   {
@@ -35,8 +35,8 @@ const coursesData = [
     level: 'Beginner',
     image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     category: 'Language',
-    price: '$24.99',
-    originalPrice: '$89.99',
+    price: '₹24.99',
+    originalPrice: '₹89.99',
     progressColor: 'bg-blue-500'
   },
   {
@@ -52,8 +52,8 @@ const coursesData = [
     level: 'Advanced',
     image: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     category: 'Programming',
-    price: '$29.99',
-    originalPrice: '$119.99',
+    price: '₹29.99',
+    originalPrice: '₹119.99',
     progressColor: 'bg-green-500'
   },
   {
@@ -69,8 +69,8 @@ const coursesData = [
     level: 'Beginner',
     image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     category: 'Design',
-    price: '$34.99',
-    originalPrice: '$149.99',
+    price: '₹34.99',
+    originalPrice: '₹149.99',
     progressColor: 'bg-pink-500'
   }
 ];
