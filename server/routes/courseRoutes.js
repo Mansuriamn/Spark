@@ -7,7 +7,10 @@ import {
   createCourse,
   updateCourse,
   deleteCourse,
-  getCoursesByInstructor
+  getCoursesByInstructor,
+  createCategory, updateCategory, getAllCategories,
+  getSingleLessonFromCourse,
+  getLessonsOfCourse
 } from '../controllers/courseController.js';
 
 import { checkRole, protect } from '../middlewares/authMiddleware.js'; // ✅ New role-check middleware
@@ -29,6 +32,12 @@ const router = express.Router();
 router.get('/', getAllCourses);
 router.get('/:id', getCourseById);
 router.get('/instructor/:instructorId', getCoursesByInstructor);
+
+router.post('/category', createCategory);
+router.put('/category/:categoryId', updateCategory);
+router.get('/category', getAllCategories);
+router.get('/:id/lessons', getLessonsOfCourse);
+router.get('/:courseId/lessons/:lessonId', getSingleLessonFromCourse);
 
 // Protected Routes (Admin or Mentor only)
 router.post(

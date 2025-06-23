@@ -91,8 +91,8 @@ const CourseCard = ({ course }) => {
       <div className="relative h-48">
         <img src={course.image || course.thumbnail || 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'} alt={course.title} className="w-full h-full object-cover" />
         <div className="absolute top-4 left-4 flex gap-2">
-          <span className={`${statusBadges[course.status || 'not-started'].color} px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm bg-opacity-90`}>
-            {statusBadges[course.status || 'not-started'].text}
+          <span className={`${statusBadges[course.status || 'not-started']} px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm bg-opacity-90`}>
+            {statusBadges[course.status || 'not-started']}
           </span>
           <span className="bg-black bg-opacity-75 text-white text-xs px-3 py-1 rounded-full font-medium">
             {course.category || 'General'}
