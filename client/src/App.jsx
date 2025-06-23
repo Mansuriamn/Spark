@@ -45,10 +45,10 @@ function AppWrapper() {
           <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['student']}><DashboardPage /></ProtectedRoute>} />
           <Route path="/live-sessions" element={<ProtectedRoute allowedRoles={['student']}><LiveSessionsPage /></ProtectedRoute>} />
           <Route path="/schedule" element={<ProtectedRoute allowedRoles={['student']}><Schedule /></ProtectedRoute>} />
-          <Route path="/lesson/:lessonId" element={<ProtectedRoute allowedRoles={['student']}><LessonPageWrapper /></ProtectedRoute>} />
+          {/*<Route path="/courses/:courseId/lesson/:lessonId" element={<ProtectedRoute allowedRoles={['student']}><LessonPageWrapper /></ProtectedRoute>} />*/}
           <Route path="/contest" element={<ProtectedRoute allowedRoles={['student']}><Contest /></ProtectedRoute>} />
           <Route path="/progressupdate" element={<ProtectedRoute allowedRoles={['student']}><MyCoursesPage /></ProtectedRoute>} />
-          <Route path="/courses/:courseId/video" element={<ProtectedRoute allowedRoles={['student']}><VideoDashboard /></ProtectedRoute>} />
+          <Route path="/courses/:courseId/lesson/:lessonId" element={<ProtectedRoute allowedRoles={['student']}><VideoDashboard /></ProtectedRoute>} />
           <Route path="/practice" element={<ProtectedRoute allowedRoles={['student']}><Practice /></ProtectedRoute>} />
           <Route path="/practiceinside" element={<ProtectedRoute allowedRoles={['student']}><PathToProficiency /></ProtectedRoute>} />
           <Route path="/student" element={<ProtectedRoute allowedRoles={['student']}><Student /></ProtectedRoute>} />

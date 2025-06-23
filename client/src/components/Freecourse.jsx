@@ -109,6 +109,7 @@ const coursedata = {
 const FreeCourseDetails = () => {
   const navigate = useNavigate();
   const { courseId: id } = useParams();
+  const { lessonId: lessonid } = useParams();
 
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -122,7 +123,8 @@ const FreeCourseDetails = () => {
     updateEnrolledCourses,
     user,
     token,
-    enrolledCourseIds
+    enrolledCourseIds,
+    currentLessonId
   } = useContext(AuthContext);
 
   // Helper function to add debug information
@@ -165,7 +167,7 @@ const FreeCourseDetails = () => {
         const possibleEndpoints = [
           `/api/courses/${decodedId}`,
           `/api/course/${decodedId}`,
-          `/api/tracks/${decodedId}`, // Since your URL uses /track/
+          `/api/track/${decodedId}`, // Since your URL uses /track/
           `/api/course/${decodedId}`,
           `/api/courses/details/${decodedId}`,
           `/api/v1/courses/${decodedId}`
@@ -461,7 +463,18 @@ const FreeCourseDetails = () => {
 
 
   const handleStartCourse = () => {
-    navigate(`/course/${course.id || course._id}/video`);
+    if (course && course.lessons && course.lessons.length > 0) {
+      // lessons could be objects or IDs, adjust accordingly
+      const firstLesson = course.lessons[0];
+      const firstLessonId = typeof firstLesson === "object" ? (firstLesson._id || firstLesson.id) : firstLesson;
+      if (firstLessonId) {
+        navigate(`/courses/${course._id}/lesson/${firstLessonId}`);
+      } else {
+        alert("No valid lessons found for this course.");
+      }
+    } else {
+      alert("No lessons found for this course.");
+    }
   };
 
   const safeArray = (arr) => Array.isArray(arr) ? arr : [];
@@ -522,10 +535,10 @@ const FreeCourseDetails = () => {
 
               {course.status && (
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${course.status === 'published'
-                    ? 'bg-green-100 text-green-800'
-                    : course.status === 'draft'
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-gray-100 text-gray-800'
+                  ? 'bg-green-100 text-green-800'
+                  : course.status === 'draft'
+                    ? 'bg-yellow-100 text-yellow-800'
+                    : 'bg-gray-100 text-gray-800'
                   }`}>
                   {course.status.charAt(0).toUpperCase() + course.status.slice(1)}
                 </span>
