@@ -50,7 +50,7 @@ export default function Navbar() {
     }
     switch (role) {
       case 'student':
-        return ['Home', 'Courses', 'Contest', 'Practice', 'Progress Update'];
+        return ['Home', 'Courses', 'Contest', 'Practice', 'Dashboard'];
       case 'admin':
         return ['Admin', 'Admin Dashboard'];
       case 'instructor':
@@ -66,12 +66,12 @@ export default function Navbar() {
   const navItemRoutes = {
     Home: '/home',
     Courses: '/courses',
-    Dashboard: '/dashboard',
+    
     'Live Sessions': '/live-sessions',
     Schedule: '/schedule',
     Contest: '/contest',
     Practice: '/practice',
-    'Progress Update': '/progressupdate',
+    'Dashboard': '/progressupdate',
     Video: '/video',
     'Student Dashboard': '/student-dashboard',
     Admin: '/admin',
@@ -120,10 +120,14 @@ export default function Navbar() {
         <a href="/" className="flex items-center space-x-2">
           {/* <h1 className="text-xl font-bold text-gray-900">Spark</h1> */}
           <img
+          style={{
+            objectFit: 'contain',
+            width:"100px",
+            height:"60px"
+          }}
             src={logo5}
             alt="Logo"
             onClick={() => navigate('/')}
-            className="w-24 h-16 cursor-pointer hover:scale-105 transition-transform duration-300"
           />
 
         </a>
@@ -159,7 +163,10 @@ export default function Navbar() {
                     className="absolute top-12 right-0 w-96 bg-white rounded-lg shadow-lg z-50 border border-gray-200"
                   >
                     <div className="px-6 py-4 bg-gradient-to-r from-purple-600 to-purple-700 rounded-t-lg">
-                      <h2 className="text-xl font-bold text-white">LernoHub Refer and Earn Program</h2>
+
+=======
+                      <h2 className="text-xl font-bold text-white">ADRS referral and Earn Program</h2>
+
                     </div>
                     <div className="px-6 py-4 bg-purple-50">
                       <div className="flex items-center space-x-3 mb-3">
@@ -169,10 +176,10 @@ export default function Navbar() {
                         <h3 className="text-lg font-semibold text-gray-800">Referral Bonus</h3>
                       </div>
                       <p className="text-gray-600 mb-2">
-                        Earn <span className="text-purple-600 font-bold">₹2,000</span> for every successful referral
+                        Earn <span className="text-purple-600 font-bold">₹1,000</span> for every successful referral
                       </p>
                       <p className="text-gray-600 mb-2">
-                        Your friend gets <span className="text-red-500 font-bold">₹2,000 discount</span> on course fees
+                        Your friend gets <span className="text-red-500 font-bold">₹1,000 discount</span> on course fees
                       </p>
                       <p className="text-gray-500 italic text-sm">No limit on referrals - earn unlimited rewards!</p>
                     </div>
