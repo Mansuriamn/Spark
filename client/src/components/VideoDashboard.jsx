@@ -14,8 +14,7 @@ const VideoDashboard = () => {
   const [currentLesson, setCurrentLesson] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
-  const {
+const {
     isAuthenticated,
     enrolledCourses,
     updateEnrolledCourses,
@@ -34,6 +33,7 @@ const VideoDashboard = () => {
   // Fetch course lessons
   const fetchCourseLessons = async () => {
     try {
+      console.log(`lessonId= ${lessonId}`)
       const response = await fetch(`/api/courses/${courseId}/lessons`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -46,14 +46,28 @@ const VideoDashboard = () => {
       }
 
       const data = await response.json();
-     
-      setLessons(data.lessons || []);
 
+      const validLessons = data.lessons?.filter(lesson => isValidObjectId(lesson.id || lesson._id));
+      const LessonData = validLessons.find((val) => val._id === lessonId);
+
+
+      // if (LessonData?.videos?.[0]) {
+      //   lesson_Url = LessonData.videos[0].url;
+      //   console.log(lesson_Url);
+      // }
+
+
+    
+      
+      setCourseData(LessonData);
+      console.log(LessonData)
+      setLessons(validLessons || []);
+  
       // Set current lesson based on stored lesson ID or first uncompleted lesson
       let lessonToSet = null;
       if (currentLessonId) {
         lessonToSet = data.lessons?.find(lesson =>
-          (lesson.id || lesson._id) === urlLessonId
+          (lesson.id || lesson._id) === lessonId
         );
       }
 
@@ -148,7 +162,7 @@ const VideoDashboard = () => {
         throw new Error("Course not found in any endpoint");
       }
 
-      setCourseData(courseDetails);
+    
 
       // Fetch lessons after getting course details
       await fetchCourseLessons();
@@ -214,7 +228,7 @@ const VideoDashboard = () => {
       
       if (currentLessonId) {
   lessonToSet = data.lessons?.find(lesson =>
-    (lesson.id || lesson._id) === urlLessonId
+    (lesson.id || lesson._id) === lessonId
   );
 }
 
@@ -419,10 +433,10 @@ const VideoDashboard = () => {
                       <div className="absolute inset-0 bg-black bg-opacity-20"></div>
 
                       <div className="w-full aspect-video rounded overflow-hidden mb-0 z-10">
-                        {currentLesson?.videoUrl ? (
+                        {courseData.videos ? (
                           <iframe
-                            src={currentLesson.videoUrl}
-                            title={currentLesson.title || 'Current Lesson'}
+                            src={courseData.videos[0].url}
+                            title={courseData.videos[0].title || 'Current Lesson'}
                             allowFullScreen
                             className="w-full h-full rounded"
                           />
