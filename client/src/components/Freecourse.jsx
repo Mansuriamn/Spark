@@ -5,8 +5,6 @@ import { AuthContext } from '../pages/AuthContext';
 import Footer from './Footer';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-
-// Fallback course data in case API fails
 const coursedata = {
   id: 'free-python-basics',
   title: 'Python Programming Fundamentals - Free Course',
@@ -207,13 +205,12 @@ const FreeCourseDetails = () => {
           addDebugInfo(`Course data retrieved from: ${successfulEndpoint}`);
           addDebugInfo(`Course title: ${courseData.title || 'No title found'}`);
 
-          // Transform backend data to match component expectations
           const transformedCourse = {
-            // Basic info
+          
             id: courseData._id || courseData.id,
             _id: courseData._id || courseData.id,
             title: courseData.title,
-            subtitle: courseData.description, // Map description to subtitle
+            subtitle: courseData.description, 
             description: courseData.description,
             image: courseData.thumbnailUrl || courseData.pictureUrl,
 
@@ -249,15 +246,14 @@ const FreeCourseDetails = () => {
             lessons: courseData.lessons || [],
             lecturesCount: courseData.lessons?.length || 0,
 
-            // Default values for missing fields
-            rating: 4.5, // Default rating since not in backend
+            
+            rating: 4.5, 
             totalRatings: 0,
             students: 0,
             languages: [courseData.language === 'en' ? 'English' : courseData.language || 'English'],
             sections: 1,
             lectures: courseData.lessons?.length || 0,
 
-            // Course content - we'll need to fetch lessons separately or structure differently
             whatYouLearn: [
               `Learn ${courseData.title}`,
               `Understand ${courseData.category?.name || 'programming'} concepts`,
@@ -290,7 +286,6 @@ const FreeCourseDetails = () => {
               }
             ],
 
-            // Course content structure - simplified since we don't have detailed lesson data
             courseContent: [
               {
                 section: 1,
@@ -409,8 +404,6 @@ const FreeCourseDetails = () => {
     c.id === course.id || c._id === course._id || c.id === course._id || c._id === course.id
   );
 
-  // Handle course enrollment
-  // Handle course enrollment - CORRECTED VERSION
   const handleEnroll = async () => {
     if (!isAuthenticated) {
       alert('Please login to enroll in this course');
@@ -418,11 +411,10 @@ const FreeCourseDetails = () => {
     }
 if (!isAlreadyEnrolled && user) {
   try {
-    const previousCourses = [...enrolledCourses]; // Save original
+    const previousCourses = [...enrolledCourses]; 
     const updatedCourses = [...previousCourses, course];
 
-    updateEnrolledCourses(updatedCourses); // Optimistically update
-
+    updateEnrolledCourses(updatedCourses); 
     const response = await axios.post('/api/users/enroll', {
       userId: user.id || user._id,
       courseId: course.id || course._id,
@@ -438,7 +430,7 @@ if (!isAlreadyEnrolled && user) {
       console.log('Enrollment successful:', response.data);
       alert('Successfully enrolled in the course!');
 
-      // Optionally update with fresh data from server
+      
       if (response.data.enrolledCourses) {
         updateEnrolledCourses(response.data.enrolledCourses);
       }
@@ -446,7 +438,7 @@ if (!isAlreadyEnrolled && user) {
   } catch (error) {
     console.error('Enrollment failed:', error);
 
-    // Revert optimistic update correctly
+   
     updateEnrolledCourses(previousCourses);
 
     const errorMessage = error.response?.data?.message ||
@@ -462,7 +454,7 @@ if (!isAlreadyEnrolled && user) {
 
   const handleStartCourse = () => {
     if (course && course.lessons && course.lessons.length > 0) {
-      // lessons could be objects or IDs, adjust accordingly
+      
       const firstLesson = course.lessons[0];
       const firstLessonId = typeof firstLesson === "object" ? (firstLesson._id || firstLesson.id) : firstLesson;
       if (firstLessonId) {

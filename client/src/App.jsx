@@ -1,4 +1,5 @@
 import React from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import CoursesPage from './pages/Home';
@@ -26,13 +27,25 @@ import ProtectedRoute from './components/ProtectedRout';
 const StudentDashboard = () => <div>Student Dashboard</div>;
 const AdminDashboard = () => <div>Admin Dashboard</div>;
 
+
 function AppWrapper() {
   const location = useLocation();
   const hideNavbarRoutes = ['/', '/login', '/register'];
   const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname.toLowerCase().trim());
   const selectedRole = localStorage.getItem("selectedRole");
+
+function RouteDebugger(){
+  const location = useLocation();
+
+  useEffect(() => {
+    console.log('Navigated to:', location.pathname);
+  }, [location]);
+
+  return null;
+}
   return (
     <div className="min-h-screen bg-purple-50 font-sans text-gray-800">
+     <RouteDebugger/>
       {shouldShowNavbar && <Navbar />}
       <main>
         <Routes>
@@ -47,7 +60,7 @@ function AppWrapper() {
           <Route path="/schedule" element={<ProtectedRoute allowedRoles={['student']}><Schedule /></ProtectedRoute>} />
           {/*<Route path="/courses/:courseId/lesson/:lessonId" element={<ProtectedRoute allowedRoles={['student']}><LessonPageWrapper /></ProtectedRoute>} />*/}
           <Route path="/contest" element={<ProtectedRoute allowedRoles={['student']}><Contest /></ProtectedRoute>} />
-          <Route path="/progressupdate" element={<ProtectedRoute allowedRoles={['student']}><MyCoursesPage /></ProtectedRoute>} />
+          <Route path="/progressupdate" element={<ProtectedRoute allowedRoles={['student']}><MyCoursesPage   /></ProtectedRoute>} />
           <Route path="/courses/:courseId/lesson/:lessonId" element={<ProtectedRoute allowedRoles={['student']}><VideoDashboard /></ProtectedRoute>} />
           <Route path="/practice" element={<ProtectedRoute allowedRoles={['student']}><Practice /></ProtectedRoute>} />
           <Route path="/practiceinside" element={<ProtectedRoute allowedRoles={['student']}><PathToProficiency /></ProtectedRoute>} />
@@ -59,6 +72,8 @@ function AppWrapper() {
           <Route path="/admin-dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
           <Route path="/instructor" element={<ProtectedRoute allowedRoles={['instructor']}><InstructorDashboard /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute allowedRoles={['student', 'admin', 'instructor']}><UserProfile /></ProtectedRoute>} />
+          <Route path="*" element={<div>404 Page Not Found</div>} />
+
 
         </Routes>
       </main>
