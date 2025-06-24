@@ -74,6 +74,8 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('enrolledCourses', JSON.stringify(normalizedUserCourses));
     localStorage.setItem('cartCourses', JSON.stringify(normalizedCart));
     localStorage.setItem('enrolledCourseIds', JSON.stringify(courseIds));
+    
+
     localStorage.setItem('cartCourseIds', JSON.stringify(cartIds));
     if (profile) {
       localStorage.setItem('userProfile', JSON.stringify(profile));

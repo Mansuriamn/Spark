@@ -1,6 +1,8 @@
 .Admin_Container {
          display: flex;
          flex-direction: column;
+         margin-left: 20px;
+         margin-right: 20px;
 
 }
 
@@ -10,6 +12,7 @@
          font-weight: bold;
          color: #1f2937;
          margin: 2rem 0;
+
 }
 
 .input-box {

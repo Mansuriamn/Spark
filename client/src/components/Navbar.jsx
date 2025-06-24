@@ -151,7 +151,7 @@ export default function Navbar() {
                   onClick={() => setHelpEarnOpen(!helpEarnOpen)}
                   className="px-5 py-1 rounded-full text-sm font-medium bg-purple-600 text-white hover:bg-purple-700 focus:outline-none transition-colors"
                 >
-                  Help & Earn
+                  Refer & Earn
                 </button>
                 {helpEarnOpen && (
                   <div
@@ -159,7 +159,7 @@ export default function Navbar() {
                     className="absolute top-12 right-0 w-96 bg-white rounded-lg shadow-lg z-50 border border-gray-200"
                   >
                     <div className="px-6 py-4 bg-gradient-to-r from-purple-600 to-purple-700 rounded-t-lg">
-                      <h2 className="text-xl font-bold text-white">KodNest Help and Earn Program</h2>
+                      <h2 className="text-xl font-bold text-white">LernoHub Refer and Earn Program</h2>
                     </div>
                     <div className="px-6 py-4 bg-purple-50">
                       <div className="flex items-center space-x-3 mb-3">
