@@ -39,7 +39,7 @@ router.put('/category/:categoryId', updateCategory);
 router.get('/category', getAllCategories);
 router.get('/:id/lessons', getLessonsOfCourse);
 router.get('/:courseId/lessons/:lessonId', getSingleLessonFromCourse);
-router.get('/:courseId/enrolled-users', getUsersEnrolledInCourse);
+router.get('/enrolled-users/:courseId', getUsersEnrolledInCourse);
 // Protected Routes (Admin or Mentor only)
 router.post(
   '/',
