@@ -34,7 +34,11 @@ const VideoDashboard = () => {
   // Fetch course lessons
   const fetchCourseLessons = async () => {
     try {
-      const response = await fetch(`/api/courses/${courseId}/lesson/${lessonId} `);
+      const response = await fetch(`/api/courses/${courseId}/lessons`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       
 
       if (!response.ok) {
