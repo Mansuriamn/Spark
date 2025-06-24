@@ -164,7 +164,7 @@ export default function Navbar() {
                   >
                     <div className="px-6 py-4 bg-gradient-to-r from-purple-600 to-purple-700 rounded-t-lg">
 
-=======
+
                       <h2 className="text-xl font-bold text-white">ADRS referral and Earn Program</h2>
 
                     </div>
