@@ -10,7 +10,8 @@ import {
   getCoursesByInstructor,
   createCategory, updateCategory, getAllCategories,
   getSingleLessonFromCourse,
-  getLessonsOfCourse
+  getLessonsOfCourse,
+  getUsersEnrolledInCourse
 } from '../controllers/courseController.js';
 
 import { checkRole, protect } from '../middlewares/authMiddleware.js'; // ✅ New role-check middleware
@@ -38,7 +39,7 @@ router.put('/category/:categoryId', updateCategory);
 router.get('/category', getAllCategories);
 router.get('/:id/lessons', getLessonsOfCourse);
 router.get('/:courseId/lessons/:lessonId', getSingleLessonFromCourse);
-
+router.get('/:courseId/enrolled-users', getUsersEnrolledInCourse);
 // Protected Routes (Admin or Mentor only)
 router.post(
   '/',
