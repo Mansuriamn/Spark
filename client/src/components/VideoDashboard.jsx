@@ -2,11 +2,11 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Play, Clock, CheckCircle, User, Calendar, TrendingUp, BookOpen, Award, Video, ArrowLeft, Loader } from 'lucide-react';
 import { AuthContext } from '../pages/AuthContext';
 import { useNavigate, useParams } from 'react-router-dom';
-
-const VideoDashboard = ({ Footer }) => {
+import Footer from './Footer';
+const VideoDashboard = () => {
 
   const navigate = useNavigate();
-  const { courseId, lessonId: urlLessonId } = useParams();
+  const { courseId, lessonId } = useParams();
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [activeSection, setActiveSection] = useState('overview');
   const [courseData, setCourseData] = useState(null);
@@ -34,20 +34,15 @@ const VideoDashboard = ({ Footer }) => {
   // Fetch course lessons
   const fetchCourseLessons = async () => {
     try {
-      const response = await fetch(`/api/courses/${courseId}/lesson`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token && { 'Authorization': `Bearer ${token}` }),
-        },
-
-      });
+      const response = await fetch(`/api/courses/${courseId}/lesson/${lessonId} `);
+      
 
       if (!response.ok) {
         throw new Error(`Failed to fetch lessons: ${response.status}`);
       }
 
       const data = await response.json();
+     
       setLessons(data.lessons || []);
 
       // Set current lesson based on stored lesson ID or first uncompleted lesson
