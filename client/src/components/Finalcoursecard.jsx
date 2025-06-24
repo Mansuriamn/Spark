@@ -23,7 +23,7 @@ const TrackCard = (course) => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
-    navigate(`/track/${courseData._id}`);
+    navigate(`/courses/${courseData._id}`);
   };
   
 

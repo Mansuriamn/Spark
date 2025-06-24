@@ -51,14 +51,6 @@ const {
       const LessonData = validLessons.find((val) => val._id === lessonId);
 
 
-      // if (LessonData?.videos?.[0]) {
-      //   lesson_Url = LessonData.videos[0].url;
-      //   console.log(lesson_Url);
-      // }
-
-
-    
-      
       setCourseData(LessonData);
       console.log(LessonData)
       setLessons(validLessons || []);

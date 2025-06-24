@@ -416,49 +416,47 @@ const FreeCourseDetails = () => {
       alert('Please login to enroll in this course');
       return;
     }
+if (!isAlreadyEnrolled && user) {
+  try {
+    const previousCourses = [...enrolledCourses]; // Save original
+    const updatedCourses = [...previousCourses, course];
 
-    if (!isAlreadyEnrolled && user) {
-      try {
-        // Optimistically update UI first
-        const updatedCourses = [...enrolledCourses, course];
-        updateEnrolledCourses(updatedCourses);
+    updateEnrolledCourses(updatedCourses); // Optimistically update
 
-        // CORRECTED API call - using the proper endpoint and request body
-        const response = await axios.post('/api/users/enroll', {
-          userId: user.id || user._id, // Handle both possible user ID fields
-          courseId: course.id || course._id, // Handle both possible course ID fields
-          courseTitle: course.title,
-        }, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          }
-        });
-
-        if (response.status === 200 || response.status === 201) {
-          console.log('Enrollment successful:', response.data);
-          alert('Successfully enrolled in the course!');
-
-          // Optionally update with server response data
-          if (response.data.enrolledCourses) {
-            updateEnrolledCourses(response.data.enrolledCourses);
-          }
-        }
-      } catch (error) {
-        console.error('Enrollment failed:', error);
-
-        // Revert optimistic update in case of error
-        updateEnrolledCourses(enrolledCourses);
-
-        // Show user-friendly error message
-        const errorMessage = error.response?.data?.message ||
-          error.response?.data?.error ||
-          'Failed to enroll in course. Please try again.';
-        alert(errorMessage);
+    const response = await axios.post('/api/users/enroll', {
+      userId: user.id || user._id,
+      courseId: course.id || course._id,
+      courseTitle: course.title,
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       }
-    } else if (isAlreadyEnrolled) {
-      alert('You are already enrolled in this course!');
+    });
+
+    if (response.status === 200 || response.status === 201) {
+      console.log('Enrollment successful:', response.data);
+      alert('Successfully enrolled in the course!');
+
+      // Optionally update with fresh data from server
+      if (response.data.enrolledCourses) {
+        updateEnrolledCourses(response.data.enrolledCourses);
+      }
     }
+  } catch (error) {
+    console.error('Enrollment failed:', error);
+
+    // Revert optimistic update correctly
+    updateEnrolledCourses(previousCourses);
+
+    const errorMessage = error.response?.data?.message ||
+      error.response?.data?.error ||
+      'Failed to enroll in course. Please try again.';
+    alert(errorMessage);
+  }
+} else if (isAlreadyEnrolled) {
+  alert('You are already enrolled in this course!');
+}
   };
 
 

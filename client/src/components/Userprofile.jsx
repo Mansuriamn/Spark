@@ -61,7 +61,7 @@ const saveProfile = async (newProfileData) => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/user/67f0b81f2fc577093ad382b6', {
+      const response = await fetch(`http://localhost:5000/api/users/${user._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
