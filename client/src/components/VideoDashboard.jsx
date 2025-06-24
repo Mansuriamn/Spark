@@ -1,83 +1,345 @@
-
-import React, { useState } from 'react';
-import { Play, Clock, CheckCircle, User, Calendar, TrendingUp, BookOpen, Award, Video } from 'lucide-react';
+import React, { useState, useEffect, useContext } from 'react';
+import { Play, Clock, CheckCircle, User, Calendar, TrendingUp, BookOpen, Award, Video, ArrowLeft, Loader } from 'lucide-react';
+import { AuthContext } from '../pages/AuthContext';
+import { useNavigate, useParams } from 'react-router-dom';
 import Footer from './Footer';
-
 const VideoDashboard = () => {
+
+  const navigate = useNavigate();
+  const { courseId, lessonId } = useParams();
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [activeSection, setActiveSection] = useState('overview');
+  const [courseData, setCourseData] = useState(null);
+  const [lessons, setLessons] = useState([]);
+  const [currentLesson, setCurrentLesson] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+const {
+    isAuthenticated,
+    enrolledCourses,
+    updateEnrolledCourses,
+    user,
+    token,
+    enrolledCourseIds,
+    currentLessonId,
+    updateCurrentLessonId
+  } = useContext(AuthContext) || {};
 
-  const videoSections = [
-    {
-      id: 1,
-      title: "Getting Started",
-      lessons: 4,
-      duration: "27min",
-      progress: 100,
-      videos: [
-        { id: 1, title: "Introduction to Data Science", duration: "8:30", completed: true },
-        { id: 2, title: "Setting up Environment", duration: "6:45", completed: true },
-        { id: 3, title: "Course Overview", duration: "7:20", completed: true },
-        { id: 4, title: "Resources & Materials", duration: "4:25", completed: true }
-      ]
-    },
-    {
-      id: 2,
-      title: "Python Programming Language",
-      lessons: 8,
-      duration: "1hr 24min",
-      progress: 75,
-      videos: [
-        { id: 5, title: "Python Basics", duration: "12:30", completed: true },
-        { id: 6, title: "Variables and Data Types", duration: "10:15", completed: true },
-        { id: 7, title: "Operators", duration: "8:45", completed: true },
-        { id: 8, title: "String Manipulation", duration: "15:20", completed: false },
-        { id: 9, title: "Lists and Tuples", duration: "13:40", completed: false },
-        { id: 10, title: "Dictionaries", duration: "11:25", completed: false },
-        { id: 11, title: "Python Functions", duration: "9:30", completed: false },
-        { id: 12, title: "Error Handling", duration: "12:35", completed: false }
-      ]
-    },
-    {
-      id: 3,
-      title: "Python Control Flow",
-      lessons: 3,
-      duration: "49min",
-      progress: 33,
-      videos: [
-        { id: 13, title: "If Statements", duration: "16:20", completed: true },
-        { id: 14, title: "Loops", duration: "18:40", completed: false },
-        { id: 15, title: "Advanced Control Flow", duration: "14:00", completed: false }
-      ]
-    },
-    {
-      id: 4,
-      title: "Data Structures in Python",
-      lessons: 9,
-      duration: "2hr 9min",
-      progress: 22,
-      videos: [
-        { id: 16, title: "Introduction to Data Structures", duration: "12:45", completed: true },
-        { id: 17, title: "Working with Arrays", duration: "15:30", completed: true },
-        { id: 18, title: "Linked Lists", duration: "18:20", completed: false },
-        { id: 19, title: "Stacks and Queues", duration: "16:40", completed: false },
-        { id: 20, title: "Trees", duration: "22:15", completed: false },
-        { id: 21, title: "Hash Tables", duration: "14:35", completed: false },
-        { id: 22, title: "Graphs", duration: "19:25", completed: false },
-        { id: 23, title: "Algorithm Complexity", duration: "13:50", completed: false },
-        { id: 24, title: "Performance Optimization", duration: "16:00", completed: false }
-      ]
-    }
-  ];
-
-  const stats = {
-    totalHours: 99,
-    completedLessons: 12,
-    inProgress: 8,
-    upcoming: 14,
-    overallProgress: 64
+  // Helper function to validate MongoDB ObjectId
+  const isValidObjectId = (id) => {
+    return /^[0-9a-fA-F]{24}$/.test(id);
   };
 
+  // Fetch course lessons
+  const fetchCourseLessons = async () => {
+    try {
+      console.log(`lessonId= ${lessonId}`)
+      const response = await fetch(`/api/courses/${courseId}/lessons`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch lessons: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      const validLessons = data.lessons?.filter(lesson => isValidObjectId(lesson.id || lesson._id));
+      const LessonData = validLessons.find((val) => val._id === lessonId);
+
+
+      // if (LessonData?.videos?.[0]) {
+      //   lesson_Url = LessonData.videos[0].url;
+      //   console.log(lesson_Url);
+      // }
+
+
+    
+      
+      setCourseData(LessonData);
+      console.log(LessonData)
+      setLessons(validLessons || []);
+  
+      // Set current lesson based on stored lesson ID or first uncompleted lesson
+      let lessonToSet = null;
+      if (currentLessonId) {
+        lessonToSet = data.lessons?.find(lesson =>
+          (lesson.id || lesson._id) === lessonId
+        );
+      }
+
+      if (!lessonToSet && currentLessonId) {
+        lessonToSet = data.lessons?.find(lesson =>
+          (lesson.id || lesson._id) === currentLessonId
+        );
+      }
+
+      if (!lessonToSet) {
+        const firstIncomplete = data.lessons?.find(lesson => !lesson.completed);
+        lessonToSet = firstIncomplete || data.lessons?.[0] || null;
+      }
+
+      setCurrentLesson(lessonToSet);
+
+      return data.lessons;
+    } catch (error) {
+      setError(`Failed to load lessons: ${error.message}`);
+      return [];
+    }
+  };
+
+  // Fetch specific lesson details
+  const fetchLessonDetails = async (lessonId) => {
+    try {
+      const response = await fetch(`/api/courses/${courseId}/lesson/${lessonId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch lesson details: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  // Fetch course details
+  const fetchCourseDetails = async () => {
+    if (!courseId) {
+      setError("Course ID not provided");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError("");
+
+      const decodedId = decodeURIComponent(courseId);
+      const isValidId = isValidObjectId(decodedId);
+
+      // Try multiple API endpoints that might work
+      const possibleEndpoints = [
+        `/api/courses/${decodedId}`,
+        `/api/course/${decodedId}`,
+        `/api/track/${decodedId}`,
+        `/api/courses/details/${decodedId}`,
+        `/api/v1/courses/${decodedId}`
+      ];
+
+      let courseDetails = null;
+
+      for (const endpoint of possibleEndpoints) {
+        try {
+          const response = await fetch(endpoint, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(token && { 'Authorization': `Bearer ${token}` }),
+            },
+          });
+
+          if (response.ok) {
+            courseDetails = await response.json();
+            break;
+          }
+        } catch (endpointError) {
+          continue;
+        }
+      }
+
+      if (!courseDetails) {
+        throw new Error("Course not found in any endpoint");
+      }
+
+    
+
+      // Fetch lessons after getting course details
+      await fetchCourseLessons();
+
+    } catch (error) {
+      setError(`Failed to load course: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (courseId) {
+      // For demo purposes, load sample data if no token
+      if (!token) {
+        setLoading(false);
+        setSampleData();
+      } else {
+        fetchCourseDetails();
+      }
+    }
+  }, [courseId, token]);
+
+  // Sample data for demo purposes
+  const setSampleData = () => {
+    const sampleLessons = [
+      { id: 1, title: "Introduction to Data Science", duration: "8", completed: true, videoUrl: "https://www.youtube.com/embed/rjfchLPJ3m8", section: "Getting Started" },
+      { id: 2, title: "Setting up Environment", duration: "6", completed: true, videoUrl: "https://www.youtube.com/embed/rjfchLPJ3m8", section: "Getting Started" },
+      { id: 3, title: "Python Basics", duration: "12", completed: false, progress: 75, videoUrl: "https://www.youtube.com/embed/rjfchLPJ3m8", section: "Python Programming" },
+      { id: 4, title: "Variables and Data Types", duration: "10", completed: false, videoUrl: "https://www.youtube.com/embed/rjfchLPJ3m8", section: "Python Programming" },
+      { id: 5, title: "Control Flow", duration: "16", completed: false, videoUrl: "https://www.youtube.com/embed/rjfchLPJ3m8", section: "Python Control Flow" }
+    ];
+
+    setLessons(sampleLessons);
+
+    // Set current lesson based on stored lesson ID or first uncompleted lesson
+    let lessonToSet = null;
+    if (currentLessonId) {
+      lessonToSet = sampleLessons.find(lesson =>
+        (lesson.id || lesson._id) === currentLessonId
+      );
+    }
+
+    if (!lessonToSet) {
+      lessonToSet = sampleLessons.find(l => !l.completed) || sampleLessons[0];
+    }
+
+    setCurrentLesson(lessonToSet);
+    setCourseData({
+      title: "Complete Data Science Bootcamp",
+      description: "Master the theory, practice, and math behind Data Science, Machine Learning, Deep Learning, NLP",
+      rating: "4.6",
+      studentsCount: "80,397",
+      level: "All Levels"
+    });
+  };
+
+  // Handle lesson selection
+  const handleLessonSelect = async (lesson) => {
+    try {
+      setSelectedVideo(lesson);
+      setCurrentLesson(lesson);
+      
+      if (currentLessonId) {
+  lessonToSet = data.lessons?.find(lesson =>
+    (lesson.id || lesson._id) === lessonId
+  );
+}
+
+      // Update current lesson ID in AuthContext (saves to localStorage)
+      const lessonId = lesson.id || lesson._id;
+      if (lessonId && updateCurrentLessonId) {
+        updateCurrentLessonId(lessonId);
+      }
+
+      // Fetch detailed lesson content if needed
+      if (lessonId && token) {
+        const lessonDetails = await fetchLessonDetails(lessonId);
+        setCurrentLesson({ ...lesson, ...lessonDetails });
+      }
+    } catch (error) {
+      console.error('Error selecting lesson:', error.message);
+    }
+  };
+
+  // Calculate progress statistics
+  const calculateStats = () => {
+    if (!lessons.length) {
+      return {
+        totalLessons: 0,
+        completedLessons: 0,
+        inProgress: 0,
+        upcoming: 0,
+        overallProgress: 0,
+        totalDuration: 0
+      };
+    }
+
+    const completed = lessons.filter(lesson => lesson.completed).length;
+    const inProgress = lessons.filter(lesson => lesson.inProgress).length;
+    const upcoming = lessons.length - completed - inProgress;
+    const overallProgress = Math.round((completed / lessons.length) * 100);
+
+    // Calculate total duration (assuming duration is in minutes)
+    const totalDuration = lessons.reduce((acc, lesson) => {
+      const duration = lesson.duration || 0;
+      return acc + (typeof duration === 'string' ? parseInt(duration) : duration);
+    }, 0);
+
+    return {
+      totalLessons: lessons.length,
+      completedLessons: completed,
+      inProgress,
+      upcoming,
+      overallProgress,
+      totalDuration: Math.round(totalDuration / 60) // Convert to hours
+    };
+  };
+
+  const stats = calculateStats();
+
+  // Group lessons by sections if they have section information
+  const groupLessonsBySection = () => {
+    if (!lessons.length) return [];
+
+    // If lessons have section info, group them
+    if (lessons[0].section) {
+      const sections = {};
+      lessons.forEach(lesson => {
+        const sectionName = lesson.section || 'General';
+        if (!sections[sectionName]) {
+          sections[sectionName] = [];
+        }
+        sections[sectionName].push(lesson);
+      });
+
+      return Object.entries(sections).map(([name, sectionLessons], index) => ({
+        id: index + 1,
+        title: name,
+        lessons: sectionLessons.length,
+        duration: calculateSectionDuration(sectionLessons),
+        progress: calculateSectionProgress(sectionLessons),
+        videos: sectionLessons
+      }));
+    }
+
+    // Otherwise, create a single section with all lessons
+    return [{
+      id: 1,
+      title: "Course Content",
+      lessons: lessons.length,
+      duration: `${stats.totalDuration}h`,
+      progress: stats.overallProgress,
+      videos: lessons
+    }];
+  };
+
+  const calculateSectionDuration = (sectionLessons) => {
+    const totalMinutes = sectionLessons.reduce((acc, lesson) => {
+      const duration = lesson.duration || 0;
+      return acc + (typeof duration === 'string' ? parseInt(duration) : duration);
+    }, 0);
+
+    if (totalMinutes >= 60) {
+      return `${Math.floor(totalMinutes / 60)}h ${totalMinutes % 60}min`;
+    }
+    return `${totalMinutes}min`;
+  };
+
+  const calculateSectionProgress = (sectionLessons) => {
+    const completed = sectionLessons.filter(lesson => lesson.completed).length;
+    return Math.round((completed / sectionLessons.length) * 100);
+  };
+
+  const videoSections = groupLessonsBySection();
+
+  // Sample activity data - you might want to fetch this from API as well
   const recentActivity = [
     { day: 'Mon', hours: 2.5 },
     { day: 'Tue', hours: 1.8 },
@@ -90,6 +352,30 @@ const VideoDashboard = () => {
 
   const maxHours = Math.max(...recentActivity.map(day => day.hours));
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader className="w-8 h-8 animate-spin mx-auto mb-4 text-purple-600" />
+          <p className="text-gray-600">Loading course content...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
+            <h2 className="text-xl font-semibold text-red-800 mb-2">Error Loading Course</h2>
+            <p className="text-red-600 mb-4">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
@@ -99,23 +385,23 @@ const VideoDashboard = () => {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                  Complete Data Science Bootcamp
+                  {courseData?.title || "Complete Data Science Bootcamp"}
                 </h1>
                 <p className="text-gray-600 text-lg">
-                  Master the theory, practice, and math behind Data Science, Machine Learning, Deep Learning, NLP
+                  {courseData?.description || "Master the theory, practice, and math behind Data Science, Machine Learning, Deep Learning, NLP"}
                 </p>
               </div>
               <div className="flex items-center space-x-4">
                 <div className="bg-white rounded-lg px-4 py-2 shadow-sm">
                   <div className="flex items-center space-x-2">
                     <Award className="w-5 h-5 text-yellow-500" />
-                    <span className="text-sm font-medium">4.6 Rating</span>
+                    <span className="text-sm font-medium">{courseData?.rating || "4.6"} Rating</span>
                   </div>
                 </div>
                 <div className="bg-white rounded-lg px-4 py-2 shadow-sm">
                   <div className="flex items-center space-x-2">
                     <User className="w-5 h-5 text-purple-600" />
-                    <span className="text-sm font-medium">80,397 Students</span>
+                    <span className="text-sm font-medium">{courseData?.studentsCount || "80,397"} Students</span>
                   </div>
                 </div>
               </div>
@@ -128,8 +414,8 @@ const VideoDashboard = () => {
                 key={tab}
                 onClick={() => setActiveSection(tab)}
                 className={`pb-4 px-2 text-sm font-medium capitalize transition-colors ${activeSection === tab
-                    ? 'border-b-2 border-purple-600 text-purple-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                  ? 'border-b-2 border-purple-600 text-purple-600'
+                  : 'text-gray-500 hover:text-gray-700'
                   }`}
               >
                 {tab}
@@ -138,47 +424,62 @@ const VideoDashboard = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-
             <div className="lg:col-span-3">
               {activeSection === 'overview' && (
                 <div className="space-y-6">
-
-
+                  {/* Video Section */}
                   <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-                    {/* Video Section */}
                     <div className="aspect-video bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center relative">
-
                       <div className="absolute inset-0 bg-black bg-opacity-20"></div>
 
                       <div className="w-full aspect-video rounded overflow-hidden mb-0 z-10">
-                        <iframe
-                          src="https://www.youtube.com/embed/rjfchLPJ3m8"
-                          title='loading'
-                          allowFullScreen
-                          className="w-full h-full rounded"
-                        ></iframe>
+                        {courseData.videos ? (
+                          <iframe
+                            src={courseData.videos[0].url}
+                            title={courseData.videos[0].title || 'Current Lesson'}
+                            allowFullScreen
+                            className="w-full h-full rounded"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-white">
+                            <div className="text-center">
+                              <Video className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                              <p>No video available</p>
+                            </div>
+                          </div>
+                        )}
                       </div>
-
                     </div>
+
                     <div className="p-6">
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-xl font-semibold">Current Lesson: Python Basics</h3>
+                        <h3 className="text-xl font-semibold">
+                          Current Lesson: {currentLesson?.title || "Select a lesson"}
+                        </h3>
                         <div className="flex items-center space-x-2 text-sm text-gray-500">
                           <Clock className="w-4 h-4" />
-                          <span>15:45 remaining</span>
+                          <span>{currentLesson?.duration || "0"} min</span>
                         </div>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-                        <div className="bg-blue-500 h-2 rounded-full" style={{ width: '79%' }}></div>
-                      </div>
-                      <div className="flex justify-between text-sm text-gray-600">
-                        <span>Progress: 79%</span>
-                        <span>Next: Variables and Data Types</span>
-                      </div>
+
+                      {currentLesson && (
+                        <>
+                          <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                            <div
+                              className="bg-blue-500 h-2 rounded-full"
+                              style={{ width: `${currentLesson.progress || 0}%` }}
+                            ></div>
+                          </div>
+                          <div className="flex justify-between text-sm text-gray-600">
+                            <span>Progress: {currentLesson.progress || 0}%</span>
+                            <span>Status: {currentLesson.completed ? 'Completed' : 'In Progress'}</span>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
 
-                  {/*course*/}
+                  {/* Course Content */}
                   <div className="space-y-4">
                     <h2 className="text-2xl font-bold text-gray-900 mb-6">Course Content</h2>
                     {videoSections.map((section) => (
@@ -191,7 +492,7 @@ const VideoDashboard = () => {
                               </div>
                               <div>
                                 <h3 className="text-lg font-semibold text-gray-900">
-                                  Section {section.id}: {section.title}
+                                  {section.title}
                                 </h3>
                                 <div className="flex items-center space-x-4 text-sm text-gray-500 mt-1">
                                   <span>{section.lessons} lessons</span>
@@ -212,13 +513,16 @@ const VideoDashboard = () => {
                             </div>
                           </div>
 
-                          {/*video*/}
+                          {/* Video List */}
                           <div className="space-y-2">
                             {section.videos.map((video) => (
                               <div
-                                key={video.id}
-                                className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer group"
-                                onClick={() => setSelectedVideo(video)}
+                                key={video.id || video._id}
+                                className={`flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer group ${currentLesson && (currentLesson.id === video.id || currentLesson._id === video._id)
+                                  ? 'bg-blue-50 border border-blue-200'
+                                  : ''
+                                  }`}
+                                onClick={() => handleLessonSelect(video)}
                               >
                                 <div className="flex items-center space-x-3">
                                   <div className={`p-2 rounded-lg ${video.completed ? 'bg-green-100' : 'bg-gray-100'}`}>
@@ -230,7 +534,7 @@ const VideoDashboard = () => {
                                   </div>
                                   <div>
                                     <div className="font-medium text-gray-900">{video.title}</div>
-                                    <div className="text-sm text-gray-500">{video.duration}</div>
+                                    <div className="text-sm text-gray-500">{video.duration} min</div>
                                   </div>
                                 </div>
                                 {video.completed && (
@@ -274,7 +578,7 @@ const VideoDashboard = () => {
                       </div>
                     </div>
 
-                    {/*chart*/}
+                    {/* Activity Chart */}
                     <div className="mt-8">
                       <h3 className="text-lg font-semibold mb-4">Weekly Activity</h3>
                       <div className="flex items-end space-x-2 h-40">
@@ -301,28 +605,26 @@ const VideoDashboard = () => {
                     <div className="space-y-4">
                       <div className="border border-blue-200 rounded-lg p-4 bg-blue-50">
                         <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-semibold text-blue-900">Today's Session</h3>
-                          <span className="text-sm text-blue-600 bg-blue-100 px-2 py-1 rounded">13:00 - 14:00</span>
+                          <h3 className="font-semibold text-blue-900">Current Lesson</h3>
+                          <span className="text-sm text-blue-600 bg-blue-100 px-2 py-1 rounded">
+                            {currentLesson?.duration || 0} min
+                          </span>
                         </div>
-                        <p className="text-blue-800">Python Control Flow - Advanced Topics</p>
+                        <p className="text-blue-800">{currentLesson?.title || "No lesson selected"}</p>
                         <div className="flex items-center mt-2 text-sm text-blue-600">
                           <Clock className="w-4 h-4 mr-1" />
-                          <span>60 minutes</span>
+                          <span>Duration: {currentLesson?.duration || 0} minutes</span>
                         </div>
                       </div>
 
                       <div className="space-y-3">
-                        <h4 className="font-medium text-gray-700">Upcoming Sessions</h4>
-                        {[
-                          { time: "15:00 - 16:30", title: "Data Structures Introduction", date: "Today" },
-                          { time: "10:00 - 11:00", title: "Functions in Python", date: "Tomorrow" },
-                          { time: "14:00 - 15:30", title: "Error Handling", date: "Wednesday" }
-                        ].map((session, index) => (
-                          <div key={index} className="border border-gray-200 rounded-lg p-4">
+                        <h4 className="font-medium text-gray-700">Next Lessons</h4>
+                        {lessons.filter(lesson => !lesson.completed).slice(0, 3).map((lesson, index) => (
+                          <div key={lesson.id || lesson._id} className="border border-gray-200 rounded-lg p-4">
                             <div className="flex items-center justify-between">
                               <div>
-                                <h4 className="font-medium text-gray-900">{session.title}</h4>
-                                <p className="text-sm text-gray-500">{session.date} • {session.time}</p>
+                                <h4 className="font-medium text-gray-900">{lesson.title}</h4>
+                                <p className="text-sm text-gray-500">Duration: {lesson.duration} min</p>
                               </div>
                               <Calendar className="w-5 h-5 text-gray-400" />
                             </div>
@@ -335,9 +637,9 @@ const VideoDashboard = () => {
               )}
             </div>
 
-            {/*sidebar */}
+            {/* Sidebar */}
             <div className="space-y-6">
-              {/*Overall Progress*/}
+              {/* Overall Progress */}
               <div className="bg-white rounded-xl p-6 shadow-sm">
                 <h3 className="text-lg font-semibold mb-4">Overall Progress</h3>
                 <div className="text-center mb-4">
@@ -350,11 +652,11 @@ const VideoDashboard = () => {
                   </div>
                 </div>
                 <div className="text-sm text-gray-600 text-center">
-                  {stats.completedLessons} of 34 lessons completed
+                  {stats.completedLessons} of {stats.totalLessons} lessons completed
                 </div>
               </div>
 
-              {/*quick*/}
+              {/* Course Stats */}
               <div className="bg-white rounded-xl p-6 shadow-sm">
                 <h3 className="text-lg font-semibold mb-4">Course Stats</h3>
                 <div className="space-y-4">
@@ -363,45 +665,49 @@ const VideoDashboard = () => {
                       <Clock className="w-4 h-4 text-gray-400" />
                       <span className="text-sm text-gray-600">Total Duration</span>
                     </div>
-                    <span className="font-medium">{stats.totalHours} hours</span>
+                    <span className="font-medium">{stats.totalDuration} hours</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <Video className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-gray-600">Total Lectures</span>
+                      <span className="text-sm text-gray-600">Total Lessons</span>
                     </div>
-                    <span className="font-medium">429</span>
+                    <span className="font-medium">{stats.totalLessons}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <TrendingUp className="w-4 h-4 text-gray-400" />
                       <span className="text-sm text-gray-600">Skill Level</span>
                     </div>
-                    <span className="font-medium">All Levels</span>
+                    <span className="font-medium">{courseData?.level || "All Levels"}</span>
                   </div>
                 </div>
               </div>
 
-              {/*achivement*/}
-              <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-6 border border-yellow-200">
-                <div className="flex items-center space-x-3 mb-3">
-                  <div className="bg-yellow-100 rounded-full p-2">
-                    <Award className="w-5 h-5 text-yellow-600" />
+              {/* Achievement */}
+              {stats.completedLessons > 0 && (
+                <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-6 border border-yellow-200">
+                  <div className="flex items-center space-x-3 mb-3">
+                    <div className="bg-yellow-100 rounded-full p-2">
+                      <Award className="w-5 h-5 text-yellow-600" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-yellow-900">Great Progress!</div>
+                      <div className="text-sm text-yellow-700">
+                        {stats.completedLessons} lessons completed
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="font-semibold text-yellow-900">Achievement Unlocked!</div>
-                    <div className="text-sm text-yellow-700">Python Fundamentals Master</div>
+                  <div className="text-xs text-yellow-600">
+                    Keep up the excellent work!
                   </div>
                 </div>
-                <div className="text-xs text-yellow-600">
-                  Completed all basic Python programming lessons
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
       </div>
-      <Footer></Footer>
+      <Footer />
     </>
   );
 };

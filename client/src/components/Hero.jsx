@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import CountUp from 'react-countup';
-import imgheader from '../assets/img/imgheader.png';
+import ADRS from '../assets/videos/ADRS.mp4'
 import { counterItems } from '../constants';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
@@ -49,7 +49,14 @@ function HeroSection() {
 
       {/* Right Image */}
       <div className="mt-10 md:mt-0 md:w-1/2 flex justify-center md:justify-end z-10">
-        <img src={imgheader} alt="Hero" className="w-full max-w-md object-contain" />
+         <video
+         style={{
+          borderRadius:"10px",
+         }}
+          width="500" height="300" autoPlay loop muted playsInline>
+        <source src={ADRS} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
       </div>
     </div>
   );

@@ -13,6 +13,8 @@ export const AuthProvider = ({ children }) => {
   const [enrolledCourseIds, setEnrolledCourseIds] = useState([]);
   const [cartCourseIds, setCartCourseIds] = useState([]);
 
+  const [currentLessonId, setCurrentLessonId] = useState(""); 
+
   useEffect(() => {
     const storedUser = localStorage.getItem('userData');
     const storedToken = localStorage.getItem('authToken');
@@ -21,43 +23,67 @@ export const AuthProvider = ({ children }) => {
     const storedCart = localStorage.getItem('cartCourses');
     const storedCourseIds = localStorage.getItem('enrolledCourseIds');
     const storedCartIds = localStorage.getItem('cartCourseIds');
+    const storedLessonId = localStorage.getItem('currentLessonId');
 
     if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setToken(storedToken);
-      if (storedProfile) setUserProfile(JSON.parse(storedProfile));
-      if (storedCourses) setEnrolledCourses(JSON.parse(storedCourses));
-      if (storedCart) setCartCourses(JSON.parse(storedCart));
-      if (storedCourseIds) setEnrolledCourseIds(JSON.parse(storedCourseIds));
-      if (storedCartIds) setCartCourseIds(JSON.parse(storedCartIds));
+      try {
+        setUser(JSON.parse(storedUser));
+        setToken(storedToken);
+
+        if (storedProfile) {
+          setUserProfile(JSON.parse(storedProfile));
+        }
+        if (storedCourses) {
+          setEnrolledCourses(JSON.parse(storedCourses));
+        }
+        if (storedCart) {
+          setCartCourses(JSON.parse(storedCart));
+        }
+        if (storedCourseIds) {
+          setEnrolledCourseIds(JSON.parse(storedCourseIds));
+        }
+        if (storedCartIds) {
+          setCartCourseIds(JSON.parse(storedCartIds));
+        }
+        if (storedLessonId) {
+          setCurrentLessonId(storedLessonId);
+        }
+      } catch (err) {
+        localStorage.clear();
+      }
     }
   }, []);
 
   const isAuthenticated = !!user && !!token;
 
-  const login = (
-    userData,
-    authToken,
-    userCourses = [],
-    cart = [],
-    profile = null
-  ) => {
+  const login = (userData, authToken, userCourses = [], cart = [], profile = null) => {
+    const normalizedUserCourses = userCourses.map(course => ({
+      ...course,
+      _id: String(course._id)
+    }));
+    const normalizedCart = cart.map(course => ({
+      ...course,
+      _id: String(course._id)
+    }));
+
+    const courseIds = normalizedUserCourses.map(c => String(c._id));
+    const cartIds = normalizedCart.map(c => String(c._id));
+
     localStorage.setItem('userData', JSON.stringify(userData));
     localStorage.setItem('authToken', authToken);
-    localStorage.setItem('enrolledCourses', JSON.stringify(userCourses));
-    localStorage.setItem('cartCourses', JSON.stringify(cart));
-
-    const courseIds = userCourses.map((c) => c._id);
-    const cartIds = cart.map((c) => c._id);
-
+    localStorage.setItem('enrolledCourses', JSON.stringify(normalizedUserCourses));
+    localStorage.setItem('cartCourses', JSON.stringify(normalizedCart));
     localStorage.setItem('enrolledCourseIds', JSON.stringify(courseIds));
     localStorage.setItem('cartCourseIds', JSON.stringify(cartIds));
+    if (profile) {
+      localStorage.setItem('userProfile', JSON.stringify(profile));
+    }
 
     setUser(userData);
     setToken(authToken);
     setUserProfile(profile || null);
-    setEnrolledCourses(userCourses);
-    setCartCourses(cart);
+    setEnrolledCourses(normalizedUserCourses);
+    setCartCourses(normalizedCart);
     setEnrolledCourseIds(courseIds);
     setCartCourseIds(cartIds);
   };
@@ -71,6 +97,7 @@ export const AuthProvider = ({ children }) => {
     setCartCourses([]);
     setEnrolledCourseIds([]);
     setCartCourseIds([]);
+    setCurrentLessonId(null);
   };
 
   const updateUser = (updatedUser) => {
@@ -84,21 +111,42 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateEnrolledCourses = (newCourses) => {
-    localStorage.setItem('enrolledCourses', JSON.stringify(newCourses));
-    setEnrolledCourses(newCourses);
+    const normalizedCourses = newCourses.map(course => ({
+      ...course,
+      _id: String(course._id)
+    }));
+    const ids = normalizedCourses.map(c => String(c._id));
 
-    const ids = newCourses.map((c) => c._id);
+    localStorage.setItem('enrolledCourses', JSON.stringify(normalizedCourses));
     localStorage.setItem('enrolledCourseIds', JSON.stringify(ids));
+    setEnrolledCourses(normalizedCourses);
     setEnrolledCourseIds(ids);
   };
 
   const updateCartCourses = (newCart) => {
-    localStorage.setItem('cartCourses', JSON.stringify(newCart));
-    setCartCourses(newCart);
+    const normalizedCart = newCart.map(course => ({
+      ...course,
+      _id: String(course._id)
+    }));
+    const ids = normalizedCart.map(c => String(c._id));
 
-    const ids = newCart.map((c) => c._id);
+    localStorage.setItem('cartCourses', JSON.stringify(normalizedCart));
     localStorage.setItem('cartCourseIds', JSON.stringify(ids));
+    setCartCourses(normalizedCart);
     setCartCourseIds(ids);
+  };
+
+  const isCourseEnrolled = (courseId) => {
+    return enrolledCourseIds.includes(String(courseId));
+  };
+
+  const isCourseInCart = (courseId) => {
+    return cartCourseIds.includes(String(courseId));
+  };
+
+  const updateCurrentLessonId = (lessonId) => {
+    setCurrentLessonId(lessonId);
+    localStorage.setItem('currentLessonId', lessonId);
   };
 
   return (
@@ -112,12 +160,16 @@ export const AuthProvider = ({ children }) => {
         cartCourses,
         enrolledCourseIds,
         cartCourseIds,
+        currentLessonId,
+        updateCurrentLessonId,
         login,
         logout,
         updateUser,
         updateUserProfile,
         updateEnrolledCourses,
         updateCartCourses,
+        isCourseEnrolled,
+        isCourseInCart,
       }}
     >
       {children}

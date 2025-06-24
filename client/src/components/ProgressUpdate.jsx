@@ -1,9 +1,23 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Clock, Users, BookOpen, Check, Play, ArrowRight, Filter, Trophy, Medal, Star, GraduationCap, TrendingUp, Crown, Flame, Award, ChevronDown } from 'lucide-react';
 import Footer from './Footer';
 import { useNavigate } from 'react-router-dom';
-
+import axios from 'axios';
+import {
+  FaClock,
+  FaUsers,
+  FaBookOpen,
+  FaCheck,
+  FaPlay,
+  FaArrowRight,
+  FaStar,
+  FaFire,
+  FaGraduationCap,
+  FaAward,
+  FaCompass,
+  FaBook
+} from 'react-icons/fa';
 const coursesData = [
   {
     title: 'English punctuation made easy',
@@ -18,8 +32,8 @@ const coursesData = [
     level: 'Advanced',
     image: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     category: 'Language',
-    price: '$19.99',
-    originalPrice: '$99.99',
+    price: '₹19.99',
+    originalPrice: '₹99.99',
     progressColor: 'bg-purple-500'
   },
   {
@@ -35,8 +49,8 @@ const coursesData = [
     level: 'Beginner',
     image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     category: 'Language',
-    price: '$24.99',
-    originalPrice: '$89.99',
+    price: '₹24.99',
+    originalPrice: '₹89.99',
     progressColor: 'bg-blue-500'
   },
   {
@@ -52,8 +66,8 @@ const coursesData = [
     level: 'Advanced',
     image: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     category: 'Programming',
-    price: '$29.99',
-    originalPrice: '$119.99',
+    price: '₹29.99',
+    originalPrice: '₹119.99',
     progressColor: 'bg-green-500'
   },
   {
@@ -69,8 +83,8 @@ const coursesData = [
     level: 'Beginner',
     image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
     category: 'Design',
-    price: '$34.99',
-    originalPrice: '$149.99',
+    price: '₹34.99',
+    originalPrice: '₹149.99',
     progressColor: 'bg-pink-500'
   }
 ];
@@ -118,12 +132,7 @@ const achievements = [
   }
 ];
 
-const stats = [
-  { label: 'Total Courses', value: 12, icon: <BookOpen className="w-5 h-5" />, color: 'bg-purple-100 text-purple-600' },
-  { label: 'Completed', value: 5, icon: <Check className="w-5 h-5" />, color: 'bg-green-100 text-green-600' },
-  { label: 'In Progress', value: 4, icon: <Play className="w-5 h-5" />, color: 'bg-blue-100 text-blue-600' },
-  { label: 'Learning Hours', value: '42h', icon: <Clock className="w-5 h-5" />, color: 'bg-orange-100 text-orange-600' }
-];
+
 
 const StatCard = ({ stat }) => (
   <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 flex items-center hover:shadow-md transition-shadow duration-200">
@@ -308,6 +317,67 @@ export default function MyCoursesPage() {
     if (filter === 'all') return true;
     return course.status === filter;
   });
+
+  const userData = JSON.parse(localStorage.getItem("userData"));
+  const [stats, setStats] = useState([
+    { label: 'Total Courses', value: 0, icon: <FaBookOpen className="w-5 h-5" />, color: 'bg-purple-100 text-purple-600' },
+    { label: 'Completed', value: 0, icon: <FaCheck className="w-5 h-5" />, color: 'bg-green-100 text-green-600' },
+    { label: 'In Progress', value: 0, icon: <FaPlay className="w-5 h-5" />, color: 'bg-blue-100 text-blue-600' },
+    { label: 'Learning Hours', value: '0h', icon: <FaClock className="w-5 h-5" />, color: 'bg-orange-100 text-orange-600' }
+  ]);
+
+  const userId = userData?._id;
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const [
+          completedRes,
+          inProgressRes,
+          totalRes,
+          hoursRes
+        ] = await Promise.all([
+          axios.get(`http://localhost:5000/api/users/${userId}/completed-courses-count`),
+          axios.get(`http://localhost:5000/api/users/${userId}/in-progress-courses-count`),
+          axios.get(`http://localhost:5000/api/users/${userId}/total-courses-count`),
+          axios.get(`http://localhost:5000/api/users/${userId}/learning-hours`)
+        ]);
+
+        setStats([
+          {
+            label: 'Total Courses',
+            value: totalRes.data.count || 0,
+            icon: <FaBookOpen className="w-5 h-5" />,
+            color: 'bg-purple-100 text-purple-600'
+          },
+          {
+            label: 'Completed',
+            value: completedRes.data.count || 0,
+            icon: <FaCheck className="w-5 h-5" />,
+            color: 'bg-green-100 text-green-600'
+          },
+          {
+            label: 'In Progress',
+            value: inProgressRes.data.count || 0,
+            icon: <FaPlay className="w-5 h-5" />,
+            color: 'bg-blue-100 text-blue-600'
+          },
+          {
+            label: 'Learning Hours',
+            value: `${hoursRes.data.hours || 0}h`,
+            icon: <FaClock className="w-5 h-5" />,
+            color: 'bg-orange-100 text-orange-600'
+          }
+        ]);
+      } catch (err) {
+        console.error("Failed to fetch stats:", err);
+      }
+    };
+
+    if (userId) {
+      fetchStats();
+    }
+  }, []);
 
   return (
     <>

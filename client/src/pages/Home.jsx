@@ -28,11 +28,11 @@ function CoursesPage({UserId}) {
         <HeroSection />
       </section>
       
-      {isAuthenticated &&  enrolledCourses.length > 0 && (
+      {/* {isAuthenticated &&  enrolledCourses.length > 0 && (
         <section className="relative bg-white rounded-xl shadow-lg p-6 md:p-10 container mx-auto">
           <LearningDashboard userId={user?.id || UserId} />
         </section>
-      )}
+      )} */}
       
       <section className="relative bg-white rounded-xl shadow-lg p-6 md:p-10 container mx-auto">
         <TrackList />

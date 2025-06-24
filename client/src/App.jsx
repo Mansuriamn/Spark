@@ -28,37 +28,38 @@ const AdminDashboard = () => <div>Admin Dashboard</div>;
 
 function AppWrapper() {
   const location = useLocation();
-  const hideNavbarRoutes = ['/', '/Register' ,'/Login'];
-  const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname.toLowerCase());
-  const selectedRole=localStorage.getItem("selectedRole");
+  const hideNavbarRoutes = ['/', '/login', '/register'];
+  const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname.toLowerCase().trim());
+  const selectedRole = localStorage.getItem("selectedRole");
   return (
     <div className="min-h-screen bg-purple-50 font-sans text-gray-800">
       {shouldShowNavbar && <Navbar />}
       <main>
         <Routes>
-          <Route path='/' element={<WelcomePage />}/>
+          <Route path='/' element={<WelcomePage />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/Register" element={<Register />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/meeting/:roomName" element={<WebRTCMeeting userName="Roshan" />} />
           <Route path="/home" element={<ProtectedRoute allowedRoles={['student']}><CoursesPage /></ProtectedRoute>} />
           <Route path="/courses" element={<ProtectedRoute allowedRoles={['student']}><Courses /></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['student']}><DashboardPage /></ProtectedRoute>} />
           <Route path="/live-sessions" element={<ProtectedRoute allowedRoles={['student']}><LiveSessionsPage /></ProtectedRoute>} />
           <Route path="/schedule" element={<ProtectedRoute allowedRoles={['student']}><Schedule /></ProtectedRoute>} />
-          <Route path="/lesson/:lessonId" element={<ProtectedRoute allowedRoles={['student']}><LessonPageWrapper /></ProtectedRoute>} />
+          {/*<Route path="/courses/:courseId/lesson/:lessonId" element={<ProtectedRoute allowedRoles={['student']}><LessonPageWrapper /></ProtectedRoute>} />*/}
           <Route path="/contest" element={<ProtectedRoute allowedRoles={['student']}><Contest /></ProtectedRoute>} />
           <Route path="/progressupdate" element={<ProtectedRoute allowedRoles={['student']}><MyCoursesPage /></ProtectedRoute>} />
-          <Route path="/video" element={<ProtectedRoute allowedRoles={['student']}><VideoDashboard /></ProtectedRoute>} />
+          <Route path="/courses/:courseId/lesson/:lessonId" element={<ProtectedRoute allowedRoles={['student']}><VideoDashboard /></ProtectedRoute>} />
           <Route path="/practice" element={<ProtectedRoute allowedRoles={['student']}><Practice /></ProtectedRoute>} />
           <Route path="/practiceinside" element={<ProtectedRoute allowedRoles={['student']}><PathToProficiency /></ProtectedRoute>} />
           <Route path="/student" element={<ProtectedRoute allowedRoles={['student']}><Student /></ProtectedRoute>} />
           <Route path="/student-dashboard" element={<ProtectedRoute allowedRoles={['student']}><StudentDashboard /></ProtectedRoute>} />
-          <Route path="/track/:trackName" element={<ProtectedRoute allowedRoles={['student']}><Trackdetails /></ProtectedRoute>} />
-          <Route path="/courses/:courseId" element={<ProtectedRoute allowedRoles={['student']}><Trackdetails/></ProtectedRoute>} />
+          <Route path="/track/:trackName" element={<ProtectedRoute allowedRoles={['student']}><FreeCourseDetails /></ProtectedRoute>} />
+          <Route path="/courses/:courseId" element={<ProtectedRoute allowedRoles={['student']}><FreeCourseDetails /></ProtectedRoute>} />
           <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']}><Admin /></ProtectedRoute>} />
           <Route path="/admin-dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
           <Route path="/instructor" element={<ProtectedRoute allowedRoles={['instructor']}><InstructorDashboard /></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute allowedRoles={['student','admin','instructor']}><UserProfile /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute allowedRoles={['student', 'admin', 'instructor']}><UserProfile /></ProtectedRoute>} />
+
         </Routes>
       </main>
     </div>
