@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Play, Clock, CheckCircle, User, Calendar, TrendingUp, BookOpen, Award, Video, ArrowLeft, Loader } from 'lucide-react';
+import { Play, Clock, CheckCircle, User, Calendar, TrendingUp, BookOpen, Award, Video, Loader } from 'lucide-react';
 import { AuthContext } from '../pages/AuthContext';
 import { useNavigate, useParams } from 'react-router-dom';
 import Footer from './Footer';
-const VideoDashboard = () => {
 
+const VideoDashboard = () => {
   const navigate = useNavigate();
   const { courseId, lessonId } = useParams();
   const [selectedVideo, setSelectedVideo] = useState(null);
@@ -14,15 +14,15 @@ const VideoDashboard = () => {
   const [currentLesson, setCurrentLesson] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-const {
+
+  const {
     isAuthenticated,
     enrolledCourses,
-    updateEnrolledCourses,
     user,
     token,
     enrolledCourseIds,
     currentLessonId,
-    updateCurrentLessonId
+    updateCurrentLessonId,
   } = useContext(AuthContext) || {};
 
   // Helper function to validate MongoDB ObjectId
@@ -33,58 +33,48 @@ const {
   // Fetch course lessons
   const fetchCourseLessons = async () => {
     try {
-      console.log(`lessonId= ${lessonId}`)
       const response = await fetch(`/api/courses/${courseId}/lessons`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      
 
       if (!response.ok) {
         throw new Error(`Failed to fetch lessons: ${response.status}`);
       }
 
       const data = await response.json();
+      const validLessons = data.lessons?.filter((lesson) => isValidObjectId(lesson._id));
 
-      const validLessons = data.lessons?.filter(lesson => isValidObjectId(lesson.id || lesson._id));
-      const LessonData = validLessons.find((val) => val._id === lessonId);
-
-
-      // if (LessonData?.videos?.[0]) {
-      //   lesson_Url = LessonData.videos[0].url;
-      //   console.log(lesson_Url);
-      // }
-
-
-    
-      
-      setCourseData(LessonData);
-      console.log(LessonData)
       setLessons(validLessons || []);
-  
-      // Set current lesson based on stored lesson ID or first uncompleted lesson
+
+      // Set current lesson based on lessonId from URL or stored currentLessonId
       let lessonToSet = null;
-      if (currentLessonId) {
-        lessonToSet = data.lessons?.find(lesson =>
-          (lesson.id || lesson._id) === lessonId
-        );
+      if (lessonId && isValidObjectId(lessonId)) {
+        lessonToSet = validLessons.find((lesson) => lesson._id === lessonId);
       }
 
       if (!lessonToSet && currentLessonId) {
-        lessonToSet = data.lessons?.find(lesson =>
-          (lesson.id || lesson._id) === currentLessonId
-        );
+        lessonToSet = validLessons.find((lesson) => lesson._id === currentLessonId);
       }
 
       if (!lessonToSet) {
-        const firstIncomplete = data.lessons?.find(lesson => !lesson.completed);
-        lessonToSet = firstIncomplete || data.lessons?.[0] || null;
+        const firstIncomplete = validLessons.find((lesson) => !lesson.completed);
+        lessonToSet = firstIncomplete || validLessons[0] || null;
       }
 
       setCurrentLesson(lessonToSet);
+      if (lessonToSet && lessonToSet._id !== lessonId) {
+        console.log(lessonToSet._id)
+        navigate(`/courses/${courseId}/lesson/${lessonToSet._id}`);
+      }
 
-      return data.lessons;
+      // Set course data for the current lesson
+      if (lessonToSet) {
+        setCourseData(lessonToSet);
+      }
+
+      return validLessons;
     } catch (error) {
       setError(`Failed to load lessons: ${error.message}`);
       return [];
@@ -98,7 +88,7 @@ const {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          ...(token && { 'Authorization': `Bearer ${token}` }),
+          ...(token && { Authorization: `Bearer ${token}` }),
         },
       });
 
@@ -115,58 +105,40 @@ const {
 
   // Fetch course details
   const fetchCourseDetails = async () => {
-    if (!courseId) {
-      setError("Course ID not provided");
+    if (!courseId || !isValidObjectId(courseId)) {
+      setError('Invalid Course ID');
       setLoading(false);
       return;
     }
 
     try {
       setLoading(true);
-      setError("");
+      setError('');
 
-      const decodedId = decodeURIComponent(courseId);
-      const isValidId = isValidObjectId(decodedId);
+      const response = await fetch(`/api/courses/${courseId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
 
-      // Try multiple API endpoints that might work
-      const possibleEndpoints = [
-        `/api/courses/${decodedId}`,
-        `/api/course/${decodedId}`,
-        `/api/track/${decodedId}`,
-        `/api/courses/details/${decodedId}`,
-        `/api/v1/courses/${decodedId}`
-      ];
-
-      let courseDetails = null;
-
-      for (const endpoint of possibleEndpoints) {
-        try {
-          const response = await fetch(endpoint, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              ...(token && { 'Authorization': `Bearer ${token}` }),
-            },
-          });
-
-          if (response.ok) {
-            courseDetails = await response.json();
-            break;
-          }
-        } catch (endpointError) {
-          continue;
-        }
+      if (!response.ok) {
+        throw new Error(`Failed to fetch course details: ${response.status}`);
       }
 
-      if (!courseDetails) {
-        throw new Error("Course not found in any endpoint");
-      }
-
-    
+      const courseDetails = await response.json();
+      setCourseData((prev) => ({
+        ...prev,
+        title: courseDetails.title,
+        description: courseDetails.description,
+        rating: courseDetails.rating,
+        studentsCount: courseDetails.studentsCount,
+        level: courseDetails.level,
+      }));
 
       // Fetch lessons after getting course details
       await fetchCourseLessons();
-
     } catch (error) {
       setError(`Failed to load course: ${error.message}`);
     } finally {
@@ -175,73 +147,34 @@ const {
   };
 
   useEffect(() => {
-    if (courseId) {
-      // For demo purposes, load sample data if no token
-      if (!token) {
-        setLoading(false);
-        setSampleData();
-      } else {
-        fetchCourseDetails();
-      }
+    if (courseId && token) {
+      fetchCourseDetails();
+    } else {
+      setError('Authentication required');
+      setLoading(false);
     }
-  }, [courseId, token]);
-
-  // Sample data for demo purposes
-  const setSampleData = () => {
-    const sampleLessons = [
-      { id: 1, title: "Introduction to Data Science", duration: "8", completed: true, videoUrl: "https://www.youtube.com/embed/rjfchLPJ3m8", section: "Getting Started" },
-      { id: 2, title: "Setting up Environment", duration: "6", completed: true, videoUrl: "https://www.youtube.com/embed/rjfchLPJ3m8", section: "Getting Started" },
-      { id: 3, title: "Python Basics", duration: "12", completed: false, progress: 75, videoUrl: "https://www.youtube.com/embed/rjfchLPJ3m8", section: "Python Programming" },
-      { id: 4, title: "Variables and Data Types", duration: "10", completed: false, videoUrl: "https://www.youtube.com/embed/rjfchLPJ3m8", section: "Python Programming" },
-      { id: 5, title: "Control Flow", duration: "16", completed: false, videoUrl: "https://www.youtube.com/embed/rjfchLPJ3m8", section: "Python Control Flow" }
-    ];
-
-    setLessons(sampleLessons);
-
-    // Set current lesson based on stored lesson ID or first uncompleted lesson
-    let lessonToSet = null;
-    if (currentLessonId) {
-      lessonToSet = sampleLessons.find(lesson =>
-        (lesson.id || lesson._id) === currentLessonId
-      );
-    }
-
-    if (!lessonToSet) {
-      lessonToSet = sampleLessons.find(l => !l.completed) || sampleLessons[0];
-    }
-
-    setCurrentLesson(lessonToSet);
-    setCourseData({
-      title: "Complete Data Science Bootcamp",
-      description: "Master the theory, practice, and math behind Data Science, Machine Learning, Deep Learning, NLP",
-      rating: "4.6",
-      studentsCount: "80,397",
-      level: "All Levels"
-    });
-  };
+  }, [courseId, token, lessonId]);
 
   // Handle lesson selection
   const handleLessonSelect = async (lesson) => {
     try {
       setSelectedVideo(lesson);
       setCurrentLesson(lesson);
-      
-      if (currentLessonId) {
-  lessonToSet = data.lessons?.find(lesson =>
-    (lesson.id || lesson._id) === lessonId
-  );
-}
 
-      // Update current lesson ID in AuthContext (saves to localStorage)
-      const lessonId = lesson.id || lesson._id;
+      // Update URL with new lessonId
+      const lessonId = lesson._id;
+      navigate(`/courses/${courseId}/lesson/${lessonId}`);
+
+      // Update current lesson ID in AuthContext
       if (lessonId && updateCurrentLessonId) {
         updateCurrentLessonId(lessonId);
       }
 
-      // Fetch detailed lesson content if needed
+      // Fetch detailed lesson content
       if (lessonId && token) {
         const lessonDetails = await fetchLessonDetails(lessonId);
         setCurrentLesson({ ...lesson, ...lessonDetails });
+        setCourseData((prev) => ({ ...prev, ...lessonDetails }));
       }
     } catch (error) {
       console.error('Error selecting lesson:', error.message);
@@ -257,16 +190,15 @@ const {
         inProgress: 0,
         upcoming: 0,
         overallProgress: 0,
-        totalDuration: 0
+        totalDuration: 0,
       };
     }
 
-    const completed = lessons.filter(lesson => lesson.completed).length;
-    const inProgress = lessons.filter(lesson => lesson.inProgress).length;
+    const completed = lessons.filter((lesson) => lesson.completed).length;
+    const inProgress = lessons.filter((lesson) => lesson.inProgress).length;
     const upcoming = lessons.length - completed - inProgress;
     const overallProgress = Math.round((completed / lessons.length) * 100);
 
-    // Calculate total duration (assuming duration is in minutes)
     const totalDuration = lessons.reduce((acc, lesson) => {
       const duration = lesson.duration || 0;
       return acc + (typeof duration === 'string' ? parseInt(duration) : duration);
@@ -278,20 +210,19 @@ const {
       inProgress,
       upcoming,
       overallProgress,
-      totalDuration: Math.round(totalDuration / 60) // Convert to hours
+      totalDuration: Math.round(totalDuration / 60),
     };
   };
 
   const stats = calculateStats();
 
-  // Group lessons by sections if they have section information
+  // Group lessons by sections
   const groupLessonsBySection = () => {
     if (!lessons.length) return [];
 
-    // If lessons have section info, group them
     if (lessons[0].section) {
       const sections = {};
-      lessons.forEach(lesson => {
+      lessons.forEach((lesson) => {
         const sectionName = lesson.section || 'General';
         if (!sections[sectionName]) {
           sections[sectionName] = [];
@@ -305,18 +236,17 @@ const {
         lessons: sectionLessons.length,
         duration: calculateSectionDuration(sectionLessons),
         progress: calculateSectionProgress(sectionLessons),
-        videos: sectionLessons
+        videos: sectionLessons,
       }));
     }
 
-    // Otherwise, create a single section with all lessons
     return [{
       id: 1,
-      title: "Course Content",
+      title: 'Course Content',
       lessons: lessons.length,
       duration: `${stats.totalDuration}h`,
       progress: stats.overallProgress,
-      videos: lessons
+      videos: lessons,
     }];
   };
 
@@ -333,24 +263,11 @@ const {
   };
 
   const calculateSectionProgress = (sectionLessons) => {
-    const completed = sectionLessons.filter(lesson => lesson.completed).length;
+    const completed = sectionLessons.filter((lesson) => lesson.completed).length;
     return Math.round((completed / sectionLessons.length) * 100);
   };
 
   const videoSections = groupLessonsBySection();
-
-  // Sample activity data - you might want to fetch this from API as well
-  const recentActivity = [
-    { day: 'Mon', hours: 2.5 },
-    { day: 'Tue', hours: 1.8 },
-    { day: 'Wed', hours: 3.2 },
-    { day: 'Thu', hours: 2.1 },
-    { day: 'Fri', hours: 4.2 },
-    { day: 'Sat', hours: 3.8 },
-    { day: 'Sun', hours: 2.9 }
-  ];
-
-  const maxHours = Math.max(...recentActivity.map(day => day.hours));
 
   if (loading) {
     return (
@@ -385,23 +302,23 @@ const {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                  {courseData?.title || "Complete Data Science Bootcamp"}
+                  {courseData?.title || 'Course Title'}
                 </h1>
                 <p className="text-gray-600 text-lg">
-                  {courseData?.description || "Master the theory, practice, and math behind Data Science, Machine Learning, Deep Learning, NLP"}
+                  {courseData?.description || 'Course Description'}
                 </p>
               </div>
               <div className="flex items-center space-x-4">
                 <div className="bg-white rounded-lg px-4 py-2 shadow-sm">
                   <div className="flex items-center space-x-2">
                     <Award className="w-5 h-5 text-yellow-500" />
-                    <span className="text-sm font-medium">{courseData?.rating || "4.6"} Rating</span>
+                    <span className="text-sm font-medium">{courseData?.rating || 'N/A'} Rating</span>
                   </div>
                 </div>
                 <div className="bg-white rounded-lg px-4 py-2 shadow-sm">
                   <div className="flex items-center space-x-2">
                     <User className="w-5 h-5 text-purple-600" />
-                    <span className="text-sm font-medium">{courseData?.studentsCount || "80,397"} Students</span>
+                    <span className="text-sm font-medium">{courseData?.studentsCount || '0'} Students</span>
                   </div>
                 </div>
               </div>
@@ -413,10 +330,11 @@ const {
               <button
                 key={tab}
                 onClick={() => setActiveSection(tab)}
-                className={`pb-4 px-2 text-sm font-medium capitalize transition-colors ${activeSection === tab
-                  ? 'border-b-2 border-purple-600 text-purple-600'
-                  : 'text-gray-500 hover:text-gray-700'
-                  }`}
+                className={`pb-4 px-2 text-sm font-medium capitalize transition-colors ${
+                  activeSection === tab
+                    ? 'border-b-2 border-purple-600 text-purple-600'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
               >
                 {tab}
               </button>
@@ -431,12 +349,11 @@ const {
                   <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
                     <div className="aspect-video bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center relative">
                       <div className="absolute inset-0 bg-black bg-opacity-20"></div>
-
                       <div className="w-full aspect-video rounded overflow-hidden mb-0 z-10">
-                        {courseData.videos ? (
+                        {courseData?.videos?.length > 0 ? (
                           <iframe
-                            src={courseData.videos[0].url}
-                            title={courseData.videos[0].title || 'Current Lesson'}
+                            src={courseData.videos[0]?.url}
+                            title={courseData.videos[0]?.title || 'Current Lesson'}
                             allowFullScreen
                             className="w-full h-full rounded"
                           />
@@ -454,11 +371,11 @@ const {
                     <div className="p-6">
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="text-xl font-semibold">
-                          Current Lesson: {currentLesson?.title || "Select a lesson"}
+                          Current Lesson: {currentLesson?.title || 'Select a lesson'}
                         </h3>
                         <div className="flex items-center space-x-2 text-sm text-gray-500">
                           <Clock className="w-4 h-4" />
-                          <span>{currentLesson?.duration || "0"} min</span>
+                          <span>{currentLesson?.duration || '0'} min</span>
                         </div>
                       </div>
 
@@ -483,7 +400,10 @@ const {
                   <div className="space-y-4">
                     <h2 className="text-2xl font-bold text-gray-900 mb-6">Course Content</h2>
                     {videoSections.map((section) => (
-                      <div key={section.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                      <div
+                        key={section.id}
+                        className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+                      >
                         <div className="p-6">
                           <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center space-x-4">
@@ -491,9 +411,7 @@ const {
                                 <BookOpen className="w-5 h-5 text-purple-600" />
                               </div>
                               <div>
-                                <h3 className="text-lg font-semibold text-gray-900">
-                                  {section.title}
-                                </h3>
+                                <h3 className="text-lg font-semibold text-gray-900">{section.title}</h3>
                                 <div className="flex items-center space-x-4 text-sm text-gray-500 mt-1">
                                   <span>{section.lessons} lessons</span>
                                   <span>{section.duration}</span>
@@ -501,9 +419,7 @@ const {
                               </div>
                             </div>
                             <div className="text-right">
-                              <div className="text-2xl font-bold text-purple-600 mb-1">
-                                {section.progress}%
-                              </div>
+                              <div className="text-2xl font-bold text-purple-600 mb-1">{section.progress}%</div>
                               <div className="w-20 bg-gray-200 rounded-full h-2">
                                 <div
                                   className="bg-purple-600 h-2 rounded-full transition-all duration-500"
@@ -517,11 +433,12 @@ const {
                           <div className="space-y-2">
                             {section.videos.map((video) => (
                               <div
-                                key={video.id || video._id}
-                                className={`flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer group ${currentLesson && (currentLesson.id === video.id || currentLesson._id === video._id)
-                                  ? 'bg-blue-50 border border-blue-200'
-                                  : ''
-                                  }`}
+                                key={video._id}
+                                className={`flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer group ${
+                                  currentLesson && currentLesson._id === video._id
+                                    ? 'bg-blue-50 border border-blue-200'
+                                    : ''
+                                }`}
                                 onClick={() => handleLessonSelect(video)}
                               >
                                 <div className="flex items-center space-x-3">
@@ -577,23 +494,6 @@ const {
                         <div className="text-sm text-gray-500">Upcoming</div>
                       </div>
                     </div>
-
-                    {/* Activity Chart */}
-                    <div className="mt-8">
-                      <h3 className="text-lg font-semibold mb-4">Weekly Activity</h3>
-                      <div className="flex items-end space-x-2 h-40">
-                        {recentActivity.map((day, index) => (
-                          <div key={index} className="flex-1 flex flex-col items-center">
-                            <div
-                              className="w-full bg-purple-600 hover:bg-purple-500 rounded-t-lg transition-all duration-500"
-                              style={{ height: `${(day.hours / maxHours) * 100}%`, minHeight: '20px' }}
-                            ></div>
-                            <div className="text-xs text-gray-500 mt-2">{day.day}</div>
-                            <div className="text-xs font-medium text-gray-700">{day.hours}h</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
                   </div>
                 </div>
               )}
@@ -610,7 +510,7 @@ const {
                             {currentLesson?.duration || 0} min
                           </span>
                         </div>
-                        <p className="text-blue-800">{currentLesson?.title || "No lesson selected"}</p>
+                        <p className="text-blue-800">{currentLesson?.title || 'No lesson selected'}</p>
                         <div className="flex items-center mt-2 text-sm text-blue-600">
                           <Clock className="w-4 h-4 mr-1" />
                           <span>Duration: {currentLesson?.duration || 0} minutes</span>
@@ -619,17 +519,20 @@ const {
 
                       <div className="space-y-3">
                         <h4 className="font-medium text-gray-700">Next Lessons</h4>
-                        {lessons.filter(lesson => !lesson.completed).slice(0, 3).map((lesson, index) => (
-                          <div key={lesson.id || lesson._id} className="border border-gray-200 rounded-lg p-4">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <h4 className="font-medium text-gray-900">{lesson.title}</h4>
-                                <p className="text-sm text-gray-500">Duration: {lesson.duration} min</p>
+                        {lessons
+                          .filter((lesson) => !lesson.completed)
+                          .slice(0, 3)
+                          .map((lesson) => (
+                            <div key={lesson._id} className="border border-gray-200 rounded-lg p-4">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <h4 className="font-medium text-gray-900">{lesson.title}</h4>
+                                  <p className="text-sm text-gray-500">Duration: {lesson.duration} min</p>
+                                </div>
+                                <Calendar className="w-5 h-5 text-gray-400" />
                               </div>
-                              <Calendar className="w-5 h-5 text-gray-400" />
                             </div>
-                          </div>
-                        ))}
+                          ))}
                       </div>
                     </div>
                   </div>
@@ -679,7 +582,7 @@ const {
                       <TrendingUp className="w-4 h-4 text-gray-400" />
                       <span className="text-sm text-gray-600">Skill Level</span>
                     </div>
-                    <span className="font-medium">{courseData?.level || "All Levels"}</span>
+                    <span className="font-medium">{courseData?.level || 'All Levels'}</span>
                   </div>
                 </div>
               </div>
@@ -693,14 +596,10 @@ const {
                     </div>
                     <div>
                       <div className="font-semibold text-yellow-900">Great Progress!</div>
-                      <div className="text-sm text-yellow-700">
-                        {stats.completedLessons} lessons completed
-                      </div>
+                      <div className="text-sm text-yellow-700">{stats.completedLessons} lessons completed</div>
                     </div>
                   </div>
-                  <div className="text-xs text-yellow-600">
-                    Keep up the excellent work!
-                  </div>
+                  <div className="text-xs text-yellow-600">Keep up the excellent work!</div>
                 </div>
               )}
             </div>
