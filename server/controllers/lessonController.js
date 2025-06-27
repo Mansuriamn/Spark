@@ -1,4 +1,6 @@
 import { Lesson } from '../models/Lesson.js';
+import { User } from '../models/User.js';
+import { Course } from '../models/Course.js';
 import mongoose from 'mongoose';
 const asyncHandler = (fn) => (req, res, next) =>
   Promise.resolve(fn(req, res, next)).catch(next);
@@ -66,4 +68,27 @@ export const addLessonVideoCloud = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
+};
+
+export const markLessonComplete = async (req, res) => {
+  const { id } = req.params; // lessonId
+  const userId = req.user._id;
+
+  const user = await User.findById(userId);
+
+  const existing = user.progress.find(p => p.lessonId.toString() === id);
+  if (existing) {
+    existing.completed = true;
+    existing.watchedDuration = req.body.watchedDuration;
+  } else {
+    user.progress.push({
+      lessonId: id,
+      watchedDuration: req.body.watchedDuration,
+      totalDuration: req.body.totalDuration,
+      completed: true,
+    });
+  }
+
+  await user.save();
+  res.status(200).json({ message: 'Lesson marked complete' });
 };

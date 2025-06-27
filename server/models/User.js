@@ -34,6 +34,14 @@ const userSchema = new mongoose.Schema({
     ],
     completedLessons: [
   { type: mongoose.Schema.Types.ObjectId, ref: 'Lesson' }
+],
+progress: [
+  {
+    lessonId: { type: mongoose.Schema.Types.ObjectId, ref: 'Lesson' },
+    watchedDuration: Number,
+    totalDuration: Number,
+    completed: { type: Boolean, default: false }
+  }
 ]
 
 });

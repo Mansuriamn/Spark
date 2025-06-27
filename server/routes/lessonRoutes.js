@@ -5,6 +5,7 @@ import {
   createLesson,
   updateLesson,
   deleteLesson,
+  markLessonComplete
 } from '../controllers/lessonController.js';
 
 import {protect, checkRole } from '../middlewares/authMiddleware.js'; // make sure this file exports the function
@@ -17,6 +18,7 @@ const router = express.Router();
 // Public Routes
 router.get('/', getAllLessons);              // GET all lessons
 router.get('/:id', getLessonById);           // GET a single lesson by ID
+router.post('/:id/progress', markLessonComplete); // POST to mark a lesson as complete
 
 // Protected Routes (Admin or Mentor only)
 router.post('/', protect, checkRole(['Admin', 'Mentor']), createLesson);
