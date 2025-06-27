@@ -118,13 +118,7 @@ const FreeCourseDetails = () => {
   const [expandedSection, setExpandedSection] = useState(null);
 
   const {
-    isAuthenticated,
-    enrolledCourses,
-    updateEnrolledCourses,
-    user,
-    token,
-    enrolledCourseIds,
-    currentLessonId
+    isAuthenticated,enrolledCourses,updateEnrolledCourses,user,token,enrolledCourseIds,currentLessonId
   } = useContext(AuthContext);
 
   // Helper function to add debug information
@@ -369,17 +363,7 @@ const FreeCourseDetails = () => {
           <p className="text-gray-600 mb-4">The course you're looking for doesn't exist.</p>
           <p className="text-gray-500 mb-4">Tried to find course with ID: <code className="bg-gray-100 px-2 py-1 rounded">{id}</code></p>
 
-          {/* Debug Information */}
-          <div className="mb-6 text-left">
-            <details className="bg-gray-50 p-4 rounded">
-              <summary className="cursor-pointer font-medium">🔍 Debug Information ({debugInfo.length} entries)</summary>
-              <div className="mt-2 text-xs space-y-1 max-h-60 overflow-y-auto">
-                {debugInfo.map((info, i) => (
-                  <div key={i} className="font-mono bg-white p-1 rounded">{info}</div>
-                ))}
-              </div>
-            </details>
-          </div>
+          
 
           <div className="space-y-4">
             <button

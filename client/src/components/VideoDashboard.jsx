@@ -3,6 +3,7 @@ import { Play, Clock, CheckCircle, User, Calendar, TrendingUp, BookOpen, Award, 
 import { AuthContext } from '../pages/AuthContext';
 import { useNavigate, useParams } from 'react-router-dom';
 import Footer from './Footer';
+import axios from 'axios';
 
 const VideoDashboard = () => {
   const navigate = useNavigate();
@@ -15,6 +16,10 @@ const VideoDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [videoProgress, setVideoProgress] = useState(0);
+  const [studentCount, setStudentCount] = useState(0);
+  const [apiProgress, setApiProgress] = useState({
+    overallProgress: 0, completedLessons: 0, totalLessons: 0,
+  });
 
   const {
     isAuthenticated, enrolledCourses, user, token, enrolledCourseIds, currentLessonId, updateCurrentLessonId, } = useContext(AuthContext) || {};
@@ -174,31 +179,90 @@ const VideoDashboard = () => {
       console.error('Error selecting lesson:', error.message);
     }
   };
-const handleVideoProgress = async (e) => {
-  const current = e.target.currentTime;
-  const duration = e.target.duration;
-  if (duration > 0) {
-    const progress = Math.round((current / duration) * 100);
-    setVideoProgress(progress);
+  const handleVideoProgress = async (e) => {
+    const current = e.target.currentTime;
+    const duration = e.target.duration;
+    if (duration > 0) {
+      const progress = Math.round((current / duration) * 100);
+      setVideoProgress(progress);
 
-    // Optionally: send progress to backend here
-    try {
-      await fetch(`/api/lessons/${currentLesson?._id}/progress`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          lessonId: currentLesson?._id,
-          progress,
-        }),
-      });
-    } catch (err) {
-      // handle error
+      // Optionally: send progress to backend here
+      try {
+        await fetch(`/api/lessons/${currentLesson?._id}/progress`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            lessonId: currentLesson?._id,
+            progress,
+          }),
+        });
+      } catch (err) {
+        // handle error
+      }
     }
-  }
-};
+  };
+
+
+  useEffect(() => {
+    const fetchAllData = async () => {
+      if (!courseId || !token) {
+        setError('Authentication required');
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setError('');
+
+      try {
+        // Fetch course details
+        const response = await fetch(`/api/courses/${courseId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch course details: ${response.status}`);
+        }
+
+        const courseDetails = await response.json();
+        setCourseData((prev) => ({
+          ...prev,
+          title: courseDetails.title,
+          description: courseDetails.description,
+          rating: courseDetails.rating,
+          studentsCount: courseDetails.studentsCount, // fallback if API fails
+          level: courseDetails.level,
+        }));
+
+        // Fetch lessons after getting course details
+        await fetchCourseLessons();
+
+        // Fetch enrolled users and count students (role: "user" and deleted: false)
+        const studentRes = await axios.get(`http://localhost:5000/api/courses/${courseId}/enrolled-users`);
+        const users = studentRes.data.users || [];
+        const studentCount = users.filter(
+          (u) => u.role === "user" && !u.deleted
+        ).length;
+        setStudentCount(studentCount);
+
+      } catch (error) {
+        setError(`Failed to load course: ${error.message}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllData();
+    // eslint-disable-next-line
+  }, [courseId, token, lessonId]);
+
 
   // Calculate progress statistics
   const calculateStats = () => {
@@ -223,6 +287,8 @@ const handleVideoProgress = async (e) => {
       return acc + (typeof duration === 'string' ? parseInt(duration) : duration);
     }, 0);
 
+
+
     return {
       totalLessons: lessons.length,
       completedLessons: completed,
@@ -235,6 +301,31 @@ const handleVideoProgress = async (e) => {
 
   const stats = calculateStats();
 
+  useEffect(() => {
+  const fetchProgress = async () => {
+    if (!courseId || !user?._id) return;
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/courses/${courseId}/progress`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      // Ensure overallProgress is set for UI
+      setApiProgress({
+        ...res.data,
+        overallProgress: res.data.progressPercentage || 0,
+      });
+    } catch (err) {
+      // fallback to local stats if API fails
+      setApiProgress({
+        overallProgress: stats.overallProgress,
+        completedLessons: stats.completedLessons,
+        totalLessons: stats.totalLessons,
+        progressPercentage: stats.progressPercentage || 0,
+      });
+    }
+  };
+  fetchProgress();
+}, [courseId, user, token, stats.overallProgress, stats.completedLessons, stats.totalLessons]);
   // Group lessons by sections
   const groupLessonsBySection = () => {
     if (!lessons.length) return [];
@@ -288,6 +379,7 @@ const handleVideoProgress = async (e) => {
 
   const videoSections = groupLessonsBySection();
 
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
@@ -311,6 +403,9 @@ const handleVideoProgress = async (e) => {
       </div>
     );
   }
+
+
+
 
   return (
     <>
@@ -337,7 +432,7 @@ const handleVideoProgress = async (e) => {
                 <div className="bg-white rounded-lg px-4 py-2 shadow-sm">
                   <div className="flex items-center space-x-2">
                     <User className="w-5 h-5 text-purple-600" />
-                    <span className="text-sm font-medium">{courseData?.studentsCount || '0'} Students</span>
+                    <span className="text-sm font-medium">{studentCount || '0'} Students</span>
                   </div>
                 </div>
               </div>
@@ -350,8 +445,8 @@ const handleVideoProgress = async (e) => {
                 key={tab}
                 onClick={() => setActiveSection(tab)}
                 className={`pb-4 px-2 text-sm font-medium capitalize transition-colors ${activeSection === tab
-                    ? 'border-b-2 border-purple-600 text-purple-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                  ? 'border-b-2 border-purple-600 text-purple-600'
+                  : 'text-gray-500 hover:text-gray-700'
                   }`}
               >
                 {tab}
@@ -436,15 +531,7 @@ const handleVideoProgress = async (e) => {
                                 </div>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <div className="text-2xl font-bold text-purple-600 mb-1">{section.progress}%</div>
-                              <div className="w-20 bg-gray-200 rounded-full h-2">
-                                <div
-                                  className="bg-purple-600 h-2 rounded-full transition-all duration-500"
-                                  style={{ width: `${section.progress}%` }}
-                                ></div>
-                              </div>
-                            </div>
+ 
                           </div>
 
                           {/* Video List */}
@@ -453,8 +540,8 @@ const handleVideoProgress = async (e) => {
                               <div
                                 key={video._id}
                                 className={`flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer group ${currentLesson && currentLesson._id === video._id
-                                    ? 'bg-blue-50 border border-blue-200'
-                                    : ''
+                                  ? 'bg-blue-50 border border-blue-200'
+                                  : ''
                                   }`}
                                 onClick={() => handleLessonSelect(video)}
                               >
@@ -563,19 +650,18 @@ const handleVideoProgress = async (e) => {
               <div className="bg-white rounded-xl p-6 shadow-sm">
                 <h3 className="text-lg font-semibold mb-4">Overall Progress</h3>
                 <div className="text-center mb-4">
-                  <div className="text-3xl font-bold text-purple-600 mb-2">{stats.overallProgress}%</div>
+                  <div className="text-3xl font-bold text-purple-600 mb-2">{apiProgress.overallProgress}%</div>
                   <div className="w-full bg-gray-200 rounded-full h-3">
                     <div
                       className="bg-purple-600 h-3 rounded-full transition-all duration-700"
-                      style={{ width: `${stats.overallProgress}%` }}
+                      style={{ width: `${apiProgress.progressPercentage}%` }}
                     ></div>
                   </div>
                 </div>
                 <div className="text-sm text-gray-600 text-center">
-                  {stats.completedLessons} of {stats.totalLessons} lessons completed
+                  {apiProgress.completedLessons} of {apiProgress.totalLessons} lessons completed
                 </div>
               </div>
-
               {/* Course Stats */}
               <div className="bg-white rounded-xl p-6 shadow-sm">
                 <h3 className="text-lg font-semibold mb-4">Course Stats</h3>
