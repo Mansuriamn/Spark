@@ -17,6 +17,7 @@ const UserProfile = () => {
   } = useContext(AuthContext);
   
   const { userProfile, updateUserProfile } = useContext(AuthContext);
+  const [courseProgress, setCourseProgress] = useState({});
 
 const saveProfile = async (newProfileData) => {
   // maybe call API first, then update
@@ -106,7 +107,7 @@ const saveProfile = async (newProfileData) => {
   };
 
   const handleContinueLearning = (courseId) => {
-    navigate('/video', { state: { courseId } });
+    navigate('/courses', { state: { courseId } });
   };
 
   const handleRemoveFromCart = async (courseId) => {
@@ -161,6 +162,32 @@ const saveProfile = async (newProfileData) => {
   const calculateProgress = (courseId) => {
     return Math.floor(Math.random() * 100);
   };
+
+  useEffect(() => {
+  const fetchAllProgress = async () => {
+    if (!user || !token || !enrolledCourses || enrolledCourses.length === 0) return;
+    const progressData = {};
+    for (const course of enrolledCourses) {
+      try {
+        const res = await fetch(
+          `http://localhost:5000/api/courses/${course.id}/progress?userId=${user.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const data = await res.json();
+        // Use progressPercentage from API, fallback to 0
+        progressData[course.id] = data.progressPercentage || 0;
+      } catch {
+        progressData[course.id] = 0;
+      }
+    }
+    setCourseProgress(progressData);
+  };
+  fetchAllProgress();
+}, [user, token, enrolledCourses]);
 
   if (!user) {
     return (
@@ -300,7 +327,7 @@ const saveProfile = async (newProfileData) => {
               </div>
               <div className="grid md:grid-cols-2 gap-6">
                 {enrolledCourses.map((course) => {
-                  const progress = calculateProgress(course.id);
+                  const progress = courseProgress[course.id] ?? 0;
                   return (
                     <div key={course.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
                       <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-6 text-white">
