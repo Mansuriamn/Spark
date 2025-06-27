@@ -24,11 +24,7 @@ const LessonSchema = new mongoose.Schema({
   module: { type: mongoose.Schema.Types.ObjectId, ref: 'Module' },
   duration: { type: Number, default: 0 },
   attachments: [String],
-  courseId: {
-  type: mongoose.Schema.Types.ObjectId,
-  ref: 'Course',
-  required: true
-}
+ 
 }, { timestamps: true });
 
 export const Lesson = mongoose.model('Lesson', LessonSchema);
