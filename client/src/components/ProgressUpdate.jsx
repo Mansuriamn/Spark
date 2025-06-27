@@ -1,9 +1,9 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Clock, Users, BookOpen, Check, Play, ArrowRight, Filter, Trophy, Medal, Star, GraduationCap, TrendingUp, Crown, Flame, Award, ChevronDown } from 'lucide-react';
 import Footer from './Footer';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useParams } from 'react-router-dom';
 import axios from 'axios';
+import { AuthContext } from '../pages/AuthContext'; // Add this import
 import {
   FaClock,
   FaUsers,
@@ -18,76 +18,6 @@ import {
   FaCompass,
   FaBook
 } from 'react-icons/fa';
-const coursesData = [
-  {
-    title: 'English punctuation made easy',
-    lessons: 12,
-    students: 198,
-    rating: 4.7,
-    completed: 75,
-    days: 14,
-    status: 'in-progress',
-    instructor: 'Cody Fisher',
-    duration: '4h 30m',
-    level: 'Advanced',
-    image: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-    category: 'Language',
-    price: '₹19.99',
-    originalPrice: '₹99.99',
-    progressColor: 'bg-purple-500'
-  },
-  {
-    title: 'Technical Spanish for Beginners',
-    lessons: 8,
-    students: 305,
-    rating: 4.5,
-    completed: 45,
-    days: 30,
-    status: 'in-progress',
-    instructor: 'Jacob Jones',
-    duration: '6h 15m',
-    level: 'Beginner',
-    image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-    category: 'Language',
-    price: '₹24.99',
-    originalPrice: '₹89.99',
-    progressColor: 'bg-blue-500'
-  },
-  {
-    title: 'Advanced React Development',
-    lessons: 16,
-    students: 410,
-    rating: 4.9,
-    completed: 100,
-    days: 0,
-    status: 'completed',
-    instructor: 'Sarah Wilson',
-    duration: '8h 45m',
-    level: 'Advanced',
-    image: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-    category: 'Programming',
-    price: '₹29.99',
-    originalPrice: '₹119.99',
-    progressColor: 'bg-green-500'
-  },
-  {
-    title: 'UX/UI Design Fundamentals',
-    lessons: 10,
-    students: 256,
-    rating: 4.6,
-    completed: 0,
-    days: 45,
-    status: 'not-started',
-    instructor: 'Mike Chen',
-    duration: '5h 20m',
-    level: 'Beginner',
-    image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-    category: 'Design',
-    price: '₹34.99',
-    originalPrice: '₹149.99',
-    progressColor: 'bg-pink-500'
-  }
-];
 
 const filterOptions = [
   { id: 'all', label: 'All Courses' },
@@ -132,8 +62,6 @@ const achievements = [
   }
 ];
 
-
-
 const StatCard = ({ stat }) => (
   <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 flex items-center hover:shadow-md transition-shadow duration-200">
     <div className={`w-12 h-12 rounded-xl ${stat.color} flex items-center justify-center mr-4`}>
@@ -149,7 +77,6 @@ const StatCard = ({ stat }) => (
 const AchievementCard = ({ achievement }) => (
   <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200 hover:-translate-y-1 h-full flex flex-col">
     <div className="flex items-center mb-4">
-     
       <div className="flex-1">
         <h3 className="font-bold text-gray-800 text-lg">{achievement.title}</h3>
         <div className="text-sm text-gray-500">{achievement.count}</div>
@@ -168,40 +95,69 @@ const AchievementCard = ({ achievement }) => (
 );
 
 const CourseCard = ({ course }) => {
-
+  
+    const { courseId, lessonId } = useParams();
   const navigate = useNavigate();
   const handleNavigate = () => {
-    navigate(`/video`); 
+    navigate(`/courses/${courseId || course.id}/lessons/${lessonId || course.lessons[0].id}`); 
   };
+
+  // Ensure course is an object and has required properties
+  if (!course || typeof course !== 'object') {
+    console.error('Invalid course data:', course);
+    return null;
+  }
+
+  const statusKey = course.status || 'not-started';
+  const statusBadge = statusBadges[statusKey] || statusBadges['not-started'];
+
+  // Safely extract and convert properties to strings
+  const safeString = (value, fallback = '') => {
+    if (value === null || value === undefined) return fallback;
+    if (typeof value === 'object') return fallback;
+    return String(value);
+  };
+
+  const courseTitle = safeString(course.title, 'Untitled Course');
+  const courseInstructor = safeString(course.instructor, 'Unknown');
+  const courseLevel = safeString(course.level, 'Beginner');
+  const courseDuration = safeString(course.duration, 'N/A');
+  const courseStudents = safeString(course.students, '0');
+  const courseLessons = safeString(course.lessons, '0');
+  const courseRating = parseFloat(course.rating) || 0;
+  const courseCategory = safeString(course.category, 'General');
+  const coursePrice = safeString(course.price, 'Free');
+  const courseOriginalPrice = safeString(course.originalPrice, '');
+  const courseCompleted = parseFloat(course.completed) || 0;
+  const courseDays = safeString(course.days, '0');
+
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col lg:flex-row transition-all duration-300 hover:shadow-lg border border-gray-100">
-    
       <div className="relative lg:w-80 h-48 lg:h-auto">
         <img 
-          src={course.image} 
-          alt={course.title} 
+          src={course.image || course.thumbnail || 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'} 
+          alt={courseTitle} 
           className="w-full h-full object-cover"
         />
         <div className="absolute top-4 left-4 flex gap-2">
-          <span className={`${statusBadges[course.status].color} px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm bg-opacity-90`}>
-            {statusBadges[course.status].text}
+          <span className={`${statusBadge.color} px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm bg-opacity-90`}>
+            {statusBadge.text}
           </span>
           <span className="bg-black bg-opacity-75 text-white text-xs px-3 py-1 rounded-full font-medium">
-            {course.category}
+            {courseCategory}
           </span>
         </div>
-        
         
         {course.status === 'in-progress' && (
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent text-white p-4">
             <div className="flex justify-between text-xs mb-2 font-medium">
-              <span>Progress: {course.completed}%</span>
-              <span>{course.days} days left</span>
+              <span>Progress: {courseCompleted}%</span>
+              <span>{courseDays} days left</span>
             </div>
             <div className="w-full bg-white/20 rounded-full h-2">
               <div 
-                className={`${course.progressColor} h-2 rounded-full transition-all duration-500`} 
-                style={{ width: `${course.completed}%` }}
+                className={`${course.progressColor || 'bg-purple-500'} h-2 rounded-full transition-all duration-500`} 
+                style={{ width: `${courseCompleted}%` }}
               ></div>
             </div>
           </div>
@@ -211,42 +167,42 @@ const CourseCard = ({ course }) => {
       <div className="p-6 flex-1 flex flex-col">
         <div className="flex-1">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-gray-500 font-medium">by {course.instructor}</p>
+            <p className="text-sm text-gray-500 font-medium">by {courseInstructor}</p>
             <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg text-xs font-medium">
-              {course.level}
+              {courseLevel}
             </span>
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-4 leading-tight">{course.title}</h3>
+          <h3 className="text-xl font-bold text-gray-900 mb-4 leading-tight">{courseTitle}</h3>
           
           <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-4">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-purple-500" />
-              <span>{course.duration}</span>
+              <span>{courseDuration}</span>
             </div>
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4 text-purple-500" />
-              <span>{course.students} Students</span>
+              <span>{courseStudents} Students</span>
             </div>
             <div className="flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-purple-500" />
-              <span>{course.lessons} Lessons</span>
+              <span>{courseLessons} Lessons</span>
             </div>
           </div>
           
           <div className="flex items-center mb-6">
             <div className="flex text-yellow-400 mr-2">
               {[...Array(5)].map((_, i) => (
-                <Star key={i} className={`w-4 h-4 ${i < Math.floor(course.rating) ? "fill-current" : "text-gray-300"}`} />
+                <Star key={i} className={`w-4 h-4 ${i < Math.floor(courseRating) ? "fill-current" : "text-gray-300"}`} />
               ))}
             </div>
-            <span className="text-sm text-gray-600 font-medium">{course.rating}/5.0</span>
+            <span className="text-sm text-gray-600 font-medium">{courseRating}/5.0</span>
           </div>
         </div>
         
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-gray-100">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-400 line-through">{course.originalPrice}</span>
-            <span className="text-2xl font-bold text-purple-600">{course.price}</span>
+            <span className="text-sm text-gray-400 line-through">{courseOriginalPrice}</span>
+            <span className="text-2xl font-bold text-purple-600">{coursePrice}</span>
           </div>
           
           <button onClick={handleNavigate} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
@@ -312,8 +268,11 @@ const AchievementBanner = () => (
 export default function MyCoursesPage() {
   const [filter, setFilter] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
-
-  const filteredCourses = coursesData.filter((course) => {
+  const { enrolledCourses } = useContext(AuthContext);
+  const navigate = useNavigate(); // Get enrolled courses from context
+  
+  // Filter enrolled courses based on status
+  const filteredCourses = (enrolledCourses || []).filter((course) => {
     if (filter === 'all') return true;
     return course.status === filter;
   });
@@ -328,62 +287,109 @@ export default function MyCoursesPage() {
 
   const userId = userData?._id;
 
+  // Update stats based on enrolled courses
+  useEffect(() => {
+    if (enrolledCourses && enrolledCourses.length > 0) {
+      const completedCount = enrolledCourses.filter(course => course.status === 'completed').length;
+      const inProgressCount = enrolledCourses.filter(course => course.status === 'in-progress').length;
+      const totalHours = enrolledCourses.reduce((total, course) => {
+        const hours = parseFloat(course.duration?.replace('h', '') || 0);
+        return total + hours;
+      }, 0);
+
+      setStats([
+        {
+          label: 'Total Courses',
+          value: enrolledCourses.length,
+          icon: <FaBookOpen className="w-5 h-5" />,
+          color: 'bg-purple-100 text-purple-600'
+        },
+        {
+          label: 'Completed',
+          value: completedCount,
+          icon: <FaCheck className="w-5 h-5" />,
+          color: 'bg-green-100 text-green-600'
+        },
+        {
+          label: 'In Progress',
+          value: inProgressCount,
+          icon: <FaPlay className="w-5 h-5" />,
+          color: 'bg-blue-100 text-blue-600'
+        },
+        {
+          label: 'Learning Hours',
+          value: `${totalHours.toFixed(1)}h`,
+          icon: <FaClock className="w-5 h-5" />,
+          color: 'bg-orange-100 text-orange-600'
+        }
+      ]);
+    }
+  }, [enrolledCourses]);
+
+  // Fallback API call if context doesn't have enrolled courses
   useEffect(() => {
     const fetchStats = async () => {
-      try {
-        const [
-          completedRes,
-          inProgressRes,
-          totalRes,
-          hoursRes
-        ] = await Promise.all([
-          axios.get(`http://localhost:5000/api/users/${userId}/completed-courses-count`),
-          axios.get(`http://localhost:5000/api/users/${userId}/in-progress-courses-count`),
-          axios.get(`http://localhost:5000/api/users/${userId}/total-courses-count`),
-          axios.get(`http://localhost:5000/api/users/${userId}/learning-hours`)
-        ]);
+      if (!enrolledCourses || enrolledCourses.length === 0) {
+        try {
+          const [
+            completedRes,
+            inProgressRes,
+            totalRes,
+            hoursRes
+          ] = await Promise.all([
+            axios.get(`http://localhost:5000/api/users/${userId}/completed-courses-count`),
+            axios.get(`http://localhost:5000/api/users/${userId}/in-progress-courses-count`),
+            axios.get(`http://localhost:5000/api/users/${userId}/total-courses-count`),
+            axios.get(`http://localhost:5000/api/users/${userId}/learning-hours`)
+          ]);
 
-        setStats([
-          {
-            label: 'Total Courses',
-            value: totalRes.data.count || 0,
-            icon: <FaBookOpen className="w-5 h-5" />,
-            color: 'bg-purple-100 text-purple-600'
-          },
-          {
-            label: 'Completed',
-            value: completedRes.data.count || 0,
-            icon: <FaCheck className="w-5 h-5" />,
-            color: 'bg-green-100 text-green-600'
-          },
-          {
-            label: 'In Progress',
-            value: inProgressRes.data.count || 0,
-            icon: <FaPlay className="w-5 h-5" />,
-            color: 'bg-blue-100 text-blue-600'
-          },
-          {
-            label: 'Learning Hours',
-            value: `${hoursRes.data.hours || 0}h`,
-            icon: <FaClock className="w-5 h-5" />,
-            color: 'bg-orange-100 text-orange-600'
-          }
-        ]);
-      } catch (err) {
-        console.error("Failed to fetch stats:", err);
+          setStats([
+            {
+              label: 'Total Courses',
+              value: totalRes.data.count || 0,
+              icon: <FaBookOpen className="w-5 h-5" />,
+              color: 'bg-purple-100 text-purple-600'
+            },
+            {
+              label: 'Completed',
+              value: completedRes.data.count || 0,
+              icon: <FaCheck className="w-5 h-5" />,
+              color: 'bg-green-100 text-green-600'
+            },
+            {
+              label: 'In Progress',
+              value: inProgressRes.data.count || 0,
+              icon: <FaPlay className="w-5 h-5" />,
+              color: 'bg-blue-100 text-blue-600'
+            },
+            {
+              label: 'Learning Hours',
+              value: `${hoursRes.data.hours || 0}h`,
+              icon: <FaClock className="w-5 h-5" />,
+              color: 'bg-orange-100 text-orange-600'
+            }
+          ]);
+        } catch (err) {
+          console.error("Failed to fetch stats:", err);
+        }
       }
     };
 
     if (userId) {
       fetchStats();
     }
-  }, []);
+  }, [userId, enrolledCourses]);
+
+  const handlebrowse = () => {
+    
+    navigate('/courses');
+  }
 
   return (
     <>
     <div className="min-h-screen bg-gray-50 px-4 py-8 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-       
+        {/* Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8">
           <div>
             <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
@@ -395,7 +401,7 @@ export default function MyCoursesPage() {
           </div>
           
           <div className="mt-4 lg:mt-0">
-            <button className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-purple-500 transition-all duration-200 shadow-lg hover:shadow-xl">
+            <button onClick={handlebrowse} className="bg-purple-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-purple-500 transition-all duration-200 shadow-lg hover:shadow-xl">
               Explore New Courses
             </button>
           </div>
@@ -428,7 +434,7 @@ export default function MyCoursesPage() {
         {/* Filter Section */}
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between border border-gray-100">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 sm:mb-0 flex items-center gap-2">
-            <BookOpen className="text-purple-500 w-6 h-6" /> My Courses
+            <BookOpen onClick={handlebrowse} className="text-purple-500 w-6 h-6" /> My Enrolled Courses
           </h2>
           
           <div className="flex flex-wrap gap-3">
@@ -462,17 +468,35 @@ export default function MyCoursesPage() {
           </div>
         </div>
 
-        {/* Course Cards */}
+        {/* Course Cards - Only Enrolled Courses */}
         <div className="space-y-6 mb-12">
-          {filteredCourses.map((course, idx) => (
-            <CourseCard key={idx} course={course} />
-          ))}
+          {filteredCourses.map((course, idx) => {
+            // Debug log to see the course structure
+            console.log('Course data:', course);
+            return (
+              <CourseCard key={course._id || course.id || idx} course={course} />
+            );
+          })}
         </div>
 
         {/* Empty State */}
-        {filteredCourses.length === 0 && (
+        {(!enrolledCourses || enrolledCourses.length === 0) && (
           <div className="bg-white rounded-2xl shadow-sm p-12 text-center mb-12 border border-gray-100">
             <div className="text-6xl mb-4">📚</div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">No Enrolled Courses</h3>
+            <p className="text-gray-600 max-w-md mx-auto mb-6">
+              You haven't enrolled in any courses yet. Start your learning journey today!
+            </p>
+            <button className="bg-purple-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-purple-700 transition-colors duration-200">
+              Browse Courses
+            </button>
+          </div>
+        )}
+
+        {/* Filtered Empty State */}
+        {enrolledCourses && enrolledCourses.length > 0 && filteredCourses.length === 0 && (
+          <div className="bg-white rounded-2xl shadow-sm p-12 text-center mb-12 border border-gray-100">
+            <div className="text-6xl mb-4">🔍</div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">No courses found</h3>
             <p className="text-gray-600 max-w-md mx-auto mb-6">
               You don't have any courses matching your selected filter.
@@ -486,7 +510,7 @@ export default function MyCoursesPage() {
           </div>
         )}
 
-        
+        {/* Achievement Banner */}
         <AchievementBanner />
       </div>
     </div>
