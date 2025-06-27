@@ -18,7 +18,7 @@ const router = express.Router();
 // Public Routes
 router.get('/', getAllLessons);              // GET all lessons
 router.get('/:id', getLessonById);           // GET a single lesson by ID
-router.post('/:id/progress', markLessonComplete); // POST to mark a lesson as complete
+router.post('/:id/progress',protect, markLessonComplete); // POST to mark a lesson as complete
 
 // Protected Routes (Admin or Mentor only)
 router.post('/', protect, checkRole(['Admin', 'Mentor']), createLesson);

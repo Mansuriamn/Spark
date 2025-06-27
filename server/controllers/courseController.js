@@ -173,3 +173,37 @@ export const getUsersEnrolledInCourse = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getCourseProgress = async (req, res) => {
+  try {
+    const courseId = req.params.id;
+    const userId = req.user._id;
+
+    // Step 1: Find all lessons in the course
+    const allLessons = await Lesson.find({ courseId }).select('_id');
+    const lessonIds = allLessons.map(l => l._id.toString());
+
+    if (lessonIds.length === 0) {
+      return res.status(404).json({ message: 'No lessons found for this course' });
+    }
+
+    // Step 2: Get user progress and count how many lessons from this course are completed
+    const user = await User.findById(userId).select('progress');
+    const completedLessons = user.progress.filter(
+      (p) => p.completed && lessonIds.includes(p.lessonId.toString())
+    ).length;
+
+    const totalLessons = lessonIds.length;
+    const percentage = Math.round((completedLessons / totalLessons) * 100);
+
+    res.status(200).json({
+      courseId,
+      completedLessons,
+      totalLessons,
+      progressPercentage: percentage,
+    });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

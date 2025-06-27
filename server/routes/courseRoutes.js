@@ -11,7 +11,8 @@ import {
   createCategory, updateCategory, getAllCategories,
   getSingleLessonFromCourse,
   getLessonsOfCourse,
-  getUsersEnrolledInCourse
+  getUsersEnrolledInCourse,
+  getCourseProgress
 } from '../controllers/courseController.js';
 
 import { checkRole, protect } from '../middlewares/authMiddleware.js'; // ✅ New role-check middleware
@@ -33,6 +34,7 @@ const router = express.Router();
 router.get('/', getAllCourses);
 router.get('/:id', getCourseById);
 router.get('/instructor/:instructorId', getCoursesByInstructor);
+router.get('/:id/progress', protect, getCourseProgress);
 
 router.post('/category', createCategory);
 router.put('/category/:categoryId', updateCategory);
