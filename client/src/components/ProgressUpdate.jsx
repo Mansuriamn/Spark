@@ -95,11 +95,11 @@ const AchievementCard = ({ achievement }) => (
 );
 
 const CourseCard = ({ course }) => {
-  
+ 
     const { courseId, lessonId } = useParams();
   const navigate = useNavigate();
   const handleNavigate = () => {
-    navigate(`/courses/${courseId || course.id}/lessons/${lessonId || course.lessons[0].id}`); 
+    navigate(`/courses`); 
   };
 
   // Ensure course is an object and has required properties
@@ -232,38 +232,6 @@ const CourseCard = ({ course }) => {
   );
 };
 
-const AchievementBanner = () => (
-  <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl overflow-hidden">
-    <div className="p-8 text-white flex flex-col lg:flex-row items-center">
-      <div className="flex-1 mb-6 lg:mb-0">
-        <h3 className="text-2xl font-bold mb-3">You're making great progress!</h3>
-        <p className="text-purple-100 max-w-lg mb-4">
-          Complete 3 more courses to unlock your achievement badge and get featured on our leaderboard.
-        </p>
-        <button className="bg-white text-purple-600 px-6 py-3 rounded-xl font-medium hover:bg-gray-50 transition-colors duration-200 flex items-center gap-2">
-          <Trophy className="w-4 h-4" /> View Leaderboard
-        </button>
-      </div>
-      <div className="flex flex-col items-center">
-        <div className="relative mb-4">
-          <div className="w-24 h-24 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-            <div className="w-20 h-20 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center shadow-lg">
-              <Medal className="text-white w-8 h-8" />
-            </div>
-          </div>
-          <div className="absolute -top-2 -right-2 bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-            8
-          </div>
-        </div>
-        <div className="text-center">
-          <div className="text-sm text-purple-200">Achievement</div>
-          <div className="text-xl font-bold">Course Master</div>
-          <div className="text-xs text-purple-200 mt-1">3 courses to unlock</div>
-        </div>
-      </div>
-    </div>
-  </div>
-);
 
 export default function MyCoursesPage() {
   const [filter, setFilter] = useState('all');
@@ -414,7 +382,7 @@ export default function MyCoursesPage() {
           ))}
         </div>
 
-        {/* Achievement Section */}
+        {/*{/* Achievement Section *
         <div className="mb-8">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -429,7 +397,7 @@ export default function MyCoursesPage() {
               <AchievementCard key={idx} achievement={achievement} />
             ))}
           </div>
-        </div>
+        </div>*/}
 
         {/* Filter Section */}
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between border border-gray-100">
@@ -487,7 +455,7 @@ export default function MyCoursesPage() {
             <p className="text-gray-600 max-w-md mx-auto mb-6">
               You haven't enrolled in any courses yet. Start your learning journey today!
             </p>
-            <button className="bg-purple-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-purple-700 transition-colors duration-200">
+            <button onclick={handlebrowse} className="bg-purple-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-purple-700 transition-colors duration-200">
               Browse Courses
             </button>
           </div>
@@ -502,7 +470,7 @@ export default function MyCoursesPage() {
               You don't have any courses matching your selected filter.
             </p>
             <button 
-              onClick={() => setFilter('all')}
+              onClick={( ) => setFilter('all')}
               className="bg-purple-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-purple-700 transition-colors duration-200"
             >
               View All Courses
@@ -510,8 +478,6 @@ export default function MyCoursesPage() {
           </div>
         )}
 
-        {/* Achievement Banner */}
-        <AchievementBanner />
       </div>
     </div>
     <Footer></Footer>

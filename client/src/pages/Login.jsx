@@ -38,6 +38,17 @@ export default function Login() {
         const selectedRole = localStorage.getItem("selectedRole");
         login(data.user, data.token);
 
+        const enrolledRes = await fetch(`/api/courses/enrolled-users/${data.user._id}`, {
+        headers: {
+          'Authorization': `Bearer ${data.token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const enrolledCourses = enrolledRes.ok ? await enrolledRes.json() : [];
+
+      login(data.user, data.token, enrolledCourses);
+
         if (selectedRole === 'student') {
           navigate('/home');
         } else if (selectedRole === 'instructor') {

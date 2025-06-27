@@ -608,6 +608,18 @@ setError('Failed to create course: ' + err.message);
                           value={lesson.content}
                           onChange={(e) => updateLesson(index, 'content', e.target.value)}
                         />
+                        {/*<input
+                          type="file"
+                          name="video"
+                    accept="video/*"
+                          placeholder="Content/Description"
+                          className="p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                          value={lesson.video}
+                          onChange={(e) => updateLesson(index, 'video', e.target.value)}
+                        />
+                         <Upload className="w-5 h-5  text-gray-400" />
+                    
+                        */}
                       </div>
                     </div>
                   ))}

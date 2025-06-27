@@ -30,6 +30,8 @@ export const AuthProvider = ({ children }) => {
         setUser(JSON.parse(storedUser));
         setToken(storedToken);
 
+        
+
         if (storedProfile) {
           setUserProfile(JSON.parse(storedProfile));
         }
@@ -68,6 +70,8 @@ export const AuthProvider = ({ children }) => {
 
     const courseIds = normalizedUserCourses.map(c => String(c._id));
     const cartIds = normalizedCart.map(c => String(c._id));
+
+    
 
     localStorage.setItem('userData', JSON.stringify(userData));
     localStorage.setItem('authToken', authToken);
