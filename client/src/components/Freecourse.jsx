@@ -483,14 +483,14 @@ const FreeCourseDetails = () => {
     <>
       <div className="min-h-screen bg-gray-50">
         {/* Error Banner */}
-        {error && (
+      {/*}  {error && (
           <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
             <p className="font-medium">Notice: {error}</p>
             <p className="text-sm mt-1">Using fallback data for demonstration</p>
           </div>
         )}
 
-        {/* Debug Banner - Show only in development */}
+        {/* Debug Banner - Show only in development 
         {process.env.NODE_ENV === 'development' && debugInfo.length > 0 && (
           <div className="bg-blue-50 border-l-4 border-blue-400 p-4">
             <details>
@@ -506,12 +506,12 @@ const FreeCourseDetails = () => {
           </div>
         )}
 
-        {/* Header Banner */}
+        {/* Header Banner 
         <div className="bg-gray-900 text-white py-4">
           <div className="max-w-7xl mx-auto px-4">
             <h1 className="text-lg md:text-xl font-semibold">{course.title}</h1>
           </div>
-        </div>
+        </div>*/}
 
         <div className="max-w-6xl mx-auto px-4 py-8">
           {/* Course Header */}
