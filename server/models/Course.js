@@ -92,6 +92,9 @@ const CourseSchema = new mongoose.Schema({
   estimatedDuration: { type: Number, default: 0 },
   price: { type: Number, default: 0 },
   skillTags: [String],
+  userEnrolled: [
+  { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+],
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 }, { timestamps: true });
 

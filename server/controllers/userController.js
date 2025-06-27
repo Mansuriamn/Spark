@@ -70,13 +70,26 @@ export const softDeleteUser = async (req, res) => {
 export const enrollInCourse = async (req, res) => {
   try {
     const { userId, courseId } = req.body;
+
+    // Add course to user's enrolledCourses
     const user = await User.findByIdAndUpdate(
       userId,
       { $addToSet: { enrolledCourses: courseId } },
       { new: true }
-    ).populate('enrolledCourses');
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    res.json(user);
+    );
+
+    // Add user to course's userEnrolled
+    const course = await Course.findByIdAndUpdate(
+      courseId,
+      { $addToSet: { userEnrolled: userId } },
+      { new: true }
+    );
+
+    if (!user || !course) {
+      return res.status(404).json({ message: 'User or Course not found' });
+    }
+
+    res.json({ user, course });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
