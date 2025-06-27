@@ -14,16 +14,10 @@ const VideoDashboard = () => {
   const [currentLesson, setCurrentLesson] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [videoProgress, setVideoProgress] = useState(0);
 
   const {
-    isAuthenticated,
-    enrolledCourses,
-    user,
-    token,
-    enrolledCourseIds,
-    currentLessonId,
-    updateCurrentLessonId,
-  } = useContext(AuthContext) || {};
+    isAuthenticated, enrolledCourses, user, token, enrolledCourseIds, currentLessonId, updateCurrentLessonId, } = useContext(AuthContext) || {};
 
   // Helper function to validate MongoDB ObjectId
   const isValidObjectId = (id) => {
@@ -180,6 +174,31 @@ const VideoDashboard = () => {
       console.error('Error selecting lesson:', error.message);
     }
   };
+const handleVideoProgress = async (e) => {
+  const current = e.target.currentTime;
+  const duration = e.target.duration;
+  if (duration > 0) {
+    const progress = Math.round((current / duration) * 100);
+    setVideoProgress(progress);
+
+    // Optionally: send progress to backend here
+    try {
+      await fetch(`/api/lessons/${currentLesson?._id}/progress`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          lessonId: currentLesson?._id,
+          progress,
+        }),
+      });
+    } catch (err) {
+      // handle error
+    }
+  }
+};
 
   // Calculate progress statistics
   const calculateStats = () => {
@@ -330,11 +349,10 @@ const VideoDashboard = () => {
               <button
                 key={tab}
                 onClick={() => setActiveSection(tab)}
-                className={`pb-4 px-2 text-sm font-medium capitalize transition-colors ${
-                  activeSection === tab
+                className={`pb-4 px-2 text-sm font-medium capitalize transition-colors ${activeSection === tab
                     ? 'border-b-2 border-purple-600 text-purple-600'
                     : 'text-gray-500 hover:text-gray-700'
-                }`}
+                  }`}
               >
                 {tab}
               </button>
@@ -351,11 +369,11 @@ const VideoDashboard = () => {
                       <div className="absolute inset-0 bg-black bg-opacity-20"></div>
                       <div className="w-full aspect-video rounded overflow-hidden mb-0 z-10">
                         {courseData?.videos?.length > 0 ? (
-                          <iframe
+                          <video
                             src={courseData.videos[0]?.url}
-                            title={courseData.videos[0]?.title || 'Current Lesson'}
-                            allowFullScreen
+                            controls
                             className="w-full h-full rounded"
+                            onTimeUpdate={handleVideoProgress}
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-white">
@@ -434,11 +452,10 @@ const VideoDashboard = () => {
                             {section.videos.map((video) => (
                               <div
                                 key={video._id}
-                                className={`flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer group ${
-                                  currentLesson && currentLesson._id === video._id
+                                className={`flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer group ${currentLesson && currentLesson._id === video._id
                                     ? 'bg-blue-50 border border-blue-200'
                                     : ''
-                                }`}
+                                  }`}
                                 onClick={() => handleLessonSelect(video)}
                               >
                                 <div className="flex items-center space-x-3">
