@@ -176,18 +176,18 @@ export const getUsersEnrolledInCourse = async (req, res) => {
 
 export const getCourseProgress = async (req, res) => {
   try {
-    const courseId = req.params.id;
     const userId = req.user._id;
+    const courseId = req.params.id;
 
-    // Step 1: Find all lessons in the course
-    const allLessons = await Lesson.find({ courseId }).select('_id');
-    const lessonIds = allLessons.map(l => l._id.toString());
-
-    if (lessonIds.length === 0) {
-      return res.status(404).json({ message: 'No lessons found for this course' });
+    // Step 1: Get course and its lesson IDs
+    const course = await Course.findById(courseId).select('lessons');
+    if (!course || !course.lessons || course.lessons.length === 0) {
+      return res.status(404).json({ message: 'No lessons found in this course' });
     }
 
-    // Step 2: Get user progress and count how many lessons from this course are completed
+    const lessonIds = course.lessons.map(id => id.toString());
+
+    // Step 2: Get user progress
     const user = await User.findById(userId).select('progress');
     const completedLessons = user.progress.filter(
       (p) => p.completed && lessonIds.includes(p.lessonId.toString())
@@ -200,7 +200,7 @@ export const getCourseProgress = async (req, res) => {
       courseId,
       completedLessons,
       totalLessons,
-      progressPercentage: percentage,
+      progressPercentage: percentage
     });
 
   } catch (err) {

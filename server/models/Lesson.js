@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 import { QuizQuestionSchema } from './quizQuestion.js';
+import { User } from './User.js';
+import { Course } from './Course.js';
 
 const VideoSchema = new mongoose.Schema({
   title: { type: String, required: true },
@@ -22,6 +24,11 @@ const LessonSchema = new mongoose.Schema({
   module: { type: mongoose.Schema.Types.ObjectId, ref: 'Module' },
   duration: { type: Number, default: 0 },
   attachments: [String],
+  courseId: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: 'Course',
+  required: true
+}
 }, { timestamps: true });
 
 export const Lesson = mongoose.model('Lesson', LessonSchema);
