@@ -317,6 +317,7 @@ import Pagination from '../assets/Models/Pagination'; // Ensure this path is cor
 import Footer from '../components/Footer'; // Ensure this path is correct
 import axios from 'axios';
 
+
 export default function Courses() {
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState({
@@ -412,20 +413,43 @@ export default function Courses() {
     })
   }
 
+
+
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768); // You can adjust the breakpoint
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
   return (
     <>
       <div className="flex justify-center bg-gray-100 border-gray-200 course_op_card">
         {/* Left Sidebar for Filters */}
-        <div className="w-1/4 p-10 border-r space-y-4 course_options">
-          <CourseCategory filters={filters} onChange={handleFilterChange} />
-          <Instructors filters={filters} onChange={handleFilterChange} />
-          <PriceFilter filters={filters} onChange={handleFilterChange} />
-          <ReviewFilter filters={filters} onChange={handleFilterChange} />
-          <LevelFilter filters={filters} onChange={handleFilterChange} />
-        </div>
+        {isMobile ? (
+          <div>
+            {/* Mobile view - show nothing or a message */}
+          </div>
+        ) : (
+          <div className="w-1/4 p-10 border-r space-y-4 course_options">
+            <CourseCategory filters={filters} onChange={handleFilterChange} />
+            <Instructors filters={filters} onChange={handleFilterChange} />
+            <PriceFilter filters={filters} onChange={handleFilterChange} />
+            <ReviewFilter filters={filters} onChange={handleFilterChange} />
+            <LevelFilter filters={filters} onChange={handleFilterChange} />
+          </div>
+        )}
+
+
+
 
         {/* Main Content Area for Course Listings */}
         <div className="p-8 flex-grow">
+
           <div className='flex flex-col justify-between items-center px-6 py-4'>
             <div>
               <h1 className="text-3xl font-bold mb-3">All Courses</h1>

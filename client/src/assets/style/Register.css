@@ -1,15 +1,15 @@
 /* ===== Base Styles (Desktop First) ===== */
-.container_login {
+.container_ragis {
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 40px 0;
   gap: 100px;
-  width: 100%;
   flex-wrap: wrap;
 }
 
-.formContainer_login {
+.formContainer_ragis {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -18,7 +18,7 @@
   border-radius: 10px;
 }
 
-.formWrapper_login {
+.formWrapper_ragis {
   width: 420px;
   background-color: white;
   backdrop-filter: blur(20px);
@@ -28,20 +28,20 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
-.heading_login {
+.heading_ragis {
   font-size: 36px;
   text-align: center;
   margin-bottom: 20px;
 }
 
-.inputBox_login {
+.inputBox_ragis {
   position: relative;
   width: 100%;
   height: 50px;
   margin: 15px 0;
 }
 
-.inputBox_login input {
+.inputBox_ragis input {
   width: 100%;
   height: 100%;
   border: 1px solid #9b73d5;
@@ -52,11 +52,11 @@
   background: transparent;
 }
 
-.inputBox_login input::placeholder {
+.inputBox_ragis input::placeholder {
   color: #6b7280;
 }
 
-.submitBtn_login {
+.submitBtn_ragis {
   width: 100%;
   height: 45px;
   background-color: #9b73d5;
@@ -70,29 +70,29 @@
   transition: all 0.2s ease-in-out;
 }
 
-.submitBtn_login:hover {
-  background-color: #6d28d2;
+.submitBtn_ragis:hover {
+  background-color: #6d28d9;
 }
 
-.linkBox_login {
+.linkBox_ragis {
   font-size: 14.5px;
   text-align: center;
   margin: 20px 0 15px;
 }
 
-.linkBox_login p a,
-.linkBox_login a {
+.linkBox_ragis p a,
+.linkBox_ragis a {
   color: #1f2937;
   font-weight: 600;
   text-decoration: none;
   font-size: 13px;
 }
 
-.linkBox_login p a:hover {
+.linkBox_ragis p a:hover {
   text-decoration: underline;
 }
 
-.logoGroup_login {
+.logoGroup_ragis {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -101,7 +101,7 @@
   flex-wrap: wrap;
 }
 
-.logoGroup_login img {
+.logoGroup_ragis img {
   width: 40px;
   height: 40px;
   border: 1px solid #9b73d5;
@@ -111,7 +111,7 @@
   transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
 }
 
-.logoGroup_login img:hover {
+.logoGroup_ragis img:hover {
   transform: scale(1.1);
   background-color: #f0f1f4;
 }
@@ -120,80 +120,81 @@
 
 /* Tablets (iPad Portrait/Landscape) */
 @media screen and (max-width: 1024px) {
-  .container_login {
+  .container_ragis {
     flex-direction: column;
     gap: 50px;
     padding: 20px;
+    padding-top: 200px;
   }
 
-  .formWrapper_login {
+  .formWrapper_ragis {
     width: 90%;
     padding: 25px 30px;
   }
 
-  .logoGroup_login {
+  .logoGroup_ragis {
     gap: 15px;
   }
 
-  .logoGroup_login img {
+  .logoGroup_ragis img {
     width: 36px;
     height: 36px;
   }
 }
 
-/* Small Tablets and Large Phones */
+/* Small Tablets and Large Phones (Landscape) */
 @media screen and (max-width: 768px) {
-  .container_login {
+  .container_ragis {
     flex-direction: column;
     gap: 30px;
     padding: 20px 10px;
   }
 
-  .formWrapper_login {
+  .formWrapper_ragis {
     width: 95%;
     padding: 20px;
   }
 
-  .heading_login {
+  .heading_ragis {
     font-size: 30px;
   }
 
-  .logoGroup_login img {
+  .logoGroup_ragis img {
     width: 34px;
     height: 34px;
   }
 }
 
-/* Phones (≤480px) */
+/* Phones (Portrait) */
 @media screen and (max-width: 480px) {
-  .formWrapper_login {
+  .formWrapper_ragis {
     width: 100%;
     padding: 15px;
   }
 
-  .heading_login {
+  .heading_ragis {
     font-size: 26px;
   }
 
-  .inputBox_login input {
+  .inputBox_ragis input {
     font-size: 14px;
     padding: 0 12px;
   }
 
-  .submitBtn_login {
+  .submitBtn_ragis {
     font-size: 14px;
     height: 42px;
   }
 
-  .linkBox_login {
+  .linkBox_ragis {
     font-size: 12.5px;
   }
 
-  .linkBox_login a {
+  .linkBox_ragis a {
     font-size: 12px;
   }
 
-  .logoGroup_login img {
+  .logoGroup_ragis img {
     width: 30px;
     height: 30px;
     padding: 4px;
