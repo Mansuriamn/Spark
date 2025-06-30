@@ -302,30 +302,30 @@ const VideoDashboard = () => {
   const stats = calculateStats();
 
   useEffect(() => {
-    const fetchProgress = async () => {
-      if (!courseId || !user?._id) return;
-      try {
-        const res = await axios.get(
-          `http://localhost:5000/api/courses/${courseId}/progress`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        // Ensure overallProgress is set for UI
-        setApiProgress({
-          ...res.data,
-          overallProgress: res.data.progressPercentage || 0,
-        });
-      } catch (err) {
-        // fallback to local stats if API fails
-        setApiProgress({
-          overallProgress: stats.overallProgress,
-          completedLessons: stats.completedLessons,
-          totalLessons: stats.totalLessons,
-          progressPercentage: stats.progressPercentage || 0,
-        });
-      }
-    };
-    fetchProgress();
-  }, [courseId, user, token, stats.overallProgress, stats.completedLessons, stats.totalLessons]);
+  const fetchProgress = async () => {
+    if (!courseId || !user?._id) return;
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/courses/${courseId}/progress`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      // Ensure overallProgress is set for UI
+      setApiProgress({
+        ...res.data,
+        overallProgress: res.data.progressPercentage || 0,
+      });
+    } catch (err) {
+      // fallback to local stats if API fails
+      setApiProgress({
+        overallProgress: stats.overallProgress,
+        completedLessons: stats.completedLessons,
+        totalLessons: stats.totalLessons,
+        progressPercentage: stats.progressPercentage || 0,
+      });
+    }
+  };
+  fetchProgress();
+}, [courseId, user, token, stats.overallProgress, stats.completedLessons, stats.totalLessons]);
   // Group lessons by sections
   const groupLessonsBySection = () => {
     if (!lessons.length) return [];
@@ -531,7 +531,7 @@ const VideoDashboard = () => {
                                 </div>
                               </div>
                             </div>
-
+ 
                           </div>
 
                           {/* Video List */}
@@ -654,7 +654,7 @@ const VideoDashboard = () => {
                   <div className="w-full bg-gray-200 rounded-full h-3">
                     <div
                       className="bg-purple-600 h-3 rounded-full transition-all duration-700"
-                      style={{ width: `${apiProgress.progressPercentage - 100}%` }}
+                      style={{ width: `${apiProgress.progressPercentage}%` }}
                     ></div>
                   </div>
                 </div>

@@ -6,23 +6,23 @@ import { AuthContext } from '../pages/AuthContext';
 
 const UserProfile = () => {
   const navigate = useNavigate();
-  const {
-    user,
-    login,
-    enrolledCourses,
+  const { 
+    user, 
+    login, 
+    enrolledCourses, 
     updateEnrolledCourses,
     cartCourses = [],
     updateCartCourses,
-    token
+    token 
   } = useContext(AuthContext);
-
+  
   const { userProfile, updateUserProfile } = useContext(AuthContext);
   const [courseProgress, setCourseProgress] = useState({});
 
-  const saveProfile = async (newProfileData) => {
-    // maybe call API first, then update
-    updateUserProfile(newProfileData);
-  };
+const saveProfile = async (newProfileData) => {
+  // maybe call API first, then update
+  updateUserProfile(newProfileData);
+};
 
   const [isEditing, setIsEditing] = useState(false);
   const [profilePic, setProfilePic] = useState(null);
@@ -81,7 +81,7 @@ const UserProfile = () => {
       }
 
       const updatedUser = await response.json();
-      login(updatedUser, token);
+      login(updatedUser, token); 
       setIsEditing(false);
       alert('Profile updated successfully!');
     } catch (error) {
@@ -164,30 +164,30 @@ const UserProfile = () => {
   };
 
   useEffect(() => {
-    const fetchAllProgress = async () => {
-      if (!user || !token || !enrolledCourses || enrolledCourses.length === 0) return;
-      const progressData = {};
-      for (const course of enrolledCourses) {
-        try {
-          const res = await fetch(
-            `http://localhost:5000/api/courses/${course.id}/progress?userId=${user.id}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          const data = await res.json();
-          // Use progressPercentage from API, fallback to 0
-          progressData[course.id] = data.progressPercentage || 0;
-        } catch {
-          progressData[course.id] = 0;
-        }
+  const fetchAllProgress = async () => {
+    if (!user || !token || !enrolledCourses || enrolledCourses.length === 0) return;
+    const progressData = {};
+    for (const course of enrolledCourses) {
+      try {
+        const res = await fetch(
+          `http://localhost:5000/api/courses/${course.id}/progress?userId=${user.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const data = await res.json();
+        // Use progressPercentage from API, fallback to 0
+        progressData[course.id] = data.progressPercentage || 0;
+      } catch {
+        progressData[course.id] = 0;
       }
-      setCourseProgress(progressData);
-    };
-    fetchAllProgress();
-  }, [user, token, enrolledCourses]);
+    }
+    setCourseProgress(progressData);
+  };
+  fetchAllProgress();
+}, [user, token, enrolledCourses]);
 
   if (!user) {
     return (
@@ -215,11 +215,11 @@ const UserProfile = () => {
             <p className="text-gray-600">Manage your account information and enrolled courses</p>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 md:p-8 mb-6 md:mb-8">
-            <div className="flex flex-col sm:flex-row items-start justify-between mb-4 sm:mb-6">
-              <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 md:space-x-6 w-full sm:w-auto">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-8">
+            <div className="flex items-start justify-between mb-6">
+              <div className="flex items-center space-x-6">
                 <div className="relative group">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden shadow-lg">
+                  <div className="w-24 h-24 rounded-2xl overflow-hidden shadow-lg">
                     {profilePic ? (
                       <img
                         src={profilePic}
@@ -227,7 +227,7 @@ const UserProfile = () => {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white text-lg sm:text-xl md:text-2xl font-bold">
+                      <div className="w-full h-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">
                         {userInfo?.name?.[0]?.toUpperCase() || 'U'}
                       </div>
                     )}
@@ -235,7 +235,7 @@ const UserProfile = () => {
                   {isEditing && (
                     <div className="absolute inset-0 bg-black bg-opacity-50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center cursor-pointer">
                       <label htmlFor="profile-upload" className="cursor-pointer">
-                        <Camera className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                        <Camera className="w-6 h-6 text-white" />
                       </label>
                       <input
                         id="profile-upload"
@@ -246,40 +246,38 @@ const UserProfile = () => {
                       />
                     </div>
                   )}
-                  <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-full border-3 sm:border-4 border-white"></div>
+                  <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white"></div>
                 </div>
-                <div className="flex-1 w-full sm:w-auto">
+                <div className="flex-1">
                   {isEditing ? (
-                    <div className="space-y-3 sm:space-y-4">
+                    <div className="space-y-4">
                       <input
                         type="text"
                         value={userInfo.name}
                         onChange={(e) => setUserInfo({ ...userInfo, name: e.target.value })}
-                        className="text-lg sm:text-xl md:text-2xl font-bold bg-gray-50 border border-gray-200 rounded-lg px-2 sm:px-3 py-1 sm:py-2 w-full max-w-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="text-2xl font-bold bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 w-full max-w-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
                         placeholder="Full Name"
                       />
                       <input
                         type="email"
                         value={userInfo.email}
                         onChange={(e) => setUserInfo({ ...userInfo, email: e.target.value })}
-                        className="text-sm sm:text-base md:text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-2 sm:px-3 py-1 sm:py-2 w-full max-w-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 w-full max-w-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                         placeholder="Email Address"
                       />
                     </div>
                   ) : (
                     <div>
-                      <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">
-                        {userInfo.name}
-                      </h2>
-                      <div className="flex items-center space-x-2 sm:space-x-4 text-gray-600 mb-1 sm:mb-2">
-                        <div className="flex items-center space-x-1 sm:space-x-2">
-                          <Mail className="w-3 h-3 sm:w-4 sm:h-4" />
-                          <span className="text-sm sm:text-base">{userInfo.email}</span>
+                      <h2 className="text-2xl font-bold text-gray-900 mb-2">{userInfo.name}</h2>
+                      <div className="flex items-center space-x-4 text-gray-600 mb-2">
+                        <div className="flex items-center space-x-2">
+                          <Mail className="w-4 h-4" />
+                          <span>{userInfo.email}</span>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-1 sm:space-x-2">
-                        <User className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
-                        <span className="bg-purple-100 text-purple-700 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium">
+                      <div className="flex items-center space-x-2">
+                        <User className="w-4 h-4 text-gray-500" />
+                        <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">
                           {userInfo.role || 'Student'}
                         </span>
                       </div>
@@ -287,12 +285,12 @@ const UserProfile = () => {
                   )}
                 </div>
               </div>
-              <div className="flex space-x-2 sm:space-x-3 mt-4 sm:mt-0 w-full sm:w-auto justify-end">
+              <div className="flex space-x-3">
                 {isEditing ? (
                   <>
                     <button
                       onClick={() => setIsEditing(false)}
-                      className="px-3 sm:px-4 py-1 sm:py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors text-sm sm:text-base"
+                      className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
                       disabled={loading}
                     >
                       Cancel
@@ -300,7 +298,7 @@ const UserProfile = () => {
                     <button
                       onClick={handleSave}
                       disabled={loading}
-                      className="px-4 sm:px-6 py-1 sm:py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium disabled:opacity-50 text-sm sm:text-base"
+                      className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium disabled:opacity-50"
                     >
                       {loading ? 'Saving...' : 'Save'}
                     </button>
@@ -308,10 +306,10 @@ const UserProfile = () => {
                 ) : (
                   <button
                     onClick={handleEditToggle}
-                    className="flex items-center space-x-1 sm:space-x-2 px-3 sm:px-4 py-1 sm:py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors w-full sm:w-auto justify-center sm:justify-start"
+                    className="flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                   >
-                    <Edit3 className="w-3 h-3 sm:w-4 sm:h-4" />
-                    <span className="font-medium text-sm sm:text-base">Edit Profile</span>
+                    <Edit3 className="w-4 h-4" />
+                    <span className="font-medium">Edit Profile</span>
                   </button>
                 )}
               </div>

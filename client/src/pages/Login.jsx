@@ -1,11 +1,12 @@
 import React, { useState, useContext } from 'react';
-import '../assets/style/Login.css'; // ✅ updated to new style filename
+import '../assets/style/Login.css';
 import logo4 from '../assets/img/logo4.jpg';
 import logo3 from '../assets/img/logo3.jpg';
 import logo2 from '../assets/img/logo2.svg';
 import { useNavigate } from 'react-router-dom';
+import img from '../assets/img/imgheader.png';
 import { AuthContext } from '../pages/AuthContext';
-import { motion } from 'framer-motion';
+import { motion } from 'framer-motion'; // ✅ import motion
 
 export default function Login() {
   const navigate = useNavigate();
@@ -35,15 +36,18 @@ export default function Login() {
       if (res.ok) {
         localStorage.setItem('authToken', data.token);
         const selectedRole = localStorage.getItem("selectedRole");
-        const enrolledRes = await fetch(`/api/courses/enrolled-users/${data.user._id}`, {
-          headers: {
-            'Authorization': `Bearer ${data.token}`,
-            'Content-Type': 'application/json'
-          }
-        });
+        login(data.user, data.token);
 
-        const enrolledCourses = enrolledRes.ok ? await enrolledRes.json() : [];
-        login(data.user, data.token, enrolledCourses);
+        const enrolledRes = await fetch(`/api/courses/enrolled-users/${data.user._id}`, {
+        headers: {
+          'Authorization': `Bearer ${data.token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const enrolledCourses = enrolledRes.ok ? await enrolledRes.json() : [];
+
+      login(data.user, data.token, enrolledCourses);
 
         if (selectedRole === 'student') {
           navigate('/home');
@@ -69,25 +73,23 @@ export default function Login() {
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: 'easeOut' }}
-        className='container_login'
+        className='contain_both'
       >
-        <div className="formContainer_login">
+        <div className="container1">
           <motion.div
-            className="formWrapper_login"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
+            className="wrapper1"
           >
             <form onSubmit={handleSubmit}>
-              <h1 className="heading_login">Login</h1>
-
-              <div className="logoGroup_login">
+              <h1>Login</h1>
+              <div className="login_img1">
                 <img src={logo4} alt="Logo 1" />
                 <img src={logo3} alt="Logo 2" />
                 <img src={logo2} alt="Logo 3" />
               </div>
-
-              <div className="inputBox_login">
+              <div className="input-box1">
                 <input
                   name="email"
                   type="email"
@@ -97,8 +99,7 @@ export default function Login() {
                   required
                 />
               </div>
-
-              <div className="inputBox_login">
+              <div className="input-box1">
                 <input
                   name="password"
                   type="password"
@@ -108,24 +109,20 @@ export default function Login() {
                   required
                 />
               </div>
-
+              <br />
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 type="submit"
-                className="submitBtn_login"
+                className="btn1"
               >
                 Login
               </motion.button>
-
-              <div className="linkBox_login">
+              <div className="register-link1">
                 <a href="#">Forget password?</a>
               </div>
-              <div className="linkBox_login">
-                <p>
-                  Don't have an account?{' '}
-                  <a onClick={() => navigate("/Register")}>Register</a>
-                </p>
+              <div className="register-link1">
+                <p>Don't have an account? <a onClick={() => navigate("/Register")}>Register</a></p>
               </div>
             </form>
           </motion.div>
