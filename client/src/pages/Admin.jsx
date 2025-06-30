@@ -58,7 +58,7 @@ export default function Admin() {
       <h2 id='admin_h2'>Admin Page</h2>
 
       {/*profile section */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-8 border border-white/20">
+      <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-8 border border-white/20 admin-profile">
         <div className="flex flex-col lg:flex-row items-center justify-between">
           <div className="flex items-center space-x-6 mb-6 lg:mb-0">
             <div className="relative">
@@ -68,7 +68,9 @@ export default function Admin() {
                 //   alt="Profile"
                 //   className="profile_image"
                 // />
-                <User />
+               <div className="profile-picture-box">
+                 <User className="profile-icon"  />
+                </div>
               ) : (
                 <div className="w-20 h-20 bg-purple-600 text-white rounded-2xl flex items-center justify-center text-3xl font-bold shadow-lg">
                   <User />

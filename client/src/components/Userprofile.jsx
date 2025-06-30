@@ -255,7 +255,7 @@ const UserProfile = () => {
                   )}
                   <div className="profile-status-indicator"></div>
                 </div>
-
+             
                 <div className="profile-details" id="profile-details">
                   {isEditing ? (
                     <div className="edit-form">
