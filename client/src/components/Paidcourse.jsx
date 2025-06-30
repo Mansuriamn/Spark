@@ -1,112 +1,103 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, Star, User, BookOpen, Play, Download, Smartphone, Award, Calendar, Users, Globe, ChevronDown, ChevronUp } from 'lucide-react';
+import { Clock, Star, User, BookOpen, Play, Download, Smartphone, Award, Calendar, Users, Globe, ChevronDown, ChevronUp, ShoppingCart, CreditCard } from 'lucide-react';
 import { AuthContext } from '../pages/AuthContext';
 import Footer from './Footer';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
-// Fallback course data in case API fails
 const coursedata = {
-  id: 'free-python-basics',
-  title: 'Python Programming Fundamentals - Free Course',
-  subtitle: 'Learn Python basics with hands-on projects. Perfect for beginners starting their programming journey!',
-  image: 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-  rating: 4.5,
-  totalRatings: 15420,
-  students: 89250,
-  instructor: 'Sarah Johnson',
-  instructorRole: 'Python Developer & Educator',
-  lastUpdated: '5/2025',
-  languages: ['English', 'Spanish [Auto]', '12 more'],
-  free: true,
-  duration: '8h 15m',
-  sections: 12,
-  lectures: 45,
+  id: 'professional-python',
+  title: 'Professional Python Development',
+  subtitle: 'Master Python for real-world applications with advanced projects',
+  image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+  rating: 4.7,
+  totalRatings: 21530,
+  students: 120450,
+  instructor: 'Michael Rodriguez',
+  instructorRole: 'Senior Python Developer',
+  lastUpdated: '6/2025',
+  languages: ['English', 'Spanish', 'German'],
+  free: false,
+  price: 89.99,
+  discountPrice: 59.99,
+  duration: '15h 30m',
+  sections: 18,
+  lectures: 72,
   whatYouLearn: [
-    'Understand Python syntax and basic programming concepts',
-    'Work with variables, data types, and control structures',
-    'Create simple programs and solve basic coding challenges',
-    'Use functions and understand scope in Python',
-    'Handle errors and exceptions in your code',
-    'Build a foundation for advanced Python development',
-    'Practice with real coding exercises and mini-projects',
-    'Get comfortable with Python development environment'
+    'Build professional-grade Python applications',
+    'Master advanced Python concepts and design patterns',
+    'Work with databases and ORM systems',
+    'Create RESTful APIs with Flask and Django',
+    'Implement testing and debugging strategies',
+    'Deploy applications to production environments',
+    'Optimize Python code for performance',
+    'Develop real-world projects'
   ],
   courseIncludes: [
-    { icon: Play, text: '8 hours on-demand video' },
-    { icon: BookOpen, text: '15 coding exercises' },
-    { icon: Download, text: '25 downloadable resources' },
+    { icon: Play, text: '15 hours on-demand video' },
+    { icon: BookOpen, text: '32 coding exercises' },
+    { icon: Download, text: '42 downloadable resources' },
     { icon: Smartphone, text: 'Access on mobile and TV' },
     { icon: Award, text: 'Certificate of completion' }
   ],
   requirements: [
-    'No programming experience required',
+    'Basic Python knowledge',
     'A computer with internet connection',
-    'Willingness to learn and practice'
+    'Experience with command line'
   ],
-  topics: ['Python', 'Programming Fundamentals', 'Beginner Programming'],
+  topics: ['Python', 'Web Development', 'APIs', 'Django', 'Flask'],
   reviews: [
     {
-      name: 'Amit K.',
-      comment: 'Perfect introduction to Python! Clear explanations and great examples.',
+      name: 'Rajesh P.',
+      comment: 'Advanced content that took my skills to the next level',
       rating: 5
     },
     {
-      name: 'Lisa M.',
-      comment: 'Excellent free course. Helped me get started with programming.',
+      name: 'Emily T.',
+      comment: 'Worth every penny! The projects are amazing.',
       rating: 5
     },
     {
-      name: 'David R.',
-      comment: 'Well-structured lessons. Great for absolute beginners.',
+      name: 'Thomas K.',
+      comment: 'Professional content from an industry expert',
       rating: 4
     }
   ],
   courseContent: [
     {
       section: 1,
-      title: 'Getting Started with Python',
-      lectures: 5,
-      duration: '45min',
+      title: 'Advanced Python Concepts',
+      lectures: 6,
+      duration: '1hr 20min',
       lessons: [
-        { title: 'Welcome to Python Programming', duration: '05:30', preview: true },
-        { title: 'Installing Python and Setting Up Your Environment', duration: '08:45' },
-        { title: 'Your First Python Program', duration: '06:20', preview: true },
-        { title: 'Understanding the Python Interpreter', duration: '12:15' },
-        { title: 'Python Syntax and Indentation', duration: '12:45' }
+        { title: 'Decorators and Context Managers', duration: '12:30' },
+        { title: 'Metaclasses and Abstract Base Classes', duration: '15:45' },
+        { title: 'Concurrency and Parallelism', duration: '18:20' },
+        { title: 'Advanced Generators', duration: '14:15' },
+        { title: 'Type Hinting and Static Analysis', duration: '10:40' },
+        { title: 'Performance Optimization Techniques', duration: '09:10' }
       ]
     },
     {
       section: 2,
-      title: 'Variables and Data Types',
-      lectures: 6,
-      duration: '1hr 10min',
+      title: 'Web Development with Django',
+      lectures: 7,
+      duration: '2hr 15min',
       lessons: [
-        { title: 'Python Variables Explained', duration: '10:30' },
-        { title: 'Numbers and Mathematical Operations', duration: '15:20' },
-        { title: 'Working with Strings', duration: '18:45' },
-        { title: 'Boolean Values and Comparisons', duration: '08:30' },
-        { title: 'Lists and Basic Operations', duration: '12:15' },
-        { title: 'Practice Exercise: Calculator Project', duration: '05:40' }
-      ]
-    },
-    {
-      section: 3,
-      title: 'Control Flow and Decision Making',
-      lectures: 4,
-      duration: '50min',
-      lessons: [
-        { title: 'If, Elif, and Else Statements', duration: '15:30' },
-        { title: 'Loops: For and While', duration: '18:20' },
-        { title: 'Break and Continue Statements', duration: '08:45' },
-        { title: 'Practice: Number Guessing Game', duration: '07:25' }
+        { title: 'Django ORM Deep Dive', duration: '18:30' },
+        { title: 'Building REST APIs with Django REST Framework', duration: '22:15' },
+        { title: 'Authentication and Authorization', duration: '15:20' },
+        { title: 'Testing in Django', duration: '12:45' },
+        { title: 'Deployment Strategies', duration: '20:30' },
+        { title: 'Performance Tuning', duration: '16:40' },
+        { title: 'Real-world Django Project', duration: '29:20' }
       ]
     }
   ]
 };
 
-const FreeCourseDetails = () => {
+const PaidCourseDetails = () => {
   const navigate = useNavigate();
   const { courseId: id } = useParams();
   const { lessonId: lessonid } = useParams();
@@ -119,7 +110,15 @@ const FreeCourseDetails = () => {
   const [videoDurations, setVideoDurations] = useState({});
 
   const {
-    isAuthenticated, enrolledCourses, updateEnrolledCourses, user, token, enrolledCourseIds, currentLessonId
+    isAuthenticated,
+    enrolledCourses,
+    updateEnrolledCourses,
+    user,
+    token,
+    enrolledCourseIds,
+    cartCourses,
+    updateCartCourses,
+    isCourseInCart
   } = useContext(AuthContext);
 
   // Helper function to add debug information
@@ -238,7 +237,8 @@ const FreeCourseDetails = () => {
 
             // Pricing
             free: courseData.price === 0,
-            price: courseData.price,
+            price: courseData.price || 0,
+            discountPrice: courseData.discountPrice || null,
 
             // Course status
             status: courseData.status,
@@ -381,8 +381,6 @@ const FreeCourseDetails = () => {
           <p className="text-gray-600 mb-4">The course you're looking for doesn't exist.</p>
           <p className="text-gray-500 mb-4">Tried to find course with ID: <code className="bg-gray-100 px-2 py-1 rounded">{id}</code></p>
 
-
-
           <div className="space-y-4">
             <button
               onClick={() => navigate('/courses')}
@@ -412,7 +410,6 @@ const FreeCourseDetails = () => {
   );
 
   // Handle course enrollment
-  // Handle course enrollment - CORRECTED VERSION
   const handleEnroll = async () => {
     if (!isAuthenticated) {
       alert('Please login to enroll in this course');
@@ -425,10 +422,10 @@ const FreeCourseDetails = () => {
         const updatedCourses = [...enrolledCourses, course];
         updateEnrolledCourses(updatedCourses);
 
-        // CORRECTED API call - using the proper endpoint and request body
+        // API call to enroll user
         const response = await axios.post('/api/users/enroll', {
-          userId: user.id || user._id, // Handle both possible user ID fields
-          courseId: course.id || course._id, // Handle both possible course ID fields
+          userId: user.id || user._id,
+          courseId: course.id || course._id,
           courseTitle: course.title,
         }, {
           headers: {
@@ -463,7 +460,42 @@ const FreeCourseDetails = () => {
     }
   };
 
+  // Handle purchase (buy now)
+  const handleBuyNow = async () => {
+    if (!isAuthenticated) {
+      alert('Please login to purchase this course');
+      return;
+    }
 
+    try {
+      // In a real app, this would integrate with a payment gateway
+      // For now, we'll simulate a successful payment
+      await handleEnroll();
+      alert('Purchase successful! You are now enrolled in this course.');
+    } catch (error) {
+      console.error('Purchase failed:', error);
+      alert('Purchase failed. Please try again.');
+    }
+  };
+
+  // Handle add to cart
+  const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      alert('Please login to add courses to your cart');
+      return;
+    }
+
+    if (isCourseInCart(course.id || course._id)) {
+      alert('This course is already in your cart');
+      return;
+    }
+
+    const newCart = [...cartCourses, course];
+    updateCartCourses(newCart);
+    alert('Course added to cart!');
+  };
+
+  // Handle start course
   const handleStartCourse = () => {
     if (course && course.lessons && course.lessons.length > 0) {
       // lessons could be objects or IDs, adjust accordingly
@@ -484,37 +516,6 @@ const FreeCourseDetails = () => {
   return (
     <>
       <div className="min-h-screen bg-gray-50">
-        {/* Error Banner */}
-        {/*}  {error && (
-          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4">
-            <p className="font-medium">Notice: {error}</p>
-            <p className="text-sm mt-1">Using fallback data for demonstration</p>
-          </div>
-        )}
-
-        {/* Debug Banner - Show only in development 
-        {process.env.NODE_ENV === 'development' && debugInfo.length > 0 && (
-          <div className="bg-blue-50 border-l-4 border-blue-400 p-4">
-            <details>
-              <summary className="cursor-pointer text-blue-800 font-medium">
-                🔧 Debug Information ({debugInfo.length} entries)
-              </summary>
-              <div className="mt-2 text-xs text-blue-700 max-h-32 overflow-y-auto">
-                {debugInfo.slice(-10).map((info, i) => (
-                  <div key={i} className="font-mono bg-white p-1 rounded mb-1">{info}</div>
-                ))}
-              </div>
-            </details>
-          </div>
-        )}
-
-        {/* Header Banner 
-        <div className="bg-gray-900 text-white py-4">
-          <div className="max-w-7xl mx-auto px-4">
-            <h1 className="text-lg md:text-xl font-semibold">{course.title}</h1>
-          </div>
-        </div>*/}
-
         <div className="max-w-6xl mx-auto px-4 py-8">
           {/* Course Header */}
           <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
@@ -524,9 +525,14 @@ const FreeCourseDetails = () => {
                   Free Course
                 </span>
               ) : (
-                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                  ₹{course.price || 0}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                    ₹{course.discountPrice || course.price}
+                  </span>
+                  {course.discountPrice && (
+                    <span className="line-through text-gray-500">${course.price}</span>
+                  )}
+                </div>
               )}
 
               {course.level && (
@@ -556,18 +562,34 @@ const FreeCourseDetails = () => {
                 <div className="flex items-center">
                   <Star className="h-4 w-4 text-yellow-400 fill-current" />
                   <span className="ml-1 font-semibold">{course.rating}</span>
-
                 </div>
               )}
-
-              {/*{course.students && typeof course.students === 'number' && (
-                <span className="text-gray-600">{course.students.toLocaleString()} students</span>
-              )}*/}
             </div>
 
             <h1 className="text-2xl md:text-3xl font-bold mb-4">{course.title}</h1>
             {(course.subtitle || course.description) && (
               <p className="text-gray-700 text-lg mb-6">{course.subtitle || course.description}</p>
+            )}
+
+            {/* Pricing Information */}
+            {!course.free && (
+              <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+                <div className="flex flex-col md:flex-row md:items-center justify-between">
+                  <div>
+                    <h3 className="font-bold text-lg">Limited Time Offer</h3>
+                    <p className="text-gray-700">
+                      {course.discountPrice
+                        ? `Get this course for ₹${course.discountPrice} (₹${course.price - course.discountPrice} off!)`
+                        : `Price: ₹${course.price}`}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">30-day money-back guarantee</p>
+                  </div>
+                  <div className="flex items-center text-yellow-500 mt-2 md:mt-0">
+                    <Clock className="h-5 w-5 mr-1" />
+                    <span>Offer ends in 2 days</span>
+                  </div>
+                </div>
+              </div>
             )}
 
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-6">
@@ -628,24 +650,58 @@ const FreeCourseDetails = () => {
                     Start Course
                   </button>
                 ) : (
-                  <button
-                    onClick={handleEnroll}
-                    className="bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
-                  >
-                    Enroll Now - {course.free ? 'Free' : 'Paid'}
-                  </button>
+                  <div className="flex flex-col sm:flex-row gap-4 w-full">
+                    <button
+                      onClick={handleBuyNow}
+                      className="bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors flex-1 flex items-center justify-center"
+                    >
+                      <CreditCard className="h-5 w-5 mr-2" />
+                      Buy Now
+                    </button>
+                    <button
+                      onClick={handleAddToCart}
+                      className="bg-white border-2 border-purple-600 text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-purple-50 transition-colors flex-1 flex items-center justify-center"
+                    >
+                      <ShoppingCart className="h-5 w-5 mr-2" />
+                      Add to Cart
+                    </button>
+                  </div>
                 )
               ) : (
-                <div className="flex flex-col">
-                  <button
-                    onClick={() => alert('Please login to enroll in this course')}
-                    className="bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
-                  >
-                    Enroll Now - {course.free ? 'Free' : 'Paid'}
-                  </button>
-                  <p className="text-red-500 text-sm mt-2">Login required to enroll</p>
+                <div className="flex flex-col w-full">
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <button
+                      onClick={() => alert('Please login to purchase this course')}
+                      className="bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors flex-1"
+                    >
+                      Buy Now
+                    </button>
+                    <button
+                      onClick={() => alert('Please login to add courses to your cart')}
+                      className="bg-white border-2 border-purple-600 text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-purple-50 transition-colors flex-1"
+                    >
+                      Add to Cart
+                    </button>
+                  </div>
+                  <p className="text-red-500 text-sm mt-2 text-center">Login required to purchase</p>
                 </div>
               )}
+            </div>
+
+            {/* Payment Security Info */}
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-500">
+              <div className="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span>30-day money-back guarantee</span>
+              </div>
+              <div className="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                </svg>
+                <span>Secure payment</span>
+              </div>
             </div>
           </div>
 
@@ -751,10 +807,9 @@ const FreeCourseDetails = () => {
                         const lessonId = lesson._id || lesson.id || lessonIndex;
                         return (
                           <div
-                            key={lessonId}
                             className="p-3 border-b last:border-b-0 flex justify-between items-center hover:bg-gray-50 cursor-pointer"
                             onClick={() => {
-                              // Only allow navigation if enrolled
+                              // Only allow navigation if user is enrolled or has bought the course
                               if (isAlreadyEnrolled) {
                                 if (lesson._id || lesson.id) {
                                   navigate(`/courses/${course._id}/lesson/${lesson._id || lesson.id}`);
@@ -770,7 +825,7 @@ const FreeCourseDetails = () => {
                                   alert("No valid lesson ID found for this lesson.");
                                 }
                               } else {
-                                alert("Please enroll in this course to access lessons.");
+                                alert("Please enroll or purchase the course to access lessons.");
                               }
                             }}
                           >
@@ -834,4 +889,4 @@ const FreeCourseDetails = () => {
   );
 };
 
-export default FreeCourseDetails;
+export default PaidCourseDetails;

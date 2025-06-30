@@ -106,9 +106,19 @@ const saveProfile = async (newProfileData) => {
     }
   };
 
-  const handleContinueLearning = (courseId) => {
-    navigate('/courses', { state: { courseId } });
-  };
+  const handleNavigate = (course) => {
+  const firstLessonId =
+    course.lessons && course.lessons.length > 0
+      ? course.lessons[0].id || course.lessons[0]._id
+      : null;
+
+  if (firstLessonId) {
+    navigate(`/courses/${course.id || course._id}/lesson/${firstLessonId}`);
+  } else {
+    navigate(`/courses/${course.id || course._id}`);
+  }
+};
+
 
   const handleRemoveFromCart = async (courseId) => {
     try {
@@ -221,11 +231,7 @@ const saveProfile = async (newProfileData) => {
                 <div className="relative group">
                   <div className="w-24 h-24 rounded-2xl overflow-hidden shadow-lg">
                     {profilePic ? (
-                      <img
-                        src={profilePic}
-                        alt="Profile"
-                        className="w-full h-full object-cover"
-                      />
+                     <User className='bg-purple-600 text-white h-full w-full' />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">
                         {userInfo?.name?.[0]?.toUpperCase() || 'U'}
@@ -336,7 +342,7 @@ const saveProfile = async (newProfileData) => {
                             {course.level || 'Beginner'}
                           </span>
                           <div className="text-right">
-                            <div className="text-2xl font-bold">{progress}%</div>
+                            <div className="text-2xl font-bold">{Math.min(progress, 100)}%</div>
                             <div className="text-sm opacity-90">Complete</div>
                           </div>
                         </div>
@@ -363,7 +369,7 @@ const saveProfile = async (newProfileData) => {
                             Instructor: <span className="font-medium text-gray-900">{course.instructor || 'Expert Instructor'}</span>
                           </div>
                           <button
-                            onClick={() => handleContinueLearning(course.id)}
+                            onClick={() => handleNavigate(course)}
                             className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium flex items-center space-x-1"
                           >
                             <Play className="w-4 h-4" />
@@ -373,12 +379,12 @@ const saveProfile = async (newProfileData) => {
                         <div>
                           <div className="flex justify-between items-center mb-2">
                             <span className="text-sm font-medium text-gray-700">Progress</span>
-                            <span className="text-sm text-gray-600">{progress}%</span>
+                            <span className="text-sm text-gray-600">{Math.min(progress, 100)}%</span>
                           </div>
                           <div className="w-full bg-gray-200 rounded-full h-2">
                             <div
                               className="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full transition-all duration-300"
-                              style={{ width: `${progress}%` }}
+                              style={{ width: `${Math.min(progress, 100)}%` }}
                             ></div>
                           </div>
                         </div>

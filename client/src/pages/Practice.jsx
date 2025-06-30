@@ -225,9 +225,9 @@ function Card({ practice, handleClick }) {
           <button className="view-button" onClick={handleClick}>
             <i className="fa-solid fa-book-open-reader"></i> View Problems
           </button>
-          <button className="Continue-button">
+          {/*<button className="Continue-button">
             <i className="fa-solid fa-arrow-right"></i> Continue
-          </button>
+          </button>*/}
         </div>
       </div>
     </div>

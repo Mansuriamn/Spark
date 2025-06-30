@@ -9,30 +9,25 @@ const iconMap = {
   "back-end": <FaDatabase className="text-yellow-500 text-xl" />,
   android: <FaAndroid className="text-green-500 text-xl" />,
 };
-
-const TrackCard = (course) => {
-  const [courseData,setCourseData]=useState({});
-  useEffect(()=>{
-    if(course){
-      setCourseData(course.course);
-    }
- console.log(courseData)
-  })
+const TrackCard = ({ course }) => {
   const [saved, setSaved] = useState(false);
   const [shared, setShared] = useState(false);
   const navigate = useNavigate();
 
   const handleCardClick = () => {
-    navigate(`/courses/${courseData._id}`);
+    if (course.price === 0 || course.price === "Free") {
+      navigate(`/courses/${course._id}`);
+    } else {
+      navigate(`/paidcourses/${course._id}`);
+    }
   };
-  
 
   const handleShare = async (e) => {
     e.stopPropagation();
-    const shareUrl = window.location.origin + `/track/${courseData.title.toLowerCase()}`;
+    const shareUrl = window.location.origin + `/track/${course.title.toLowerCase()}`;
     try {
       if (navigator.share) {
-        await navigator.share({ title: `Check out this track: ${courseData.title}`, url: shareUrl });
+        await navigator.share({ title: `Check out this track: ${course.title}`, url: shareUrl });
       } else {
         await navigator.clipboard.writeText(shareUrl);
         alert("Link copied to clipboard!");
@@ -46,11 +41,20 @@ const TrackCard = (course) => {
   return (
     <div
       onClick={handleCardClick}
-      className="bg-white rounded-2xl shadow-md hover:shadow-xl transition transform hover:-translate-y-1 hover:scale-[1.02] cursor-pointer p-4 max-w-sm w-full group"
+      className="relative bg-white rounded-2xl shadow-md hover:shadow-xl transition transform hover:-translate-y-1 hover:scale-[1.02] cursor-pointer p-4 max-w-sm w-full group"
     >
+      <span
+        className={`absolute top-4 right-4 z-20 px-3 py-1 rounded-full text-xs font-semibold mt-0.5 mr-0.5
+          ${course.price === 0 || course.price === "Free"
+            ? "bg-green-100 text-green-700"
+            : "bg-blue-100 text-blue-700"
+          }`}
+      >
+        {course.price === 0 || course.price === "Free" ? "Free" : "Paid"}
+      </span>
       <div className="relative h-48 w-full bg-gray-200 rounded-lg mb-4 overflow-hidden flex items-center justify-center">
         <img
-          src={courseData.pictureUrl}
+          src={course.pictureUrl}
           alt="Loading.."
           className="absolute top-0 left-0 w-full h-full object-cover opacity-60 group-hover:opacity-70 transition-opacity"
         />
@@ -58,8 +62,8 @@ const TrackCard = (course) => {
       </div>
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          {iconMap[courseData.key]}
-          <h3 className="text-lg font-semibold text-gray-800">{courseData.title}</h3>
+          {iconMap[course.key]}
+          <h3 className="text-lg font-semibold text-gray-800">{course.title}</h3>
         </div>
         <div className="flex items-center gap-3 text-gray-500 z-20" onClick={(e) => e.stopPropagation()}>
           <FiShare2
@@ -74,16 +78,13 @@ const TrackCard = (course) => {
           />
         </div>
       </div>
-      <p className="text-sm text-gray-600 mb-4">{courseData.description}</p>
+      <p className="text-sm text-gray-600 mb-4">{course.description}</p>
       <div className="flex justify-between text-sm text-gray-700 font-medium">
-        {/* <span>{courseData.courses} Courses</span>
-        <span>{courseData.lessons} Lessons</span>
-        <span>{courseData.duration}</span> */}
+        {/* Add more info here if needed */}
       </div>
     </div>
   );
 };
-
 const TrackList = () => {
   const count=0;
   const [courses, setCourses] = useState([]);

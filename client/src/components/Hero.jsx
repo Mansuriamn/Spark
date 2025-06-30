@@ -22,9 +22,11 @@ function HeroSection() {
 
       {/* Left Content */}
       <div className="flex flex-col items-center md:items-start md:w-1/2 z-10">
+      
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight text-gray-900 mb-6">
-          Get where you're <span className="text-purple-600">going</span> faster with <br />
-          <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent bg-clip-text">Learnohub</span>
+          <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent bg-clip-text">Spark - </span>
+        let the <span className="text-purple-600">learning</span> be set alight.<br />
+          
         </h1>
 
         {/* ✅ Animated Stats Section */}
