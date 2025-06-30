@@ -216,3 +216,16 @@ export const getLearningHours = async (req, res) => {
 }
 };
 
+
+
+export const getUserEnrolledCourses = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    // Populate enrolledCourses to get course details
+    const user = await User.findById(userId).populate('enrolledCourses');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ enrolledCourses: user.enrolledCourses });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

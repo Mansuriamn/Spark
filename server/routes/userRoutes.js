@@ -12,7 +12,8 @@ changeUserRole, getAllInstructors,
 getInProgressCoursesCount,
 getTotalCoursesCount,
 getUserById,
-getUserProfile
+getUserProfile,
+getUserEnrolledCourses
 } from '../controllers/userController.js';
 
 import { loginUser } from '../controllers/loginController.js'
@@ -28,7 +29,7 @@ router.patch('/users/:userId/role', changeUserRole);
 router.get('/instructors', getAllInstructors);
 router.get('/:userId', getUserById);
 
-
+router.get('/:userId/enrolled-courses', getUserEnrolledCourses);
 // Route to enroll a user in a course
 router.post('/enroll', enrollInCourse);
 
