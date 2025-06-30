@@ -59,22 +59,22 @@ const Contest = () => {
     }
   };
 
-  const filteredContests = contestData.filter(contest => {
-    //by serach
-    const matchesSearch = searchTerm === '' ||
-      contest.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contest.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contest.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+ const filteredContests = contestData.filter(contest => {
+  //by search
+  const matchesSearch = searchTerm === '' ||
+    (contest.name && contest.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (contest.description && contest.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (contest.tags && contest.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())));
 
-    //category
-    const matchesCategory = selectedCategories.length === 0 ||
-      selectedCategories.includes(contest.type);
+  //category
+  const matchesCategory = selectedCategories.length === 0 ||
+    selectedCategories.includes(contest.type);
 
-    //by active tab
-    const matchesActiveFilter = activeFilter === 'all' || contest.type === activeFilter;
+  //by active tab
+  const matchesActiveFilter = activeFilter === 'all' || contest.type === activeFilter;
 
-    return matchesSearch && matchesCategory && matchesActiveFilter;
-  });
+  return matchesSearch && matchesCategory && matchesActiveFilter;
+});
 
   // reset all filters
   const resetFilters = () => {
@@ -216,7 +216,7 @@ const Contest = () => {
           {/* Stats Cards */}
          {contestData.length > 0 ? (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-    {contestData.map((contest, index) => {
+    {filteredContests.map((contest, index) => {
       const formattedTime = new Date(contest.time).toLocaleDateString('en-GB', {
         day: 'numeric',
         month: 'short',
@@ -346,7 +346,7 @@ const Contest = () => {
                   </div>
                 </div>
 
-                <div className="mb-8">
+                {/*<div className="mb-8">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4">By Prize Amount</h3>
                   <div className="grid grid-cols-2 gap-3">
                     {[
@@ -381,7 +381,7 @@ const Contest = () => {
                       </button>
                     ))}
                   </div>
-                </div>
+                </div>*/}
 
                 <div className="flex justify-between">
                   <button

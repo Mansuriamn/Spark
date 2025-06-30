@@ -190,7 +190,7 @@ export default function Navbar() {
                         <div className="flex">
                           <input
                             type="text"
-                            value={`https://learnhub.com/refer-earn?code=${user?.id || ''}`}
+                            value={`https://spark-ards.com/refer-earn?code=${user?.id || ''}`}
                             readOnly
                             className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md bg-gray-50 text-sm"
                           />
@@ -283,12 +283,10 @@ export default function Navbar() {
               </div>
 
               <div className="relative">
-                <img
-                  src={user.profilePic}
-                  alt="profile"
-                  className="h-9 w-9 rounded-full cursor-pointer hover:ring-2 hover:ring-purple-300 transition-all object-cover"
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
-                />
+                <User
+  className="bg-purple-600 text-white h-9 w-9 rounded-full cursor-pointer hover:ring-2 hover:ring-purple-300 transition-all"
+  onClick={() => setDropdownOpen(!dropdownOpen)}
+/>
                 {dropdownOpen && (
                   <div
                     ref={dropdownRef}
@@ -296,14 +294,9 @@ export default function Navbar() {
                   >
                     <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
                       <div className="flex items-center space-x-3">
-                        {user.img}
-                        <img style={{
-                          cursor: "pointer"
-                        }}
-                          src={user.profilePic}
-                          alt="profile"
-                          className="h-10 w-10 rounded-full object-cover"
-                        />
+                        <User
+  className="bg-purple-600 text-white h-10 w-10 rounded-full cursor-pointer hover:ring-2 hover:ring-purple-300 transition-all"
+/>
                         <div>
                           <p style={{
                             cursor: "pointer"

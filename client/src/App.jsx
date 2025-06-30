@@ -23,6 +23,8 @@ import WelcomePage from './pages/Mainpage';
 import Student from './components/Seestudent';
 import Admin from './pages/Admin';
 import ProtectedRoute from './components/ProtectedRout';
+import PaidCourseDetails from './components/Paidcourse';
+
 const StudentDashboard = () => <div>Student Dashboard</div>;
 const AdminDashboard = () => <div>Admin Dashboard</div>;
 
@@ -45,6 +47,7 @@ function AppWrapper() {
           <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['student']}><DashboardPage /></ProtectedRoute>} />
           <Route path="/live-sessions" element={<ProtectedRoute allowedRoles={['student']}><LiveSessionsPage /></ProtectedRoute>} />
           <Route path="/schedule" element={<ProtectedRoute allowedRoles={['student']}><Schedule /></ProtectedRoute>} />
+            
           {/*<Route path="/courses/:courseId/lesson/:lessonId" element={<ProtectedRoute allowedRoles={['student']}><LessonPageWrapper /></ProtectedRoute>} />*/}
           <Route path="/contest" element={<ProtectedRoute allowedRoles={['student']}><Contest /></ProtectedRoute>} />
           <Route path="/progressupdate" element={<ProtectedRoute allowedRoles={['student']}><MyCoursesPage /></ProtectedRoute>} />
@@ -59,6 +62,7 @@ function AppWrapper() {
           <Route path="/admin-dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
           <Route path="/instructor" element={<ProtectedRoute allowedRoles={['instructor']}><InstructorDashboard /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute allowedRoles={['student', 'admin', 'instructor']}><UserProfile /></ProtectedRoute>} />
+          <Route path='/paidcourses/:courseId' element={<ProtectedRoute allowedRoles={['student', 'admin', 'instructor']}><PaidCourseDetails /></ProtectedRoute>}></Route>
 
         </Routes>
       </main>

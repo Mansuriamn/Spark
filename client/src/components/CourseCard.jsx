@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function CourseCard({ course = {} }) {
  
@@ -16,7 +17,7 @@ function CourseCard({ course = {} }) {
     level = 'Unknown',
   } = course;
 
-
+ const navigate = useNavigate();
   // lesson count
   const lessonCount = Array.isArray(lesson) ? lesson.length : 0;
   // console.log(lessonCount);

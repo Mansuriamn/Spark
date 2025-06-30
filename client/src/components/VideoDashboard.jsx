@@ -20,6 +20,9 @@ const VideoDashboard = () => {
   const [apiProgress, setApiProgress] = useState({
     overallProgress: 0, completedLessons: 0, totalLessons: 0,
   });
+  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [videoDurations, setVideoDurations] = useState({});
 
   const {
     isAuthenticated, enrolledCourses, user, token, enrolledCourseIds, currentLessonId, updateCurrentLessonId, } = useContext(AuthContext) || {};
@@ -70,7 +73,10 @@ const VideoDashboard = () => {
 
       // Set course data for the current lesson
       if (lessonToSet) {
-        setCourseData(lessonToSet);
+        setCourseData(prev => ({
+          ...prev,
+          ...lessonToSet
+        }));
       }
 
       return validLessons;
@@ -274,6 +280,7 @@ const VideoDashboard = () => {
         upcoming: 0,
         overallProgress: 0,
         totalDuration: 0,
+        totalTimeString: '0min',
       };
     }
 
@@ -287,7 +294,9 @@ const VideoDashboard = () => {
       return acc + (typeof duration === 'string' ? parseInt(duration) : duration);
     }, 0);
 
-
+    const hours = Math.floor(totalDuration / 60);
+    const minutes = totalDuration % 60;
+    const totalTimeString = hours > 0 ? `${hours}h ${minutes}min` : `${minutes}min`;
 
     return {
       totalLessons: lessons.length,
@@ -296,36 +305,37 @@ const VideoDashboard = () => {
       upcoming,
       overallProgress,
       totalDuration: Math.round(totalDuration / 60),
+      totalTimeString,
     };
   };
 
   const stats = calculateStats();
 
   useEffect(() => {
-  const fetchProgress = async () => {
-    if (!courseId || !user?._id) return;
-    try {
-      const res = await axios.get(
-        `http://localhost:5000/api/courses/${courseId}/progress`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      // Ensure overallProgress is set for UI
-      setApiProgress({
-        ...res.data,
-        overallProgress: res.data.progressPercentage || 0,
-      });
-    } catch (err) {
-      // fallback to local stats if API fails
-      setApiProgress({
-        overallProgress: stats.overallProgress,
-        completedLessons: stats.completedLessons,
-        totalLessons: stats.totalLessons,
-        progressPercentage: stats.progressPercentage || 0,
-      });
-    }
-  };
-  fetchProgress();
-}, [courseId, user, token, stats.overallProgress, stats.completedLessons, stats.totalLessons]);
+    const fetchProgress = async () => {
+      if (!courseId || !user?._id) return;
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/courses/${courseId}/progress`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        // Ensure overallProgress is set for UI
+        setApiProgress({
+          ...res.data,
+          overallProgress: res.data.progressPercentage || 0,
+        });
+      } catch (err) {
+        // fallback to local stats if API fails
+        setApiProgress({
+          overallProgress: stats.overallProgress,
+          completedLessons: stats.completedLessons,
+          totalLessons: stats.totalLessons,
+          progressPercentage: stats.progressPercentage || 0,
+        });
+      }
+    };
+    fetchProgress();
+  }, [courseId, user, token, stats.overallProgress, stats.completedLessons, stats.totalLessons]);
   // Group lessons by sections
   const groupLessonsBySection = () => {
     if (!lessons.length) return [];
@@ -358,6 +368,13 @@ const VideoDashboard = () => {
       progress: stats.overallProgress,
       videos: lessons,
     }];
+  };
+
+  const handleLoadedMetadata = (lessonId, e) => {
+    setVideoDurations(prev => ({
+      ...prev,
+      [lessonId]: e.target.duration
+    }));
   };
 
   const calculateSectionDuration = (sectionLessons) => {
@@ -426,7 +443,7 @@ const VideoDashboard = () => {
                 <div className="bg-white rounded-lg px-4 py-2 shadow-sm">
                   <div className="flex items-center space-x-2">
                     <Award className="w-5 h-5 text-yellow-500" />
-                    <span className="text-sm font-medium">{courseData?.rating || 'N/A'} Rating</span>
+                    <span className="text-sm font-medium">{courseData?.rating || '4.5'} Rating</span>
                   </div>
                 </div>
                 <div className="bg-white rounded-lg px-4 py-2 shadow-sm">
@@ -468,7 +485,11 @@ const VideoDashboard = () => {
                             src={courseData.videos[0]?.url}
                             controls
                             className="w-full h-full rounded"
-                            onTimeUpdate={handleVideoProgress}
+                            onLoadedMetadata={e => setDuration(e.target.duration)}
+                            onTimeUpdate={e => {
+                              setCurrentTime(e.target.currentTime);
+                              handleVideoProgress(e);
+                            }}
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-white">
@@ -488,7 +509,7 @@ const VideoDashboard = () => {
                         </h3>
                         <div className="flex items-center space-x-2 text-sm text-gray-500">
                           <Clock className="w-4 h-4" />
-                          <span>{currentLesson?.duration || '0'} min</span>
+                          <span>Time: {Math.floor(currentTime)} / {Math.floor(duration)} seconds</span>
                         </div>
                       </div>
 
@@ -497,12 +518,16 @@ const VideoDashboard = () => {
                           <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
                             <div
                               className="bg-blue-500 h-2 rounded-full"
-                              style={{ width: `${currentLesson.progress || 0}%` }}
+                              style={{
+                                width: duration > 0
+                                  ? `${(currentTime / duration) * 100}%`
+                                  : '0%'
+                              }}
                             ></div>
                           </div>
                           <div className="flex justify-between text-sm text-gray-600">
-                            <span>Progress: {currentLesson.progress || 0}%</span>
-                            <span>Status: {currentLesson.completed ? 'Completed' : 'In Progress'}</span>
+                            <span>Progress: {currentLesson.content || 0}</span>
+
                           </div>
                         </>
                       )}
@@ -531,7 +556,7 @@ const VideoDashboard = () => {
                                 </div>
                               </div>
                             </div>
- 
+
                           </div>
 
                           {/* Video List */}
@@ -580,21 +605,27 @@ const VideoDashboard = () => {
                         <div className="w-20 h-20 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-3">
                           <CheckCircle className="w-8 h-8 text-blue-600" />
                         </div>
-                        <div className="text-2xl font-bold text-gray-900">{stats.completedLessons}</div>
+                        <div className="text-2xl font-bold text-gray-900">
+                          {Math.min(apiProgress.completedLessons, apiProgress.totalLessons)}
+                        </div>
                         <div className="text-sm text-gray-500">Completed</div>
                       </div>
                       <div className="text-center">
                         <div className="w-20 h-20 mx-auto bg-orange-100 rounded-full flex items-center justify-center mb-3">
                           <Clock className="w-8 h-8 text-orange-600" />
                         </div>
-                        <div className="text-2xl font-bold text-gray-900">{stats.inProgress}</div>
+                        <div className="text-2xl font-bold text-gray-900">
+                          {Math.max(apiProgress.totalLessons - apiProgress.completedLessons, 0)}
+                        </div>
                         <div className="text-sm text-gray-500">In Progress</div>
                       </div>
                       <div className="text-center">
                         <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-3">
                           <Video className="w-8 h-8 text-gray-600" />
                         </div>
-                        <div className="text-2xl font-bold text-gray-900">{stats.upcoming}</div>
+                        <div className="text-2xl font-bold text-gray-900">
+                          {Math.max(apiProgress.totalLessons - apiProgress.completedLessons, 0)}
+                        </div>
                         <div className="text-sm text-gray-500">Upcoming</div>
                       </div>
                     </div>
@@ -611,13 +642,20 @@ const VideoDashboard = () => {
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="font-semibold text-blue-900">Current Lesson</h3>
                           <span className="text-sm text-blue-600 bg-blue-100 px-2 py-1 rounded">
-                            {currentLesson?.duration || 0} min
+                            {/* Show actual video duration if available, otherwise fallback */}
+                            {typeof duration === 'number' && duration > 0
+                              ? `${Math.floor(duration / 60)}m ${Math.round(duration % 60)}s`
+                              : (currentLesson?.duration ? `${currentLesson.duration} min` : '0 min')}
                           </span>
                         </div>
                         <p className="text-blue-800">{currentLesson?.title || 'No lesson selected'}</p>
                         <div className="flex items-center mt-2 text-sm text-blue-600">
                           <Clock className="w-4 h-4 mr-1" />
-                          <span>Duration: {currentLesson?.duration || 0} minutes</span>
+                          <span>
+                            Video Duration: {typeof duration === 'number' && duration > 0
+                              ? `${Math.floor(duration / 60)}m ${Math.round(duration % 60)}s`
+                              : '0 min'}
+                          </span>
                         </div>
                       </div>
 
@@ -631,7 +669,22 @@ const VideoDashboard = () => {
                               <div className="flex items-center justify-between">
                                 <div>
                                   <h4 className="font-medium text-gray-900">{lesson.title}</h4>
-                                  <p className="text-sm text-gray-500">Duration: {lesson.duration} min</p>
+                                  <p className="text-sm text-gray-500">
+                                    Duration: {lesson.duration} min
+                                    {lesson.videoUrl && (
+                                      <>
+                                        {/* Hidden video to get duration */}
+                                        <video
+                                          src={lesson.videoUrl}
+                                          style={{ display: 'none' }}
+                                          onLoadedMetadata={e => handleLoadedMetadata(lesson._id, e)}
+                                        />
+                                        {videoDurations[lesson._id] &&
+                                          <> | Video: {Math.floor(videoDurations[lesson._id] / 60)}m {Math.round(videoDurations[lesson._id] % 60)}s</>
+                                        }
+                                      </>
+                                    )}
+                                  </p>
                                 </div>
                                 <Calendar className="w-5 h-5 text-gray-400" />
                               </div>
@@ -650,17 +703,20 @@ const VideoDashboard = () => {
               <div className="bg-white rounded-xl p-6 shadow-sm">
                 <h3 className="text-lg font-semibold mb-4">Overall Progress</h3>
                 <div className="text-center mb-4">
-                  <div className="text-3xl font-bold text-purple-600 mb-2">{apiProgress.overallProgress}%</div>
+                  <div className="text-3xl font-bold text-purple-600 mb-2">
+                    {Math.min(apiProgress.overallProgress, 100)}%
+                  </div>
                   <div className="w-full bg-gray-200 rounded-full h-3">
                     <div
                       className="bg-purple-600 h-3 rounded-full transition-all duration-700"
-                      style={{ width: `${apiProgress.progressPercentage}%` }}
+                      style={{ width: `${Math.min(apiProgress.overallProgress, 100)}%` }}
                     ></div>
                   </div>
                 </div>
-                <div className="text-sm text-gray-600 text-center">
-                  {apiProgress.completedLessons} of {apiProgress.totalLessons} lessons completed
+                <div className="text-sm text-gray-500">
+                  Total {Math.min(apiProgress.completedLessons, apiProgress.totalLessons)} Lesson Completed
                 </div>
+                <div className="text-sm text-gray-500"></div>
               </div>
               {/* Course Stats */}
               <div className="bg-white rounded-xl p-6 shadow-sm">
@@ -671,14 +727,14 @@ const VideoDashboard = () => {
                       <Clock className="w-4 h-4 text-gray-400" />
                       <span className="text-sm text-gray-600">Total Duration</span>
                     </div>
-                    <span className="font-medium">{stats.totalDuration} hours</span>
+                    <span className="font-medium">{stats.totalTimeString}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <Video className="w-4 h-4 text-gray-400" />
                       <span className="text-sm text-gray-600">Total Lessons</span>
                     </div>
-                    <span className="font-medium">{stats.totalLessons}</span>
+                    <span className="font-medium">{apiProgress.totalLessons}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
@@ -691,7 +747,7 @@ const VideoDashboard = () => {
               </div>
 
               {/* Achievement */}
-              {stats.completedLessons > 0 && (
+              {currentTime > 0 && (
                 <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-6 border border-yellow-200">
                   <div className="flex items-center space-x-3 mb-3">
                     <div className="bg-yellow-100 rounded-full p-2">
@@ -699,7 +755,7 @@ const VideoDashboard = () => {
                     </div>
                     <div>
                       <div className="font-semibold text-yellow-900">Great Progress!</div>
-                      <div className="text-sm text-yellow-700">{stats.completedLessons} lessons completed</div>
+                      <div className="text-sm text-yellow-700">{apiProgress.completedLessons} lessons completed</div>
                     </div>
                   </div>
                   <div className="text-xs text-yellow-600">Keep up the excellent work!</div>
