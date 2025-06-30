@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { FaBell, FaBars, FaTimes, FaCog, FaUser, FaSignOutAlt, FaChevronRight } from 'react-icons/fa';
-import { Bell, Menu, X, Settings, User, LogOut, ChevronRight } from 'lucide-react';
+import { Bell, Menu, X, Settings, User, LogOut, ChevronRight} from 'lucide-react';
 import { AuthContext } from '../pages/AuthContext';
 import logo5 from '../assets/img/logo5.png'
+
 export default function Navbar() {
   const { user, logout } = useContext(AuthContext);
 
@@ -66,7 +67,7 @@ export default function Navbar() {
   const navItemRoutes = {
     Home: '/home',
     Courses: '/courses',
-    
+
     'Live Sessions': '/live-sessions',
     Schedule: '/schedule',
     Contest: '/contest',
@@ -120,11 +121,11 @@ export default function Navbar() {
         <a href="/" className="flex items-center space-x-2">
           {/* <h1 className="text-xl font-bold text-gray-900">Spark</h1> */}
           <img
-          style={{
-            objectFit: 'contain',
-            width:"100px",
-            height:"60px"
-          }}
+            style={{
+              objectFit: 'contain',
+              width: "100px",
+              height: "60px"
+            }}
             src={logo5}
             alt="Logo"
             onClick={() => navigate('/')}
@@ -284,9 +285,9 @@ export default function Navbar() {
 
               <div className="relative">
                 <User
-  className="bg-purple-600 text-white h-9 w-9 rounded-full cursor-pointer hover:ring-2 hover:ring-purple-300 transition-all"
-  onClick={() => setDropdownOpen(!dropdownOpen)}
-/>
+                  className="bg-purple-600 text-white h-9 w-9 rounded-full cursor-pointer hover:ring-2 hover:ring-purple-300 transition-all"
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                />
                 {dropdownOpen && (
                   <div
                     ref={dropdownRef}
@@ -295,8 +296,8 @@ export default function Navbar() {
                     <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
                       <div className="flex items-center space-x-3">
                         <User
-  className="bg-purple-600 text-white h-10 w-10 rounded-full cursor-pointer hover:ring-2 hover:ring-purple-300 transition-all"
-/>
+                          className="bg-purple-600 text-white h-10 w-10 rounded-full cursor-pointer hover:ring-2 hover:ring-purple-300 transition-all"
+                        />
                         <div>
                           <p style={{
                             cursor: "pointer"
@@ -485,12 +486,15 @@ export default function Navbar() {
                   <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full" />
                 </button>
                 <div className="relative">
-                  <img
+                  {/* <img
                     src={user.avatar || 'https://flowbite.com/docs/images/people/profile-picture-5.jpg'}
                     alt="profile"
                     className="h-8 w-8 rounded-full cursor-pointer object-cover"
                     onClick={() => setDropdownOpen(!dropdownOpen)}
-                  />
+                  /> */}
+                  <User 
+                  className="h-8 w-8 rounded-full cursor-pointer object-cover"
+                  onClick={() => setDropdownOpen(!dropdownOpen) }/>
                   {dropdownOpen && (
                     <div
                       ref={dropdownRef}

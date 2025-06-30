@@ -1,0 +1,151 @@
+.profile-card-container {
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+}
+
+.profile-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .profile-card-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.profile-card-user {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  background-color: #7c3aed;
+  color: white;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.875rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.user-icon {
+  width: 36px;
+  height: 36px;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-edit-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.profile-input {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #c7d2fe;
+  font-size: 1rem;
+  padding: 0.25rem 0;
+}
+
+.profile-input:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+
+.name-input {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.profile-view-fields {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-name {
+  font-size: 1.875rem;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.profile-email {
+  color: #4b5563;
+}
+
+.profile-role {
+  margin-top: 0.5rem;
+  background-color: #e0e7ff;
+  color: #4338ca;
+  padding: 0.25rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.save-btn {
+  background-color: #16a34a;
+  color: white;
+}
+
+.save-btn:hover {
+  background-color: #15803d;
+}
+
+.cancel-btn {
+  background-color: #6b7280;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background-color: #4b5563;
+}
+
+.edit-btn {
+  background-color: #8b5cf6;
+  color: white;
+}
+
+.edit-btn:hover {
+  background-color: #7c3aed;
+}

@@ -12,6 +12,7 @@ import Pagination from '../assets/Models/Pagination';
 import Footer from '../components/Footer'; 
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; 
+import '../assets/style/Courses.css'
 
 export default function Courses() {
   const navigate = useNavigate(); 
@@ -113,7 +114,7 @@ export default function Courses() {
     <>
       <div className="flex justify-center bg-gray-100 border-gray-200 course_op_card">
         {/* Left Sidebar for Filters */}
-        <div className="w-1/4 p-10 border-r space-y-4 course_options">
+        <div className="Options">
           <CourseCategory filters={filters} onChange={handleFilterChange} />
           <Instructors filters={filters} onChange={handleFilterChange} />
           <PriceFilter filters={filters} onChange={handleFilterChange} />

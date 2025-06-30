@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import CountUp from 'react-countup';
+import '../assets/style/Hero.css'
 import ADRS from '../assets/videos/ADRS.mp4'
 import { counterItems } from '../constants';
 import { useGSAP } from '@gsap/react';
@@ -30,7 +31,7 @@ function HeroSection() {
         </h1>
 
         {/* ✅ Animated Stats Section */}
-        <div ref={statsRef} className="flex flex-wrap justify-center md:justify-start gap-8 mb-10">
+        <div ref={statsRef} className="numbers">
           {counterItems.map((item, index) => (
             <div key={index}>
               <p className="text-3xl md:text-4xl font-bold text-purple-600">
