@@ -2,6 +2,11 @@
 #site-footer {
   word-wrap: break-word;
 }
+.Footer_container{
+  display: flex;
+  justify-content: space-between;
+  gap: 100px;
+}
 
 /* Tablet */
 @media (max-width: 768px) {
@@ -32,5 +37,8 @@
   #site-footer .footer-col p,
   #site-footer .footer-col ul li a {
     font-size: 0.9rem;
+  }
+  .Footer_container{
+    flex-direction: row;
   }
 }

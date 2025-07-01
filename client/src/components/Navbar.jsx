@@ -156,7 +156,7 @@ export default function Navbar() {
                   onClick={() => setHelpEarnOpen(!helpEarnOpen)}
                   className="px-5 py-1 rounded-full text-sm font-medium bg-purple-600 text-white hover:bg-purple-700 focus:outline-none transition-colors"
                 >
-                  Refer & Earn
+                  Refer 
                 </button>
                 {helpEarnOpen && (
                   <div
