@@ -3,6 +3,7 @@ import { Edit3, Mail, User, BookOpen, Clock, Users, Camera, ShoppingCart, Trash2
 import { useNavigate } from 'react-router-dom';
 import Footer from './Footer';
 import { AuthContext } from '../pages/AuthContext';
+import '../assets/style/UserProfile.css'
 
 const UserProfile = () => {
   const navigate = useNavigate();
@@ -30,7 +31,10 @@ const UserProfile = () => {
     profilePic: '',
   });
   const [loading, setLoading] = useState(false);
-
+  const saveProfile = async (newProfileData) => {
+    // maybe call API first, then update
+    updateUserProfile(newProfileData);
+  };
   useEffect(() => {
     if (user) {
       setUserInfo({
@@ -278,6 +282,107 @@ const UserProfile = () => {
           </div>
 
           {/* ...profile header code... */}
+          <div className="profile-container" id="profile-container">
+            <div className="profile-header" id="profile-header">
+              <div className="profile-main" id="profile-main">
+                <div className="profile-picture-wrapper">
+                  <div className="profile-picture-box">
+                    {profilePic ? (
+                      <User className="profile-icon" />
+                    ) : (
+                      <div className="profile-initial">
+                        {userInfo?.name?.[0]?.toUpperCase() || 'U'}
+                      </div>
+                    )}
+                  </div>
+                  {isEditing && (
+                    <div className="profile-overlay">
+                      <label htmlFor="profile-upload" className="upload-label">
+                        <Camera className="camera-icon" />
+                      </label>
+                      <input
+                        id="profile-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="file-input"
+                      />
+                    </div>
+                  )}
+                  <div className="profile-status-indicator"></div>
+                </div>
+             
+                <div className="profile-details" id="profile-details">
+                  {isEditing ? (
+                    <div className="edit-form">
+                      <input
+                        type="text"
+                        id="edit-name"
+                        value={userInfo.name}
+                        onChange={(e) => setUserInfo({ ...userInfo, name: e.target.value })}
+                        className="edit-input name-input"
+                        placeholder="Full Name"
+                      />
+                      <input
+                        type="email"
+                        id="edit-email"
+                        value={userInfo.email}
+                        onChange={(e) => setUserInfo({ ...userInfo, email: e.target.value })}
+                        className="edit-input email-input"
+                        placeholder="Email Address"
+                      />
+                    </div>
+                  ) : (
+                    <div className="display-info">
+                      <h2 className="display-name">{userInfo.name}</h2>
+                      <div className="display-email">
+                        <Mail className="icon" />
+                        <span>{userInfo.email}</span>
+                      </div>
+                      <div className="display-role">
+                        <User className="icon" />
+                        <span className="role-badge">
+                          {userInfo.role || 'Student'}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="profile-actions" id="profile-actions">
+                {isEditing ? (
+                  <>
+                    <button
+                      onClick={() => setIsEditing(false)}
+                      className="btn cancel-btn"
+                      disabled={loading}
+                      id="cancel-edit"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSave}
+                      disabled={loading}
+                      className="btn save-btn"
+                      id="save-profile"
+                    >
+                      {loading ? 'Saving...' : 'Save'}
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={handleEditToggle}
+                    className="btn edit-btn"
+                    id="edit-toggle"
+                  >
+                    <Edit3 className="icon" />
+                    <span>Edit Profile</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
 
           {enrolledCourses && enrolledCourses.length > 0 && (
             <div className="mb-8">

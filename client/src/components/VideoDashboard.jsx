@@ -439,14 +439,14 @@ const VideoDashboard = () => {
                   {courseData?.description || 'Course Description'}
                 </p>
               </div>
-              <div className="flex items-center space-x-4">
-                <div className="bg-white rounded-lg px-4 py-2 shadow-sm">
+              <div className="flex flex-wrap items-center ml-2 space-x-4">
+                <div className="bg-white rounded-lg px-2 py-2 shadow-sm">
                   <div className="flex items-center space-x-2">
                     <Award className="w-5 h-5 text-yellow-500" />
                     <span className="text-sm font-medium">{courseData?.rating || '4.5'} Rating</span>
                   </div>
                 </div>
-                <div className="bg-white rounded-lg px-4 py-2 shadow-sm">
+                <div className="bg-white rounded-lg px-2 py-2 shadow-sm mt-2">
                   <div className="flex items-center space-x-2">
                     <User className="w-5 h-5 text-purple-600" />
                     <span className="text-sm font-medium">{studentCount || '0'} Students</span>
