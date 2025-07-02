@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import { User, Save, X, Edit3 } from 'lucide-react';
 import '../assets/style/Admin.css';
 import { AuthContext } from './AuthContext';
+import '../assets/style/UserProfile.css'
+
 
 export default function Admin() {
   const { user, login } = useContext(AuthContext);
@@ -56,16 +58,19 @@ export default function Admin() {
       <h2 id='admin_h2'>Admin Page</h2>
 
       {/*profile section */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-8 border border-white/20">
+      <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-8 border border-white/20 admin-profile">
         <div className="flex flex-col lg:flex-row items-center justify-between">
           <div className="flex items-center space-x-6 mb-6 lg:mb-0">
             <div className="relative">
               {profileImage ? (
-                <img
-                  src={profile.profilePic}
-                  alt="Profile"
-                  className="profile_image"
-                />
+                // <img
+                //   src={profile.profilePic}
+                //   alt="Profile"
+                //   className="profile_image"
+                // />
+               <div className="profile-picture-box">
+                 <User className="profile-icon"  />
+                </div>
               ) : (
                 <div className="w-20 h-20 bg-purple-600 text-white rounded-2xl flex items-center justify-center text-3xl font-bold shadow-lg">
                   <User />
@@ -82,20 +87,24 @@ export default function Admin() {
               )}
             </div>
 
-            <div>
+            <div className="profile-details" id="profile-details">
               {profileEdit ? (
-                <div className="space-y-2">
+                <div className="edit-form">
                   <input
                     type="text"
                     value={profile.name}
                     onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                    className="input-box"
+                   id="edit-name"
+                      className="edit-input name-input"
+                      placeholder="Full Name"
                   />
                   <input
                     type="email"
                     value={profile.email}
                     onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                    className="input-box"
+                   id="edit-email"
+                      className="edit-input email-input"
+                        placeholder="Email Address"
                   />
                 </div>
               ) : (
@@ -110,24 +119,31 @@ export default function Admin() {
               )}
             </div>
           </div>
-          <div className="flex space-x-3">
+          <div className="profile-actions" id="profile-actions">
             {profileEdit ? (
               <>
-                <button onClick={handleProfileSave} className="save_button">
-                  <Save className="w-4 h-4" />
-                  <span>Save</span>
+                <button
+                  onClick={() => setProfileEdit(false)}
+                  className="btn cancel-btn"
+                  id="cancel-edit"
+                >
+                  Cancel
                 </button>
-                <button onClick={() => setProfileEdit(false)} className="cancel_button">
-                  <X className="w-4 h-4" />
-                  <span>Cancel</span>
+                <button
+                  onClick={handleProfileSave}
+                  className="btn save-btn"
+                  id="save-profile"
+                >
+                  Save
                 </button>
               </>
             ) : (
               <button
                 onClick={() => setProfileEdit(true)}
-                className="bg-purple-500 text-white px-6 py-3 rounded-xl hover:bg-purple-600 transition-all duration-200 flex items-center space-x-2 shadow-lg"
+                className="btn edit-btn"
+                id="edit-toggle"
               >
-                <Edit3 className="w-4 h-4" />
+                <Edit3 className="icon" />
                 <span>Edit Profile</span>
               </button>
             )}

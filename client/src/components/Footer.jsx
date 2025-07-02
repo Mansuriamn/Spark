@@ -15,7 +15,8 @@ const Footer = () => {
     </div>
 
     {/* Courses */}
-    <div id="footer-help" className="footer-col w-full sm:w-1/4 mb-10 font-semibold text-center sm:text-left">
+   <div className='Footer_container'>
+     <div id="footer-help" className="footer-col w-full sm:w-1/4 mb-10 font-semibold text-center sm:text-left">
       <h4 className="font-bold mb-2 text-white">Courses</h4>
       <ul className="space-y-1 text-purple-100">
         <li><a href="#" className="hover:text-orange-400">Design</a></li>
@@ -39,6 +40,7 @@ const Footer = () => {
         <li><a href="#" className="hover:text-orange-400">Programming</a></li>
       </ul>
     </div>
+   </div>
 
     {/* Contact Info */}
     <div id="footer-contact" className="footer-col w-full sm:w-1/4 mb-10 font-semibold text-center sm:text-left">

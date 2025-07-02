@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import '../assets/style/Login.css';
+import '../assets/style/Register.css'; // ✅ updated filename
 import logo4 from '../assets/img/logo4.jpg';
 import logo3 from '../assets/img/logo3.jpg';
 import logo2 from '../assets/img/logo2.svg';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion'; // ✅ import motion
+import { motion } from 'framer-motion';
 
 export default function Register({ setLogin } = {}) {
   const navigate = useNavigate();
@@ -27,7 +27,6 @@ export default function Register({ setLogin } = {}) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (formData.password !== confirmPassword) {
       alert('Passwords do not match!');
       return;
@@ -58,28 +57,28 @@ export default function Register({ setLogin } = {}) {
 
   return (
     <motion.div
-      className='contain_both'
+      className='container_ragis'
       initial={{ opacity: 0, y: -40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <div className="container1">
+      <div className="formContainer_ragis">
         <motion.div
-          className="wrapper1"
+          className="formWrapper_ragis"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.2 }}
         >
           <form onSubmit={handleSubmit}>
-            <h1>Register</h1>
+            <h1 className="heading_ragis">Register</h1>
 
-            <div className="login_img1">
+            <div className="logoGroup_ragis">
               <img src={logo4} alt="Logo 1" />
               <img src={logo3} alt="Logo 2" />
               <img src={logo2} alt="Logo 3" />
             </div>
 
-            <div className="input-box1">
+            <div className="inputBox_ragis">
               <input
                 name="fullName"
                 type="text"
@@ -90,7 +89,7 @@ export default function Register({ setLogin } = {}) {
               />
             </div>
 
-            <div className="input-box1">
+            <div className="inputBox_ragis">
               <input
                 name="email"
                 type="email"
@@ -101,7 +100,7 @@ export default function Register({ setLogin } = {}) {
               />
             </div>
 
-            <div className="input-box1">
+            <div className="inputBox_ragis">
               <input
                 name="password"
                 type="password"
@@ -112,7 +111,7 @@ export default function Register({ setLogin } = {}) {
               />
             </div>
 
-            <div className="input-box1">
+            <div className="inputBox_ragis">
               <input
                 type="password"
                 placeholder="Confirm Password"
@@ -122,21 +121,19 @@ export default function Register({ setLogin } = {}) {
               />
             </div>
 
-            <br />
-
             <motion.button
               type="submit"
-              className="btn1"
+              className="submitBtn_ragis"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               Register
             </motion.button>
 
-            <div className="register-link1">
+            <div className="linkBox_ragis">
               <a href="#">Forget password?</a>
             </div>
-            <div className="register-link1">
+            <div className="linkBox_ragis">
               <p>
                 Already have an account?{' '}
                 <a onClick={() => navigate("/Login")}>Login</a>

@@ -5,6 +5,7 @@ import Student from './Seestudent';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../pages/AuthContext'; 
 import axios from 'axios';
+import '../assets/style/UserProfile.css'
 
 export default function InstructorDashboard() {
   const navigate = useNavigate();
@@ -394,20 +395,24 @@ setError('Failed to create course: ' + err.message);
               <div className="w-20 h-20 bg-purple-600 text-white rounded-2xl flex items-center justify-center text-3xl font-bold shadow-lg">
                 <User />
               </div>
-              <div>
+              <div  className="profile-details" id="profile-details">
                 {profileEdit ? (
-                  <div className="space-y-2">
+                  <div className="edit-form">
                     <input
                       type="text"
                       value={profile.name}
                       onChange={(e) => setProfile({...profile, name: e.target.value})}
-                      className="text-2xl font-bold bg-transparent border-b-2 border-indigo-300 focus:outline-none focus:border-indigo-500"
+                      id="edit-name"
+                      className="edit-input name-input"
+                      placeholder="Full Name"
                     />
                     <input
                       type="email"
                       value={profile.email}
                       onChange={(e) => setProfile({...profile, email: e.target.value})}
-                      className="block text-gray-600 bg-transparent border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                     id="edit-email"
+                      className="edit-input email-input"
+                        placeholder="Email Address"
                     />
                     
                   </div>
@@ -422,7 +427,7 @@ setError('Failed to create course: ' + err.message);
                 )}
               </div>
             </div>
-            <div className="flex space-x-3">
+            {/* <div className="flex space-x-3">
               {profileEdit ? (
                 <>
                   <button
@@ -449,10 +454,38 @@ setError('Failed to create course: ' + err.message);
                   <span>Edit Profile</span>
                 </button>
               )}
+            </div> */}
+             <div className="profile-actions" id="profile-actions">
+              {profileEdit ? (
+                <>
+                  <button
+                    onClick={() => setProfileEdit(false)}
+                    className="btn cancel-btn"
+                    id="cancel-edit"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleProfileSave}
+                    className="btn save-btn"
+                    id="save-profile"
+                  >
+                    Save
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setProfileEdit(true)}
+                  className="btn edit-btn"
+                  id="edit-toggle"
+                >
+                  <Edit3 className="icon" />
+                  <span>Edit Profile</span>
+                </button>
+              )}
             </div>
           </div>
-        </div>
-
+        </div> 
         {/* Course Header */}
         <div className="flex justify-between items-center mb-8">
           <h3 className="text-2xl font-bold text-gray-800">Your Courses</h3>

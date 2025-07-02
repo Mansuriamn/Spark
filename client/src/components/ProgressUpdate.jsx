@@ -87,76 +87,92 @@ const CourseCard = ({ course, courseProgress }) => {
   const { courseId, lessonId } = useParams();
   const navigate = useNavigate();
 
-  const handleNavigate = () => {
-  const firstLessonId = course.lessons && course.lessons.length > 0
-    ? course.lessons[0].id || course.lessons[0]._id
-    : null;
+  // Helper: get instructor name
+  const instructor =
+    course.instructor?.name ||
+    course.instructorName ||
+    course.createdBy?.name ||
+    course.createdBy ||
+    'Expert Instructor';
 
-  if (firstLessonId) {
-    navigate(`/courses/${course.id || course._id}/lesson/${firstLessonId}`);
+  // Helper: get number of students enrolled
+  const studentsCount = Array.isArray(course.userEnrolled)
+    ? course.userEnrolled.length
+    : (course.students || 0);
+
+  // Helper: get rating (0-5)
+  const rating = Number(course.rating) || 4;
+
+  // Helper: get duration in hours/minutes
+  let duration = '';
+  if (course.estimatedDuration && !isNaN(course.estimatedDuration)) {
+    const h = Math.floor(course.estimatedDuration / 60);
+    const m = course.estimatedDuration % 60;
+    duration = h > 0 ? `${h}h ${m}min` : `${m}min`;
+  } else if (course.duration) {
+    duration = course.duration;
   } else {
-    navigate(`/courses/${course.id || course._id}`);
-  }
-};
-
-  // Ensure course is an object and has required properties
-  if (!course || typeof course !== 'object') {
-    console.error('Invalid course data:', course);
-    return null;
+    duration = '0 min';
   }
 
-  // Get progress from API or fallback to course data
+  // Progress
   const progressData = courseProgress || {};
   const courseProgressPercentage = progressData.progressPercentage || course.completed || 0;
   const completedLessons = progressData.completedLessons || 0;
   const totalLessons = progressData.totalLessons || course.lessons?.length || 0;
 
-  // Determine status based on progress
+  // Status
   let courseStatus = course.status || 'not-started';
   if (courseProgressPercentage >= 100) {
     courseStatus = 'completed';
   } else if (courseProgressPercentage > 0) {
     courseStatus = 'in-progress';
   }
-
   const statusBadge = statusBadges[courseStatus] || statusBadges['not-started'];
 
-  // Safely extract and convert properties to strings
-  const safeString = (value, fallback = '') => {
-    if (value === null || value === undefined) return fallback;
-    if (typeof value === 'object') return fallback;
-    return String(value);
+  // Navigation
+  const handleNavigate = () => {
+    const firstLessonId =
+      course.lessons && course.lessons.length > 0
+        ? course.lessons[0].id || course.lessons[0]._id || course.lessons[0]
+        : null;
+    if (firstLessonId) {
+      navigate(`/courses/${course.id || course._id}/lesson/${firstLessonId}`);
+    } else {
+      navigate(`/courses/${course.id || course._id}`);
+    }
   };
 
-  const courseTitle = safeString(course.title, 'Untitled Course');
-  const courseInstructor = safeString(course.instructor, 'Unknown');
-  const courseLevel = safeString(course.level, 'Beginner');
-  const courseDuration = safeString(course.duration, 'N/A');
-  const courseStudents = safeString(course.students, '0');
-  const courseLessons = totalLessons || safeString(course.lessons, '0');
-  const courseRating = parseFloat(course.rating) || 0;
-  const courseCategory = safeString(course.category, 'General');
-  const coursePrice = safeString(course.price, 'Free');
-  const courseOriginalPrice = safeString(course.originalPrice, '');
-  const courseDays = safeString(course.days, '0');
+  // Render stars for rating
+  const renderStars = () => (
+    <div className="flex text-yellow-400 mr-2">
+      {[...Array(5)].map((_, i) => (
+        <Star
+          key={i}
+          className={`w-4 h-4 ${i < Math.round(rating) ? "fill-current" : "text-gray-300"}`}
+        />
+      ))}
+    </div>
+  );
 
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col lg:flex-row transition-all duration-300 hover:shadow-lg border border-gray-100 min-h-[320px] h-[320px]">
       <div className="relative lg:w-80 h-48 lg:h-auto">
         <img
-          src={course.image || course.thumbnail || 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'}
-          alt={courseTitle}
+          src={
+            course.pictureUrl ||
+            course.thumbnailUrl ||
+            course.image ||
+            'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
+          }
+          alt={course.title}
           className="w-full h-full object-cover"
         />
         <div className="absolute top-4 left-4 flex gap-2">
           <span className={`${statusBadge.color} px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm bg-opacity-90`}>
             {statusBadge.text}
           </span>
-          <span className="bg-black bg-opacity-75 text-white text-xs px-3 py-1 rounded-full font-medium">
-            {courseCategory}
-          </span>
         </div>
-
         {courseStatus === 'in-progress' && (
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent text-white p-4">
             <div className="flex justify-between text-xs mb-2 font-medium">
@@ -165,13 +181,12 @@ const CourseCard = ({ course, courseProgress }) => {
             </div>
             <div className="w-full bg-white/20 rounded-full h-2">
               <div
-                className={`${course.progressColor || 'bg-purple-500'} h-2 rounded-full transition-all duration-500`}
+                className="bg-purple-500 h-2 rounded-full transition-all duration-500"
                 style={{ width: `${courseProgressPercentage}%` }}
               ></div>
             </div>
           </div>
         )}
-
         {courseStatus === 'completed' && (
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-green-800/80 to-transparent text-white p-4">
             <div className="flex justify-between text-xs mb-2 font-medium">
@@ -188,37 +203,30 @@ const CourseCard = ({ course, courseProgress }) => {
       <div className="p-6 flex-1 flex flex-col">
         <div className="flex-1">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-gray-500 font-medium">by {courseInstructor}</p>
+            <p className="text-sm text-gray-500 font-medium">by {instructor}</p>
             <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg text-xs font-medium">
-              {courseLevel}
+              {course.level || 'Beginner'}
             </span>
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-4 leading-tight">{courseTitle}</h3>
-
+          <h3 className="text-xl font-bold text-gray-900 mb-2 leading-tight">{course.title}</h3>
           <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-4">
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-purple-500" />
-              <span>{courseDuration}</span>
+              <Users className="w-4 h-4 text-purple-500" />
+              <span>{studentsCount} Students</span>
             </div>
             <div className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-purple-500" />
-              <span>{courseStudents} Students</span>
+              <Clock className="w-4 h-4 text-purple-500" />
+              <span>{duration}</span>
             </div>
             <div className="flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-purple-500" />
-              <span>{courseLessons} Lessons</span>
+              <span>{totalLessons} Lessons</span>
             </div>
           </div>
-
-          <div className="flex items-center mb-6">
-            <div className="flex text-yellow-400 mr-2">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className={`w-4 h-4 ${i < Math.floor(courseRating) ? "fill-current" : "text-gray-300"}`} />
-              ))}
-            </div>
-            <span className="text-sm text-gray-600 font-medium">{courseRating}/5.0</span>
+          <div className="flex items-center mb-4">
+            {renderStars()}
+            <span className="text-sm text-gray-600 font-medium">{rating}/5.0</span>
           </div>
-
           {/* Progress Details */}
           {courseStatus === 'in-progress' && (
             <div className="mb-4 p-3 bg-purple-50 rounded-lg">
@@ -238,18 +246,17 @@ const CourseCard = ({ course, courseProgress }) => {
             </div>
           )}
         </div>
-
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-gray-100">
           <div className="flex items-center gap-2">
-            {/*<span className="text-sm text-gray-400 line-through">₹{courseOriginalPrice}</span>*/}
-            <span className="text-2xl font-bold text-purple-600">₹{coursePrice}</span>
+            <span className="text-2xl font-bold text-purple-600">
+              {course.price === 0 ? 'FREE' : `₹${course.price}`}
+            </span>
           </div>
-
           <button onClick={handleNavigate} className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 ${courseStatus === 'completed'
-            ? 'bg-green-100 text-green-700 hover:bg-green-200'
-            : courseStatus === 'in-progress'
-              ? 'bg-purple-600 text-white hover:bg-purple-700 shadow-lg hover:shadow-xl'
-              : 'bg-gray-900 text-white hover:bg-gray-800 shadow-lg hover:shadow-xl'
+              ? 'bg-green-100 text-green-700 hover:bg-green-200'
+              : courseStatus === 'in-progress'
+                ? 'bg-purple-600 text-white hover:bg-purple-700 shadow-lg hover:shadow-xl'
+                : 'bg-gray-900 text-white hover:bg-gray-800 shadow-lg hover:shadow-xl'
             }`}>
             {courseStatus === 'completed' ? (
               <>
@@ -274,14 +281,14 @@ const CourseCard = ({ course, courseProgress }) => {
 export default function MyCoursesPage() {
   const [filter, setFilter] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
-  const { enrolledCourses, user ,token} = useContext(AuthContext);
+  const { user, token } = useContext(AuthContext);
   const navigate = useNavigate();
   const [courseProgress, setCourseProgress] = useState({});
   const [isLoadingProgress, setIsLoadingProgress] = useState(true);
-
+  const [enrolledCourses, setEnrolledCourses] = useState([]);
   // Get user data and token
   const userData = JSON.parse(localStorage.getItem("userData"));
-  
+
 
   const userId = userData?._id || user?._id;
 
@@ -332,7 +339,7 @@ export default function MyCoursesPage() {
                 `http://localhost:5000/api/courses/${courseId}/progress`,
                 {
                   headers: { Authorization: `Bearer ${token}` }
-                  
+
                 }
               );
 
@@ -382,56 +389,69 @@ export default function MyCoursesPage() {
 
   // Update stats based on enrolled courses and progress data
   useEffect(() => {
-    if (enrolledCourses && enrolledCourses.length > 0) {
-      let completedCount = 0;
-      let inProgressCount = 0;
-      let totalHours = 0;
+  if (enrolledCourses && enrolledCourses.length > 0) {
+    let completedCount = 0;
+    let inProgressCount = 0;
+    let totalMinutes = 0;
 
-      enrolledCourses.forEach(course => {
-        const courseId = course.id || course._id;
-        const progress = courseProgress[courseId];
-        const progressPercentage = progress?.progressPercentage || course.completed || 0;
+    enrolledCourses.forEach(course => {
+      const courseId = course.id || course._id;
+      const progress = courseProgress[courseId];
+      const progressPercentage = progress?.progressPercentage || course.completed || 0;
 
-        // Determine status based on progress
-        if (progressPercentage >= 100) {
-          completedCount++;
-        } else if (progressPercentage > 0) {
-          inProgressCount++;
+      // Determine status based on progress
+      if (progressPercentage >= 100) {
+        completedCount++;
+      } else if (progressPercentage > 0) {
+        inProgressCount++;
+      }
+
+      // Calculate total minutes from estimatedDuration (prefer), else from duration string
+      if (course.estimatedDuration && !isNaN(course.estimatedDuration)) {
+        totalMinutes += Number(course.estimatedDuration);
+      } else if (course.duration) {
+        // Try to extract hours/minutes from string like "2h 30min"
+        const match = course.duration.match(/(\d+)h\s*(\d*)min?/i);
+        if (match) {
+          totalMinutes += (parseInt(match[1], 10) * 60) + (parseInt(match[2] || "0", 10));
+        } else {
+          // If only minutes
+          const minMatch = course.duration.match(/(\d+)\s*min/i);
+          if (minMatch) totalMinutes += parseInt(minMatch[1], 10);
         }
+      }
+    });
 
-        // Calculate total hours
-        const hours = parseFloat(course.duration?.replace('h', '') || 0);
-        totalHours += hours;
-      });
+    const totalHours = totalMinutes / 60;
 
-      setStats([
-        {
-          label: 'Total Courses',
-          value: enrolledCourses.length,
-          icon: <FaBookOpen className="w-5 h-5" />,
-          color: 'bg-purple-100 text-purple-600'
-        },
-        {
-          label: 'Completed',
-          value: completedCount,
-          icon: <FaCheck className="w-5 h-5" />,
-          color: 'bg-green-100 text-green-600'
-        },
-        {
-          label: 'In Progress',
-          value: inProgressCount,
-          icon: <FaPlay className="w-5 h-5" />,
-          color: 'bg-blue-100 text-blue-600'
-        },
-        {
-          label: 'Learning Hours',
-          value: `${totalHours.toFixed(1)}h`,
-          icon: <FaClock className="w-5 h-5" />,
-          color: 'bg-orange-100 text-orange-600'
-        }
-      ]);
-    }
-  }, [enrolledCourses, courseProgress]);
+    setStats([
+      {
+        label: 'Total Courses',
+        value: enrolledCourses.length,
+        icon: <FaBookOpen className="w-5 h-5" />,
+        color: 'bg-purple-100 text-purple-600'
+      },
+      {
+        label: 'Completed',
+        value: completedCount,
+        icon: <FaCheck className="w-5 h-5" />,
+        color: 'bg-green-100 text-green-600'
+      },
+      {
+        label: 'In Progress',
+        value: inProgressCount,
+        icon: <FaPlay className="w-5 h-5" />,
+        color: 'bg-blue-100 text-blue-600'
+      },
+      {
+        label: 'Learning Hours',
+        value: `${totalHours > 0 ? totalHours.toFixed(1) : 0}h`,
+        icon: <FaClock className="w-5 h-5" />,
+        color: 'bg-orange-100 text-orange-600'
+      }
+    ]);
+  }
+}, [enrolledCourses, courseProgress]);
 
   // Filter enrolled courses based on status and progress
   const filteredCourses = (enrolledCourses || []).filter((course) => {
@@ -509,6 +529,32 @@ export default function MyCoursesPage() {
   const handlebrowse = () => {
     navigate('/courses');
   };
+
+  useEffect(() => {
+    const fetchEnrolledCourses = async () => {
+      if (!userId || !token) return;
+      try {
+        const res = await fetch(`http://localhost:5000/api/users/${userId}/enrolled-courses`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!res.ok) throw new Error('Failed to fetch enrolled courses');
+        const data = await res.json();
+        // Only courses where user is in userEnrolled
+        const filtered = (data.enrolledCourses || []).filter(
+          (course) =>
+            Array.isArray(course.userEnrolled) &&
+            course.userEnrolled.map(String).includes(String(userId))
+        );
+        setEnrolledCourses(filtered);
+      } catch (err) {
+        setEnrolledCourses([]);
+        console.error('Error fetching enrolled courses:', err);
+      }
+    };
+    fetchEnrolledCourses();
+  }, [userId, token]);
 
   return (
     <>
