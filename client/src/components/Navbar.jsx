@@ -118,8 +118,7 @@ export default function Navbar() {
   return (
     <header className="min-h-[90px] flex flex-col justify-start py-6 bg-white shadow-sm">
       <div className="w-[95%] max-w-[1280px] flex items-center mx-auto">
-        <a href="/" className="flex items-center space-x-2">
-          {/* <h1 className="text-xl font-bold text-gray-900">Spark</h1> */}
+        <a  className="flex items-center space-x-2">
           <img
             style={{
               objectFit: 'contain',
@@ -128,8 +127,7 @@ export default function Navbar() {
             }}
             src={logo5}
             alt="Logo"
-            onClick={() => navigate('/')}
-          />
+            />
 
         </a>
 
