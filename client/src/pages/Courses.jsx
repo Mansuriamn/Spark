@@ -27,32 +27,31 @@ export default function Courses() {
   const [currentPage, setCurrentPage] = useState(1);
   const coursesPerPage = 10; // Number of courses to display per page
 
-  // State to hold the courses fetched from the API
+  //courses fetched from the API
   const [allCourses, setAllCourses] = useState([]);
-  const [loading, setLoading] = useState(true); // Add loading state
-  const [error, setError] = useState(null); // Add error state
+  const [loading, setLoading] = useState(true); 
+  const [error, setError] = useState(null); 
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   // Effect to fetch courses from the API when the component mounts
   useEffect(() => {
     const fetchCourses = async () => {
-      setLoading(true); // Set loading to true before fetching
-      setError(null); // Clear any previous errors
+      setLoading(true); 
+      setError(null); 
 
       try {
-        const res = await fetch('/api/courses'); // Make the API call to your backend
-        if (!res.ok) { // Check if the HTTP response was successful
+        const res = await fetch('/api/courses'); 
+        if (!res.ok) { 
           throw new Error(`HTTP error! status: ${res.status}`);
         }
-        const data = await res.json(); // Parse the JSON response
+        const data = await res.json(); 
 
-        // Assuming your API returns data in the format { data: [...] }
-        // Adjust `data.data` if your API response structure is different (e.g., just `data`)
         setAllCourses(Array.isArray(data.data) ? data.data : []);
       } catch (err) {
         console.error('Failed to fetch courses:', err);
-        setError('Failed to load courses. Please try again later.'); // User-friendly error message
+        setError('Failed to load courses. Please try again later.'); 
       } finally {
-        setLoading(false); // Set loading to false whether fetch succeeded or failed
+        setLoading(false); 
       }
     };
     fetchCourses();
@@ -62,7 +61,6 @@ export default function Courses() {
 
   }, []); // Empty dependency array ensures this runs only once on mount
 
-  // Handles changes from filter components (e.g., category, instructor, price)
   const handleFilterChange = (name, value) => {
     setFilters({ ...filters, [name]: value });
     setCurrentPage(1); // Reset to the first page whenever filters change
@@ -73,31 +71,54 @@ export default function Courses() {
     setCurrentPage(pageNumber);
   };
 
-  // Filters the `allCourses` array based on current search term and selected filters
-  const filteredCourses = allCourses.filter((course) => {
-    const matchesSearch = course.title.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = filters.category.length === 0 || filters.category.includes(course.category);
-    const matchesInstructor = filters.instructor.length === 0 || filters.instructor.includes(course.instructor);
-    const matchesPrice =
-      filters.price === "All" ||
-      (filters.price === "Free" && course.price === "Free") ||
-      (filters.price === "Paid" && course.price !== "Free");
-    const matchesReview = filters.review === null || course.review >= filters.review;
-    const matchesLevel = filters.level.length === 0 || filters.level.includes(course.level);
 
-    return (
-      matchesSearch &&
-      matchesCategory &&
-      matchesInstructor &&
-      matchesPrice &&
-      matchesReview &&
-      matchesLevel
-    );
-  });
+const filteredCourses = allCourses.filter((course) => {
 
-  // Calculate total pages for pagination based on filtered courses
+    let courseCategory = '';
+  if (course.category) {
+    if (typeof course.category === 'object') {
+      courseCategory = course.category._id || course.category.id || '';
+    } else {
+      courseCategory = course.category;
+    }
+  }
 
+  let courseInstructor = '';
+  if (course.instructor) {
+    if (typeof course.instructor === 'object') {
+      courseInstructor = course.instructor._id || course.instructor.id || '';
+    } else {
+      courseInstructor = course.instructor;
+    }
+  }
 
+  const courseLevel = course.level || (course.difficulty && course.difficulty.level);
+
+ 
+  const isFree = course.price === 0 || course.price === "Free";
+  const isPaid = !isFree;
+
+  const courseRating = Number(course.rating) || 0;
+
+  const matchesSearch = course.title?.toLowerCase().includes(search.toLowerCase());
+  const matchesCategory = filters.category.length === 0 || filters.category.includes(courseCategory);
+  const matchesInstructor = filters.instructor.length === 0 || filters.instructor.includes(courseInstructor);
+  const matchesPrice =
+    filters.price === "All" ||
+    (filters.price === "Free" && isFree) ||
+    (filters.price === "Paid" && isPaid);
+  const matchesReview = filters.review === null || courseRating >= filters.review;
+  const matchesLevel = filters.level.length === 0 || filters.level.includes(courseLevel);
+
+  return (
+    matchesSearch &&
+    matchesCategory &&
+    matchesInstructor &&
+    matchesPrice &&
+    matchesReview &&
+    matchesLevel
+  );
+});
 
   // Determine which courses to display on the current page
   const indexOfLastCourse = currentPage * coursesPerPage;
@@ -110,17 +131,71 @@ export default function Courses() {
     })
   }
 
+<div className="md:hidden flex justify-end mb-4 px-4">
+  <button
+    onClick={() => setShowMobileFilters(true)}
+    className="p-2 rounded bg-white border shadow"
+    aria-label="Show filters"
+  >
+    <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+</div>
+
   return (
     <>
-      <div className="flex justify-center bg-gray-100 border-gray-200 course_op_card">
+    
+
+  <div className="md:hidden flex justify-end  px-4 bg-gray-100">
+  <button
+    onClick={() => setShowMobileFilters(true)}
+    className="p-2 rounded bg-white border shadow"
+    aria-label="Show filters"
+  >
+    <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+</div>
+
+      <div className="flex justify-center bg-gray-100 border-gray-200 course_op_card ">
         {/* Left Sidebar for Filters */}
-        <div className="Options">
+        <div className="Options hidden md:block">
           <CourseCategory filters={filters} onChange={handleFilterChange} />
           <Instructors filters={filters} onChange={handleFilterChange} />
           <PriceFilter filters={filters} onChange={handleFilterChange} />
           <ReviewFilter filters={filters} onChange={handleFilterChange} />
           <LevelFilter filters={filters} onChange={handleFilterChange} />
         </div>
+        {/* Mobile Filters Drawer */}
+{showMobileFilters && (
+  <div className="fixed inset-0 z-50 bg-opacity-40 flex">
+    <div className="bg-white w-4/5 max-w-xs h-full p-6 shadow-lg flex flex-col">
+      <div className="flex justify-between items-center mb-4">
+        <span className="font-bold text-lg">Filters</span>
+        <button onClick={() => setShowMobileFilters(false)} className="text-gray-500 text-2xl">&times;</button>
+      </div>
+     
+      <div className="flex-1 overflow-y-auto">
+        <CourseCategory filters={filters} onChange={handleFilterChange} />
+        <Instructors filters={filters} onChange={handleFilterChange} />
+        <PriceFilter filters={filters} onChange={handleFilterChange} />
+        <ReviewFilter filters={filters} onChange={handleFilterChange} />
+        <LevelFilter filters={filters} onChange={handleFilterChange} />
+      </div>
+     
+      <button
+        onClick={() => setShowMobileFilters(false)}
+        className="mt-6 w-full bg-purple-600 text-white py-2 rounded sticky bottom-0"
+      >
+        Apply Filters
+      </button>
+    </div>
+  
+    <div className="flex-1" onClick={() => setShowMobileFilters(false)} />
+  </div>
+)}
 
         {/* Main Content Area for Course Listings */}
         <div className="p-8 flex-grow">
@@ -179,7 +254,7 @@ export default function Courses() {
 
           {/* Pagination Controls */}
           <div className='mt-8 '>
-            {filteredCourses.length > 0 && ( // Only show pagination if there are courses to paginate
+            {filteredCourses.length > 0 && ( 
               <Pagination
 
                 currentPage={currentPage}
@@ -190,7 +265,7 @@ export default function Courses() {
 
         </div>
       </div>
-      <Footer /> {/* Your footer component */}
+      <Footer /> 
     </>
   );
 }
