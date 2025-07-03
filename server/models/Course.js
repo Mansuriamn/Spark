@@ -78,7 +78,7 @@ const CourseSchema = new mongoose.Schema({
   title: { type: String, required: true, trim: true, maxlength: 180 },
   slug:  { type: String, unique: true, index: true },
   description: String,
-  category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: false },
+  category: String,
   tags: [String],
   level: { type: String, enum: ['Beginner','Intermediate','Advanced'], default: 'Beginner' },
   language: { type: String, default: 'en' },

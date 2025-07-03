@@ -21,7 +21,7 @@ router.get('/:id', getLessonById);           // GET a single lesson by ID
 router.post('/:id/progress',protect, markLessonComplete); // POST to mark a lesson as complete
 
 // Protected Routes (Admin or Mentor only)
-router.post('/', protect, checkRole(['Admin', 'Mentor']), createLesson);
+router.post('/', protect, checkRole(['Admin', 'Mentor']) ,uploadToCloudinary.single('video'),  createLesson);
 router.put('/:id', protect, checkRole(['Admin', 'Mentor']), updateLesson);
 router.delete('/:id', protect, checkRole(['Admin', 'Mentor']), deleteLesson);
 

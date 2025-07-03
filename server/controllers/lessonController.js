@@ -26,7 +26,12 @@ export const getLessonById = async (req, res) => {
   }
 };
 export const createLesson = asyncHandler(async (req, res) => {
-  const lesson = await Lesson.create(req.body);
+  // If a video file is uploaded, store its Cloudinary URL in the lesson
+  let payload = { ...req.body };
+  if (req.file && req.file.path) {
+    payload.video = req.file.path; // Cloudinary URL
+  }
+  const lesson = await Lesson.create(payload);
   res.status(201).json(lesson);
 });
 
@@ -49,10 +54,9 @@ export const addLessonVideoCloud = async (req, res) => {
   const lessonId = req.params.id;
 
   const videoData = {
-    title: req.body.title || req.file.originalname,
+    
     url: req.file.path,  // Cloudinary-hosted URL
-    description: req.body.description || '',
-    duration: parseInt(req.body.duration) || 0,
+   
   };
 
   try {

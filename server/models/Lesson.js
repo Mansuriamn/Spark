@@ -4,8 +4,8 @@ import { User } from './User.js';
 import { Course } from './Course.js';
 
 const VideoSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  url: { type: String, required: true },
+  title: { type: String },
+  url: { type: String },
   duration: { type: Number, default: 0 },
   description: String,
 }, { _id: false });
@@ -19,7 +19,7 @@ const VideoSchema = new mongoose.Schema({
 const LessonSchema = new mongoose.Schema({
   title: { type: String, required: true },
   content: String,
-  videos: [VideoSchema],
+  video: { type: String },
   quizzes: [QuizQuestionSchema],
   module: { type: mongoose.Schema.Types.ObjectId, ref: 'Module' },
   duration: { type: Number, default: 0 },
