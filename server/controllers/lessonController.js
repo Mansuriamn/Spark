@@ -26,12 +26,7 @@ export const getLessonById = async (req, res) => {
   }
 };
 export const createLesson = asyncHandler(async (req, res) => {
-  // If a video file is uploaded, store its Cloudinary URL in the lesson
-  let payload = { ...req.body };
-  if (req.file && req.file.path) {
-    payload.video = req.file.path; // Cloudinary URL
-  }
-  const lesson = await Lesson.create(payload);
+    const lesson = await Lesson.create(req.body);
   res.status(201).json(lesson);
 });
 

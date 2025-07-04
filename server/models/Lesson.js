@@ -20,7 +20,7 @@ const LessonSchema = new mongoose.Schema({
   title: { type: String, required: true },
   content: String,
   video: { type: String },
-  quizzes: [QuizQuestionSchema],
+  quizzes: {type: mongoose.Schema.Types.ObjectId, ref: 'VideoSchema' },
   module: { type: mongoose.Schema.Types.ObjectId, ref: 'Module' },
   duration: { type: Number, default: 0 },
   attachments: [String],
