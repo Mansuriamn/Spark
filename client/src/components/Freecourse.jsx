@@ -217,62 +217,45 @@ const FreeCourseDetails = () => {
 
           // Transform backend data to match component expectations
           const transformedCourse = {
-            // Basic info
             id: courseData._id || courseData.id,
             _id: courseData._id || courseData.id,
             title: courseData.title,
-            subtitle: courseData.description, // Map description to subtitle
+            subtitle: courseData.description,
             description: courseData.description,
             image: courseData.thumbnailUrl || courseData.pictureUrl,
-
-            // Category and tags
-            category: courseData.category?.name,
+            category: typeof courseData.category === 'object' ? courseData.category.name : courseData.category,
             tags: courseData.tags || [],
             skillTags: courseData.skillTags || [],
-
-            // Course details
             level: courseData.level,
             language: courseData.language,
-            duration: courseData.estimatedDuration ? `${Math.floor(courseData.estimatedDuration / 60)}h ${courseData.estimatedDuration % 60}m` : '0 min',
+            duration: courseData.estimatedDuration
+              ? `${Math.floor(courseData.estimatedDuration / 60)}h ${courseData.estimatedDuration % 60}m`
+              : '0 min',
             estimatedDuration: courseData.estimatedDuration,
-
-            // Pricing
             free: courseData.price === 0,
             price: courseData.price,
-
-            // Course status
             status: courseData.status,
             version: courseData.version,
-
-            // Metadata
             createdAt: courseData.createdAt,
             updatedAt: courseData.updatedAt,
             lastUpdated: courseData.updatedAt ? new Date(courseData.updatedAt).toLocaleDateString() : 'N/A',
-
-            // Instructor info
-            instructor: courseData.createdBy?.email || 'Unknown Instructor',
+            instructor: courseData.createdBy?.name || courseData.createdBy?.email || 'Unknown Instructor',
             instructorRole: 'Course Creator',
-
-            // Lessons
             lessons: courseData.lessons || [],
             lecturesCount: courseData.lessons?.length || 0,
-
-            // Default values for missing fields
-            rating: 4.5, // Default rating since not in backend
+            rating: 4.5,
             totalRatings: 0,
             students: studentsCount || 0,
             languages: [courseData.language === 'en' ? 'English' : courseData.language || 'English'],
             sections: 1,
             lectures: courseData.lessons?.length || 0,
-
-            // Course content - we'll need to fetch lessons separately or structure differently
-            whatYouLearn: [
-              `Learn ${courseData.title}`,
-              `Understand ${courseData.category?.name || 'programming'} concepts`,
-              `Build practical skills in ${courseData.skillTags?.join(', ') || 'development'}`,
-              `Complete hands-on projects and exercises`
-            ],
-
+            whatYouLearn: courseData.whatWillLearn && courseData.whatWillLearn.length > 0
+              ? courseData.whatWillLearn
+              : [
+                `Learn ${courseData.title}`,
+                ...(courseData.skillTags || []),
+                ...(courseData.tags || [])
+              ],
             courseIncludes: [
               { icon: Play, text: `${courseData.estimatedDuration || 0} minutes of content` },
               { icon: BookOpen, text: `${courseData.lessons?.length || 0} lessons` },
@@ -280,16 +263,12 @@ const FreeCourseDetails = () => {
               { icon: Smartphone, text: 'Access on mobile and TV' },
               { icon: Award, text: 'Certificate of completion' }
             ],
-
             requirements: courseData.prerequisites?.length > 0 ? courseData.prerequisites : [
               'No prior experience required',
               'A computer with internet connection',
               'Willingness to learn and practice'
             ],
-
             topics: courseData.tags || [],
-
-            // Default reviews
             reviews: [
               {
                 name: 'Student',
@@ -297,8 +276,6 @@ const FreeCourseDetails = () => {
                 rating: 5
               }
             ],
-
-            // Course content structure - simplified since we don't have detailed lesson data
             courseContent: [
               {
                 section: 1,

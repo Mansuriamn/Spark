@@ -258,47 +258,56 @@ const PaidCourseDetails = () => {
             lecturesCount: courseData.lessons?.length || 0,
 
             // Default values for missing fields
-            rating: 4.5, // Default rating since not in backend
-            totalRatings: 0,
-            students: studentsCount || 0,
-            languages: [courseData.language === 'en' ? 'English' : courseData.language || 'English'],
+            rating: courseData.rating || 4.5,
+            totalRatings: courseData.totalRatings || 0,
+            students: typeof studentsCount === 'number' ? studentsCount : (courseData.students || 0),
+            languages: courseData.language
+              ? [courseData.language === 'en' ? 'English' : courseData.language]
+              : ['English'],
             sections: 1,
-            lectures: courseData.lessons?.length || 0,
+            lectures: Array.isArray(courseData.lessons) ? courseData.lessons.length : 0,
 
-            // Course content - we'll need to fetch lessons separately or structure differently
-            whatYouLearn: [
-              `Learn ${courseData.title}`,
-              `Understand ${courseData.category?.name || 'programming'} concepts`,
-              `Build practical skills in ${courseData.skillTags?.join(', ') || 'development'}`,
-              `Complete hands-on projects and exercises`
-            ],
+            whatYouLearn: Array.isArray(courseData.whatYouLearn) && courseData.whatYouLearn.length > 0
+              ? courseData.whatYouLearn
+              : [
+                `Learn ${courseData.title || 'this course'}`,
+                `Understand ${(courseData.category && (courseData.category.name || courseData.category)) || 'programming'} concepts`,
+                `Build practical skills in ${(Array.isArray(courseData.skillTags) && courseData.skillTags.length > 0) ? courseData.skillTags.join(', ') : 'development'}`,
+                `Complete hands-on projects and exercises`
+              ],
 
-            courseIncludes: [
-              { icon: Play, text: `${courseData.estimatedDuration || 0} minutes of content` },
-              { icon: BookOpen, text: `${courseData.lessons?.length || 0} lessons` },
-              { icon: Download, text: 'Downloadable resources' },
-              { icon: Smartphone, text: 'Access on mobile and TV' },
-              { icon: Award, text: 'Certificate of completion' }
-            ],
+            courseIncludes: Array.isArray(courseData.courseIncludes) && courseData.courseIncludes.length > 0
+              ? courseData.courseIncludes
+              : [
+                { icon: Play, text: `${courseData.estimatedDuration || 0} minutes of content` },
+                { icon: BookOpen, text: `${Array.isArray(courseData.lessons) ? courseData.lessons.length : 0} lessons` },
+                { icon: Download, text: 'Downloadable resources' },
+                { icon: Smartphone, text: 'Access on mobile and TV' },
+                { icon: Award, text: 'Certificate of completion' }
+              ],
 
-            requirements: courseData.prerequisites?.length > 0 ? courseData.prerequisites : [
-              'No prior experience required',
-              'A computer with internet connection',
-              'Willingness to learn and practice'
-            ],
+            requirements: Array.isArray(courseData.prerequisites) && courseData.prerequisites.length > 0
+              ? courseData.prerequisites
+              : [
+                'No prior experience required',
+                'A computer with internet connection',
+                'Willingness to learn and practice'
+              ],
 
-            topics: courseData.tags || [],
+            topics: Array.isArray(courseData.tags) ? courseData.tags : [],
 
             // Default reviews
-            reviews: [
-              {
-                name: 'Student',
-                comment: `Great introduction to ${courseData.title}!`,
-                rating: 5
-              }
-            ],
+            reviews: Array.isArray(courseData.reviews) && courseData.reviews.length > 0
+              ? courseData.reviews
+              : [
+                {
+                  name: 'Student',
+                  comment: `Great introduction to ${courseData.title || 'this course'}!`,
+                  rating: 5
+                }
+              ],
 
-            // Course content structure - simplified since we don't have detailed lesson data
+            // Course content - we'll need to fetch lessons separately or structure differently
             courseContent: [
               {
                 section: 1,

@@ -24,6 +24,10 @@ export default function InstructorDashboard() {
     price: '',
     category: '',
     picture: null,
+    language: '',
+    prerequisites: '', 
+    skillTags: '',    
+    whatWillLearn: '', 
     lessons: [{ title: '', content: '', duration: '' }]
   });
 
@@ -41,7 +45,7 @@ export default function InstructorDashboard() {
   function AddeVideo(index, type, file) {
     if (type === 'video') {
       setVideo(file);
-      console.log(file,index);
+      console.log(file, index);
     }
   }
 
@@ -107,6 +111,17 @@ export default function InstructorDashboard() {
       formData.append('price', newCourse.price);
       formData.append('category', newCourse.category);
       formData.append('createdBy', user.id);
+      formData.append('language', newCourse.language);
+      formData.append('whatWillLearn', newCourse.whatWillLearn);
+
+      // Convert comma-separated to array for prerequisites and skillTags
+      (newCourse.prerequisites || '').split(',').map(s => s.trim()).forEach(val => {
+        if (val) formData.append('prerequisites[]', val);
+      });
+      (newCourse.skillTags || '').split(',').map(s => s.trim()).forEach(val => {
+        if (val) formData.append('skillTags[]', val);
+      });
+
       lessonIds.forEach(id => {
         formData.append('lessons[]', id);
       });
@@ -141,6 +156,10 @@ export default function InstructorDashboard() {
         price: '',
         category: '',
         picture: null,
+        language: '',
+        prerequisites: '', 
+        skillTags: '',     
+        whatWillLearn: '', 
         lessons: [{ title: '', content: '', duration: '' }],
       });
       setShowAddForm(false);
@@ -232,7 +251,7 @@ export default function InstructorDashboard() {
       }
 
       const updatedUser = await response.json();
-      updateUser(updatedUser); // Updated user in AuthContext
+      updateUser(updatedUser); 
       setProfileEdit(false);
       setError('');
     } catch (err) {
@@ -563,12 +582,12 @@ export default function InstructorDashboard() {
                   <input
                     type="text"
                     name="category"
-                    placeholder="Category ID"
+                    placeholder="Category"
                     className="p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                     value={newCourse.category}
                     onChange={handleChange}
                   />
-                 <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2">
                     <input
                       type="file"
                       name="picture"
@@ -588,13 +607,42 @@ export default function InstructorDashboard() {
                   value={newCourse.description}
                   onChange={handleChange}
                 />
+                {/* Additional Info */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <input
+                    type="text"
+                    name="language"
+                    placeholder="Language of Course"
+                    className="p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    value={newCourse.language}
+                    onChange={handleChange}
+                  />
+                </div>
 
-                <input
-                  type="text"
-                  name="topics"
-                  placeholder="Topics (comma separated)"
+                <textarea
+                  name="prerequisites"
+                  placeholder="Requirements / Prerequisites (comma separated)"
                   className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                  value={newCourse.topics}
+                  rows="2"
+                  value={newCourse.prerequisites}
+                  onChange={handleChange}
+                />
+
+                <textarea
+                  name="skillTags"
+                  placeholder="Skills (comma separated, e.g. HTML, CSS, React)"
+                  className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  rows="2"
+                  value={newCourse.skillTags}
+                  onChange={handleChange}
+                />
+
+                <textarea
+                  name="whatWillLearn"
+                  placeholder="What will students learn? (summary, comma separated)"
+                  className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  rows="2"
+                  value={newCourse.whatWillLearn}
                   onChange={handleChange}
                 />
 
@@ -664,7 +712,7 @@ export default function InstructorDashboard() {
                                 }
                               }}
                             />
-                           <Upload className="w-5 h-5  text-gray-400" />
+                            <Upload className="w-5 h-5  text-gray-400" />
                           </div>
                           {/* <Upload className="w-5 h-5  text-gray-400" /> */}
 
@@ -694,8 +742,8 @@ export default function InstructorDashboard() {
               >
                 <div className="flex justify-between items-start mb-4">
                   <span className={`text-sm px-3 py-1 rounded-full font-medium ${course.level === 'Beginner' ? 'bg-green-100 text-green-700' :
-                      course.level === 'Intermediate' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-red-100 text-red-700'
+                    course.level === 'Intermediate' ? 'bg-yellow-100 text-yellow-700' :
+                      'bg-red-100 text-red-700'
                     }`}>
                     {course.level}
                   </span>
