@@ -500,11 +500,7 @@ export default function Navbar() {
                     >
                       <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
                         <div className="flex items-center space-x-3">
-                          <img
-                            src={user.avatar || 'https://flowbite.com/docs/images/people/profile-picture-5.jpg'}
-                            alt="profile"
-                            className="h-10 w-10 rounded-full"
-                          />
+                          <User className='bg-purple-500 text-white rounded-2xl'></User>
                           <div>
                             <p className="text-sm font-semibold text-gray-900">{user.name}</p>
                             <p className="text-xs text-gray-500">{user.email}</p>

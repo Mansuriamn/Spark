@@ -1,10 +1,9 @@
 import React ,{useState} from 'react';
-import { FaChevronDown } from 'react-icons/fa'; // For a possible accordion icon
+import { FaChevronDown } from 'react-icons/fa'; 
 
 export default function CourseCategory({ filters, onChange }) {
   const categories = ['Educate', 'Design', 'Development', 'AI', 'Marketing','Machine Learning', 'Data Science', 'Finance', 'Health', 'Iot'];
-  const [isOpen, setIsOpen] = useState(true); // State for accordion behavior
-
+  const [isOpen, setIsOpen] = useState(true); 
   const handleChange = (category) => {
     const updated = filters.category.includes(category)
       ? filters.category.filter(c => c !== category)

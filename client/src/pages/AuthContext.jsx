@@ -5,6 +5,8 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  const [role, setRole] = useState(localStorage.getItem('role'));
+  
   const [userProfile, setUserProfile] = useState(null);
 
   const [enrolledCourses, setEnrolledCourses] = useState([]);
@@ -85,6 +87,7 @@ export const AuthProvider = ({ children }) => {
 
     setUser(userData);
     setToken(authToken);
+    setRole(user.role);
     setUserProfile(profile || null);
     setEnrolledCourses(normalizedUserCourses);
     setCartCourses(normalizedCart);
@@ -96,6 +99,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.clear();
     setUser(null);
     setToken(null);
+    setRole(user.role);
     setUserProfile(null);
     setEnrolledCourses([]);
     setCartCourses([]);
