@@ -23,9 +23,9 @@ const router = express.Router();
 // Route to create a user
 router.post('/register', registerUser);
 router.post('/login', loginUser);
-router.put('/users/:userId', updateUser);
-router.delete('/users/:userId', softDeleteUser);
-router.patch('/users/:userId/role', changeUserRole);
+router.put('/:userId', updateUser);
+router.delete('/:userId', softDeleteUser);
+router.patch('/:userId/role', changeUserRole);
 router.get('/instructors', getAllInstructors);
 router.get('/:userId', getUserById);
 
