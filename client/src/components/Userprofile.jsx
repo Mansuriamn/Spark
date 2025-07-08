@@ -7,14 +7,14 @@ import '../assets/style/UserProfile.css'
 
 const UserProfile = () => {
   const navigate = useNavigate();
-  const { 
-    user, 
-    login, 
-    enrolledCourses: contextEnrolledCourses, 
+  const {
+    user,
+    login,
+    enrolledCourses: contextEnrolledCourses,
     updateEnrolledCourses,
     cartCourses = [],
     updateCartCourses,
-    token 
+    token
   } = useContext(AuthContext);
 
   const { userProfile, updateUserProfile } = useContext(AuthContext);
@@ -311,7 +311,7 @@ const UserProfile = () => {
                   )}
                   <div className="profile-status-indicator"></div>
                 </div>
-             
+
                 <div className="profile-details" id="profile-details">
                   {isEditing ? (
                     <div className="edit-form">
@@ -471,8 +471,87 @@ const UserProfile = () => {
               </div>
             </div>
           )}
+          {cartCourses && cartCourses.length > 0 && (
+            <div className="mb-8">
+              <div className="flex items-center space-x-3 mb-6">
+                <ShoppingCart className="w-6 h-6 text-orange-600" />
+                <h2 className="text-2xl font-bold text-gray-900">Cart</h2>
+                <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-medium">
+                  {cartCourses.length}
+                </span>
+              </div>
+              <div className="space-y-4">
+                {cartCourses.map((course) => (
+                  <div key={course.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-start space-x-4">
+                        <img
+                          src={course.image || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80'}
+                          alt={course.title}
+                          className="w-20 h-20 rounded-lg object-cover"
+                        />
+                        <div className="flex-1">
+                          <h3 className="text-lg font-bold text-gray-900 mb-1">{course.title}</h3>
+                          <p className="text-gray-600 text-sm mb-2">
+                            {course.subtitle || course.description}
+                          </p>
+                          <div className="flex items-center space-x-4 text-sm text-gray-500">
+                            <div className="flex items-center space-x-1">
+                              <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                              <span>{course.rating || 4.5}</span>
+                            </div>
+                            <span>By {course.instructor || 'Expert Instructor'}</span>
+                            <span>{course.duration || '8 hours'}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-gray-900">
+                            {course.price || '₹2,999'}
+                          </div>
+                          {course.originalPrice && (
+                            <div className="text-sm text-gray-500 line-through">
+                              {course.originalPrice}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex flex-col space-y-2">
+                          <button
+                            onClick={() => handleEnrollFromCart(course)}
+                            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+                          >
+                            Enroll Now
+                          </button>
+                          <button
+                            onClick={() => handleRemoveFromCart(course.id)}
+                            className="bg-red-100 text-red-600 px-4 py-2 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium flex items-center space-x-1"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            <span>Remove</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-          {/* ...cart and empty state code... */}
+          {(!enrolledCourses || enrolledCourses.length === 0) && (!cartCourses || cartCourses.length === 0) && (
+            <div className="text-center py-12">
+              <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No courses yet</h3>
+              <p className="text-gray-600 mb-6">Start your learning journey by exploring our courses!</p>
+              <button
+                onClick={() => navigate('/courses')}
+                className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium"
+              >
+                Browse Courses
+              </button>
+            </div>
+          )}
         </div>
       </div>
       <Footer />

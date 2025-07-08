@@ -30,6 +30,7 @@ export default function Courses() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  
 
   // Effect to fetch courses from the API when the component mounts
   useEffect(() => {

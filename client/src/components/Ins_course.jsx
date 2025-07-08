@@ -106,7 +106,7 @@ const coursedata = {
   ]
 };
 
-const FreeCourseDetails = () => {
+const FreeCourse = () => {
   const navigate = useNavigate();
   const { courseId: id } = useParams();
   const { lessonId: lessonid } = useParams();
@@ -781,4 +781,4 @@ const FreeCourseDetails = () => {
   );
 };
 
-export default FreeCourseDetails;
+export default FreeCourse;

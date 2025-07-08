@@ -24,9 +24,18 @@ export default function CourseCard({ course }) {
   const title = course.title || 'Intro to Node.js';
   const instructor = course.createdBy?.email || 'Darkd1@gmail.com';
   const level = course.level || 'Beginner';
-  const category = course.category?.name || 'Development';
+  
   const isCompleted = course.isCompleted || false;
 
+
+let category = 'Development';
+if (course.category) {
+  if (typeof course.category === 'object') {
+    category = course.category.name || course.category._id || course.category.id || 'Development';
+  } else {
+    category = course.category;
+  }
+}
   // Fetch enrolled users count
   useEffect(() => {
     const fetchStudentCount = async () => {

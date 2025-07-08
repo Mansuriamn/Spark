@@ -24,6 +24,7 @@ import Student from './components/Seestudent';
 import Admin from './pages/Admin';
 import ProtectedRoute from './components/ProtectedRout';
 import PaidCourseDetails from './components/Paidcourse';
+import FreeCourse from './components/Ins_course';
 
 const StudentDashboard = () => <div>Student Dashboard</div>;
 const AdminDashboard = () => <div>Admin Dashboard</div>;
@@ -59,7 +60,7 @@ function AppWrapper() {
           <Route path="/track/:trackName" element={<ProtectedRoute allowedRoles={['student']}><FreeCourseDetails /></ProtectedRoute>} />
           <Route path="/courses/:courseId" element={<ProtectedRoute allowedRoles={['student']}><FreeCourseDetails /></ProtectedRoute>} />
           <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']}><Admin /></ProtectedRoute>} />
-          <Route path="/admin-dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/instructor-course" element={<ProtectedRoute allowedRoles={['instructor']}><FreeCourse/></ProtectedRoute>} />
           <Route path="/instructor" element={<ProtectedRoute allowedRoles={['instructor']}><InstructorDashboard /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute allowedRoles={['student', 'admin', 'instructor']}><UserProfile /></ProtectedRoute>} />
           <Route path='/paidcourses/:courseId' element={<ProtectedRoute allowedRoles={['student', 'admin', 'instructor']}><PaidCourseDetails /></ProtectedRoute>}></Route>
