@@ -207,3 +207,13 @@ export const getCourseProgress = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+export const getCoursesByCreator = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const courses = await Course.find({ createdBy: userId });
+    res.json(courses);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

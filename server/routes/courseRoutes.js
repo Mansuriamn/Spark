@@ -12,7 +12,9 @@ import {
   getSingleLessonFromCourse,
   getLessonsOfCourse,
   getUsersEnrolledInCourse,
-  getCourseProgress
+  getCourseProgress,
+   getCoursesByCreator 
+
 } from '../controllers/courseController.js';
 
 import { checkRole, protect } from '../middlewares/authMiddleware.js'; // ✅ New role-check middleware
@@ -35,7 +37,7 @@ router.get('/', getAllCourses);
 router.get('/:id', getCourseById);
 router.get('/instructor/:instructorId', getCoursesByInstructor);
 router.get('/:id/progress', protect, getCourseProgress);
-
+router.get('/creator/:userId', getCoursesByCreator);
 router.post('/category', createCategory);
 router.put('/category/:categoryId', updateCategory);
 router.get('/category', getAllCategories);
