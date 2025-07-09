@@ -229,3 +229,47 @@ export const getUserEnrolledCourses = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Add course to cart
+export const addToCart = async (req, res) => {
+  try {
+    const { userId, courseId } = req.body;
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $addToSet: { cart: courseId } }, // prevents duplicates
+      { new: true }
+    ).populate('cart');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ cart: user.cart });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Remove course from cart
+export const removeFromCart = async (req, res) => {
+  try {
+    const { userId, courseId } = req.body;
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $pull: { cart: courseId } },
+      { new: true }
+    ).populate('cart');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ cart: user.cart });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get user's cart
+export const getCart = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId).populate('cart');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ cart: user.cart });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

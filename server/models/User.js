@@ -29,7 +29,11 @@ const userSchema = new mongoose.Schema({
     }
     ,enrolledCourses: [
         { type: mongoose.Schema.Types.ObjectId, ref: 'Course' }
-    ],achievements: [
+    ],
+    cart: [
+  { type: mongoose.Schema.Types.ObjectId, ref: 'Course' }
+],
+achievements: [
         { type: mongoose.Schema.Types.ObjectId, ref: 'Achievement' }
     ],
     completedLessons: [

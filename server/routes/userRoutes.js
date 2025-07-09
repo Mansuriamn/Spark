@@ -13,7 +13,8 @@ getInProgressCoursesCount,
 getTotalCoursesCount,
 getUserById,
 getUserProfile,
-getUserEnrolledCourses
+getUserEnrolledCourses,
+addToCart, removeFromCart, getCart
 } from '../controllers/userController.js';
 
 import { loginUser } from '../controllers/loginController.js'
@@ -26,6 +27,10 @@ router.post('/login', loginUser);
 router.put('/:userId', updateUser);
 router.delete('/:userId', softDeleteUser);
 router.patch('/:userId/role', changeUserRole);
+
+router.post('/cart/add', addToCart);
+router.post('/cart/remove', removeFromCart);
+router.get('/:userId/cart', getCart);
 router.get('/instructors', getAllInstructors);
 router.get('/:userId', getUserById);
 

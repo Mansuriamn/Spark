@@ -2,6 +2,7 @@ import express from 'express';
 import connectDB from './config/dataBase.js';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
+import multer from 'multer'; // <-- Use import, not require
 
 import http from 'http';
 import { Server } from 'socket.io';
@@ -16,6 +17,10 @@ import contestRoutes from './routes/contestRoutes.js';
 dotenv.config();
 
 const app = express();
+const upload = multer(); // no s
+
+
+
 app.use(express.json());
 app.use(cors({ origin: ['http://localhost:3001',  'http://localhost:3002'],credentials: true }));
 app.use(express.json());
