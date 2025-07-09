@@ -41,14 +41,7 @@ export default function InstructorDashboard() {
     email: user?.email || '',
     bio: user?.bio || '',
   });
-  const [Video, setVideo] = useState({});
-
-  function AddeVideo(index, type, file) {
-    if (type === 'video') {
-      setVideo(file);
-      console.log(file, index);
-    }
-  }
+ 
   const [errors, setErrors] = useState({});
 
   
@@ -82,14 +75,30 @@ export default function InstructorDashboard() {
       setLoading(false);
     }
   };
+   const [Video, setVideo] = useState({});
+
+  function AddeVideo(index, type, file) {
+    if (type === 'video' && file) {
+      setVideo(file);
+      console.log(file, index);
+    }
+  }
 
   const createCourse = async () => {
     try {
+
+      if (!newCourse.title || !newCourse.description || !newCourse.topics || !newCourse.level || !newCourse.price || !newCourse.category || !newCourse.lessons) {
+        throw new Error('All fields are required');
+      }
 
       const lessonIds = [];
 
 
       for (const lesson of newCourse.lessons) {
+        if (!lesson.title || !lesson.content || !lesson.duration) {
+          throw new Error('All lesson fields are required');
+        }
+
         const res = await fetch('http://localhost:5000/api/lessons', {
           method: 'POST',
           headers: {
@@ -97,6 +106,10 @@ export default function InstructorDashboard() {
             'Authorization': `Bearer ${token}`,
           },
           body: JSON.stringify(lesson),
+        }).then(() => {
+            if (Video) {
+              return axios.post(`http://localhost:5000/api/lessons`, Video)
+            }
         });
 
         if (!res.ok) throw new Error('Lesson creation failed');
@@ -105,6 +118,9 @@ export default function InstructorDashboard() {
         lessonIds.push(data._id);
       }
 
+      if (lessonIds.length === 0) {
+        throw new Error('At least one lesson is required');
+      }
 
       const formData = new FormData();
       formData.append('title', newCourse.title);
