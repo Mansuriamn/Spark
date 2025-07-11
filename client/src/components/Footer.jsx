@@ -11,10 +11,10 @@ const Footer = () => {
         {/* Logo & Description */}
         <div
           id="footer-logo"
-          className="footer-col w-full sm:w-1/4 mb-10 text-center sm:text-left"
+          className="footer-col w-full sm:w-1/4 mb-1 text-center sm:text-left"
         >
-          <h4 className="text-lg font-bold mb-2 text-white">ADRS SPARK</h4>
-          <p className="text-purple-100">
+          <div className="CompanyName ">ADRS SPARK</div>
+          <p className="text-purple-100 footer_content">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
             eiusmod tempor incididunt ut labore.
           </p>
@@ -26,7 +26,7 @@ const Footer = () => {
             id="footer-help"
             className="footer-col w-full sm:w-1/4 mb-10 font-semibold text-center sm:text-left"
           >
-            <h4 className="font-bold mb-2 text-white">Courses</h4>
+            <h4 className="font-bold mb-2 text-white footer_heading">Courses</h4>
             <ul className="space-y-1 text-purple-100">
               <li>
                 <a href="#" className="hover:text-orange-400">
@@ -53,11 +53,11 @@ const Footer = () => {
                   Finance
                 </a>
               </li>
-              <li>
+              {/* <li>
                 <a href="#" className="hover:text-orange-400">
                   Health
                 </a>
-              </li>
+              </li> */}
             </ul>
           </div>
 
@@ -66,7 +66,7 @@ const Footer = () => {
             id="footer-programs"
             className="footer-col w-full sm:w-1/4 mb-10 font-semibold text-center sm:text-left"
           >
-            <h4 className="font-bold mb-2 text-white">Programs</h4>
+            <h4 className="font-bold mb-2 text-white footer_heading">Programs</h4>
             <ul className="space-y-1 text-purple-100">
               <li>
                 <a href="#" className="hover:text-orange-400">
@@ -76,7 +76,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-orange-400 font-semibold hover:text-orange-500"
+                  className=" font-semibold hover:text-orange-500"
                 >
                   Business
                 </a>
@@ -102,16 +102,16 @@ const Footer = () => {
 
         {/* Contact Info */}
         <div
-          id="footer-contact"
-          className="footer-col w-full sm:w-1/4 mb-10 font-semibold text-center sm:text-left"
+         
+          className="footer-col w-full sm:w-1/4 mb-10 font-semibold text-center sm:text-left footer-contact"
         >
-          <h4 className="font-bold mb-2 text-white">Contact Us</h4>
+          <h4 className="font-bold mb-2 text-white ">Contact Us</h4>
           <p className="text-purple-100">
             71, Dadda Nagar, Jabalpur, Madhya Pradesh
           </p>
           <p className="text-purple-100">Tel: + (91) 9201347033 </p>
           <p className="text-purple-100">Mail: support@adrstechno.com</p>
-          <div className="mt-4 flex justify-center sm:justify-start items-center space-x-6 text-2xl text-white">
+          <div className="mt-4 flex justify-center sm:justify-start items-center space-x-6 text-2xl text-white footer_icons">
             <a href="#" aria-label="YouTube" className="hover:text-orange-400">
               <FaYoutube />
             </a>

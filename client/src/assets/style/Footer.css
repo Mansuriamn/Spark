@@ -22,6 +22,19 @@
 
 /* Mobile */
 @media (max-width: 480px) {
+  .CompanyName{
+    
+     color: #fff;
+    font-weight: bold;
+     text-align: left;
+     height: 31px;
+     width: 100%;
+      margin-bottom: 16px;
+      font-size: 24px;
+  }
+  .footer_content{
+    text-align: left;
+  }
   #site-footer {
     padding: 2rem 1rem;
   }
@@ -40,5 +53,28 @@
   }
   .Footer_container{
     flex-direction: row;
+    
   }
+  ul{
+    text-align: left;
+  }
+  .footer_heading{
+          text-align: left;
+          width: 70%;
+          border-bottom: 2px solid #fff;
+  }
+  .footer-contact h4{
+    width: 28%;
+    text-align: left;
+    border-bottom: 2px solid #fff;
+  }
+  .footer-contact p {
+  text-align: left;
+  margin-top: 10px;
+  color: #ffffff;
+}
+.footer_icons{
+  
+  display: none;
+}
 }

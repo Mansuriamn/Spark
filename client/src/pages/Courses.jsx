@@ -171,7 +171,15 @@ export default function Courses() {
 
       <div className="flex justify-center bg-gray-100 border-gray-200 course_op_card ">
         {/* Left Sidebar for Filters */}
-        <div className="Options hidden md:block">
+        <div className="Options hidden md:block"
+        style={{
+          position: 'sticky',
+          top: '0',
+          bottom: '0',
+          height: '100%',
+        }}
+        
+        >
           <CourseCategory filters={filters} onChange={handleFilterChange} />
           <Instructors filters={filters} onChange={handleFilterChange} />
           <PriceFilter filters={filters} onChange={handleFilterChange} />

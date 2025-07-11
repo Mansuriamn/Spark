@@ -3,7 +3,7 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { FaBell, FaBars, FaTimes, FaCog, FaUser, FaSignOutAlt, FaChevronRight } from 'react-icons/fa';
 import { Bell, Menu, X, Settings, User, LogOut, ChevronRight} from 'lucide-react';
 import { AuthContext } from '../pages/AuthContext';
-import logo5 from '../assets/img/logo5.png'
+import logo5 from '../assets/img/logo5.jpeg'
 
 export default function Navbar() {
   const { user, logout } = useContext(AuthContext);
