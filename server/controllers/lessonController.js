@@ -8,6 +8,15 @@ const asyncHandler = (fn) => (req, res, next) =>
 export const getAllLessons = asyncHandler(async (req, res) => {
   const lessons = await Lesson.find({ ...req.query })
     .populate('module', 'title')
+    .populate('courseId', 'title')
+    .select('-__v');
+  res.status(200).json({ count: lessons.length, data: lessons });
+});
+
+export const getLessonsByCourse = asyncHandler(async (req, res) => {
+  const { courseId } = req.params;
+  const lessons = await Lesson.find({ courseId })
+    .populate('courseId', 'title')
     .select('-__v');
   res.status(200).json({ count: lessons.length, data: lessons });
 });
@@ -26,15 +35,31 @@ export const getLessonById = async (req, res) => {
   }
 };
 export const createLesson = asyncHandler(async (req, res) => {
-  let payload = { ...req.body };
+  try {
+    let payload = { ...req.body };
 
-  // If a video file is uploaded, add its Cloudinary URL
-  if (req.file && req.file.path) {
-    payload.video = req.file.path; // Cloudinary URL
+    // If a video file is uploaded, add its Cloudinary URL
+    if (req.file && req.file.path) {
+      payload.video = req.file.path; // Cloudinary URL
+    }
+
+    // Create the lesson
+    const lesson = await Lesson.create(payload);
+
+    // Add the lesson to the course's lessons array
+    if (payload.courseId) {
+      await Course.findByIdAndUpdate(
+        payload.courseId,
+        { $push: { lessons: lesson._id } },
+        { new: true }
+      );
+    }
+
+    res.status(201).json(lesson);
+  } catch (error) {
+    console.error('Error creating lesson:', error);
+    res.status(500).json({ message: 'Failed to create lesson', error: error.message });
   }
-
-  const lesson = await Lesson.create(payload);
-  res.status(201).json(lesson);
 });
 
 export const updateLesson = asyncHandler(async (req, res) => {
@@ -56,9 +81,9 @@ export const addLessonVideoCloud = async (req, res) => {
   const lessonId = req.params.id;
 
   const videoData = {
-    
+
     url: req.file.path,  // Cloudinary-hosted URL
-   
+
   };
 
   try {

@@ -17,6 +17,7 @@ import WebRTCMeeting from './components/WebRTCMeeting';
 import Practice from './pages/Practice';
 import PathToProficiency from './components/Practiceinside';
 import InstructorDashboard from './components/Instructorpage';
+import AddLesson from './components/AddLesson';
 import FreeCourseDetails from './components/Freecourse';
 import LessonPageWrapper from './pages/LessonPage';
 import WelcomePage from './pages/Mainpage';
@@ -48,7 +49,7 @@ function AppWrapper() {
           <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['student']}><DashboardPage /></ProtectedRoute>} />
           <Route path="/live-sessions" element={<ProtectedRoute allowedRoles={['student']}><LiveSessionsPage /></ProtectedRoute>} />
           <Route path="/schedule" element={<ProtectedRoute allowedRoles={['student']}><Schedule /></ProtectedRoute>} />
-            
+
           {/*<Route path="/courses/:courseId/lesson/:lessonId" element={<ProtectedRoute allowedRoles={['student']}><LessonPageWrapper /></ProtectedRoute>} />*/}
           <Route path="/contest" element={<ProtectedRoute allowedRoles={['student']}><Contest /></ProtectedRoute>} />
           <Route path="/progressupdate" element={<ProtectedRoute allowedRoles={['student']}><MyCoursesPage /></ProtectedRoute>} />
@@ -60,8 +61,9 @@ function AppWrapper() {
           <Route path="/track/:trackName" element={<ProtectedRoute allowedRoles={['student']}><FreeCourseDetails /></ProtectedRoute>} />
           <Route path="/courses/:courseId" element={<ProtectedRoute allowedRoles={['student']}><FreeCourseDetails /></ProtectedRoute>} />
           <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']}><Admin /></ProtectedRoute>} />
-          <Route path="/instructor-course" element={<ProtectedRoute allowedRoles={['instructor']}><FreeCourse/></ProtectedRoute>} />
+          <Route path="/instructor-course" element={<ProtectedRoute allowedRoles={['instructor']}><FreeCourse /></ProtectedRoute>} />
           <Route path="/instructor" element={<ProtectedRoute allowedRoles={['instructor']}><InstructorDashboard /></ProtectedRoute>} />
+          <Route path="/add-lesson/:courseId" element={<ProtectedRoute allowedRoles={['instructor']}><AddLesson /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute allowedRoles={['student', 'admin', 'instructor']}><UserProfile /></ProtectedRoute>} />
           <Route path='/paidcourses/:courseId' element={<ProtectedRoute allowedRoles={['student', 'admin', 'instructor']}><PaidCourseDetails /></ProtectedRoute>}></Route>
 

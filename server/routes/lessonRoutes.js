@@ -5,10 +5,11 @@ import {
   createLesson,
   updateLesson,
   deleteLesson,
-  markLessonComplete
+  markLessonComplete,
+  getLessonsByCourse
 } from '../controllers/lessonController.js';
 
-import {protect, checkRole } from '../middlewares/authMiddleware.js'; // make sure this file exports the function
+import { protect, checkRole } from '../middlewares/authMiddleware.js'; // make sure this file exports the function
 
 import { uploadToCloudinary } from '../middlewares/uploadCloud.js';
 import { addLessonVideoCloud } from '../controllers/lessonController.js';
@@ -17,11 +18,12 @@ const router = express.Router();
 
 // Public Routes
 router.get('/', getAllLessons);              // GET all lessons
+router.get('/course/:courseId', getLessonsByCourse); // GET lessons by course
 router.get('/:id', getLessonById);           // GET a single lesson by ID
-router.post('/:id/progress',protect, markLessonComplete); // POST to mark a lesson as complete
+router.post('/:id/progress', protect, markLessonComplete); // POST to mark a lesson as complete
 
 // Protected Routes (Admin or Mentor only)
-router.post('/', protect, checkRole(['Admin', 'Mentor']) ,uploadToCloudinary.single('video'),  createLesson);
+router.post('/', protect, checkRole(['Admin', 'Mentor']), uploadToCloudinary.single('video'), createLesson);
 router.put('/:id', protect, checkRole(['Admin', 'Mentor']), updateLesson);
 router.delete('/:id', protect, checkRole(['Admin', 'Mentor']), deleteLesson);
 

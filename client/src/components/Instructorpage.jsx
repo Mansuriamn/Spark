@@ -29,8 +29,7 @@ export default function InstructorDashboard() {
     language: '',
     prerequisites: '',
     skillTags: '',
-    whatWillLearn: '',
-    lessons: [{ title: '', content: '', duration: '' }]
+    whatWillLearn: ''
   });
 
   const [editingCourse, setEditingCourse] = useState(null);
@@ -91,32 +90,6 @@ export default function InstructorDashboard() {
 
   const createCourse = async () => {
     try {
-      const lessonIds = [];
-
-      for (const lesson of newCourse.lessons) {
-        const res = await fetch('http://localhost:5000/api/lessons', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-          body: JSON.stringify(lesson),
-        }).then(() => {
-          if (Video) {
-            return axios.post(`http://localhost:5000/api/lessons`, Video)
-          }
-        });
-
-        if (!res.ok) throw new Error('Lesson creation failed');
-
-        const data = await res.json();
-        lessonIds.push(data._id);
-      }
-
-      if (lessonIds.length === 0) {
-        throw new Error('At least one lesson is required');
-      }
-
       const formData = new FormData();
       formData.append('title', newCourse.title);
       formData.append('description', newCourse.description);
@@ -137,10 +110,6 @@ export default function InstructorDashboard() {
         if (val) formData.append('skillTags[]', val);
       });
 
-      lessonIds.forEach(id => {
-        formData.append('lessons[]', id);
-      });
-
       if (newCourse.picture) {
         formData.append('picture', newCourse.picture);
       }
@@ -156,7 +125,8 @@ export default function InstructorDashboard() {
       if (!response.ok) {
         throw new Error('Failed to create course');
       } else {
-        window.alert("Course create successfully");
+        setSuccess('Course created successfully!');
+        setTimeout(() => setSuccess(''), 3000);
       }
 
       const createdCourse = await response.json();
@@ -173,8 +143,7 @@ export default function InstructorDashboard() {
         language: '',
         prerequisites: '',
         skillTags: '',
-        whatWillLearn: '',
-        lessons: [{ title: '', content: '', duration: '' }],
+        whatWillLearn: ''
       });
       setShowAddForm(false);
       setError('');
@@ -304,60 +273,38 @@ export default function InstructorDashboard() {
     }
   };
 
+  const fetchCreatedCourses = async () => {
+    if (!user || !(user.id || user._id) || !token) return;
+
+    try {
+      const userId = user.id || user._id;
+      console.log('User ID being sent:', userId);
+      console.log('User object:', user);
+      const res = await fetch(`http://localhost:5000/api/courses/creator/${userId}`);
+
+      if (!res.ok) throw new Error('Failed to fetch created courses');
+
+      const data = await res.json();
+      console.log('API Response:', data);
+
+      const normalizedCourses = (data.courses || []).map(course => ({
+        ...course,
+        id: course._id || course.id,
+      }));
+
+      console.log('Normalized courses:', normalizedCourses);
+      setCreateCourses(normalizedCourses);
+    } catch (err) {
+      setCreateCourses([]);
+      console.error('Error fetching created courses:', err);
+    }
+  };
+
   useEffect(() => {
-    const fetchCreatedCourses = async () => {
-      if (!user || !(user.id || user._id) || !token) return;
-
-      try {
-        const userId = user.id || user._id;
-        console.log('User ID being sent:', userId);
-        console.log('User object:', user);
-        const res = await fetch(`http://localhost:5000/api/courses/creator/${userId}`);
-
-        if (!res.ok) throw new Error('Failed to fetch created courses');
-
-        const data = await res.json();
-        console.log('API Response:', data);
-
-        const normalizedCourses = (data.courses || []).map(course => ({
-          ...course,
-          id: course._id || course.id,
-        }));
-
-        console.log('Normalized courses:', normalizedCourses);
-        setCreateCourses(normalizedCourses);
-      } catch (err) {
-        setCreateCourses([]);
-        console.error('Error fetching created courses:', err);
-      }
-    };
-
     fetchCreatedCourses();
   }, [user, token]);
 
-  // Lesson management functions
-  const addLesson = () => {
-    if (newCourse.lessons.length < 5) {
-      setNewCourse({
-        ...newCourse,
-        lessons: [...newCourse.lessons, { title: '', content: '', duration: '' }]
-      });
-    }
-  };
 
-  const removeLesson = (index) => {
-    if (newCourse.lessons.length > 1) {
-      const updatedLessons = newCourse.lessons.filter((_, i) => i !== index);
-      setNewCourse({ ...newCourse, lessons: updatedLessons });
-    }
-  };
-
-  const updateLesson = (index, field, value) => {
-    const updatedLessons = newCourse.lessons.map((lesson, i) =>
-      i === index ? { ...lesson, [field]: value } : lesson
-    );
-    setNewCourse({ ...newCourse, lessons: updatedLessons });
-  };
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -463,11 +410,6 @@ export default function InstructorDashboard() {
         newErrors[field] = 'This field is required';
       }
     });
-    // Lessons validation
-    if (!newCourse.lessons || newCourse.lessons.length === 0 ||
-      newCourse.lessons.some(lesson => !lesson.title.trim() || !lesson.content.trim() || !lesson.duration.trim())) {
-      newErrors.lessons = 'All lessons must have title, content, and duration';
-    }
     return newErrors;
   };
 
@@ -482,7 +424,6 @@ export default function InstructorDashboard() {
     // Mark all fields as touched
     const allTouched = {};
     requiredFields.forEach(field => { allTouched[field] = true; });
-    allTouched.lessons = true;
     setTouched(allTouched);
 
     const validationErrors = validate();
@@ -915,89 +856,7 @@ export default function InstructorDashboard() {
                     onBlur={handleBlur}
                   />
                 </div>
-                {/* Lessons Section */}
-                <div className="border-t pt-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <h5 className="text-lg font-semibold text-gray-800">Course Lessons</h5>
-                    <button
-                      type="button"
-                      onClick={addLesson}
-                      disabled={newCourse.lessons.length >= 5}
-                      className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-all duration-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Plus className="w-4 h-4" />
-                      <span>Add Lesson ({newCourse.lessons.length}/5)</span>
-                    </button>
-                  </div>
-                  {touched.lessons && errors.lessons && (
-                    <p className="text-red-500 text-sm mb-1">{errors.lessons}</p>
-                  )}
-                  <div className="space-y-4">
-                    {newCourse.lessons.map((lesson, index) => (
-                      <div key={index} className="bg-gray-50 p-4 rounded-xl border">
-                        <div className="flex justify-between items-center mb-3">
-                          <h6 className="font-medium text-gray-700">Lesson {index + 1}</h6>
-                          {newCourse.lessons.length > 1 && (
-                            <button
-                              type="button"
-                              onClick={() => removeLesson(index)}
-                              className="text-red-600 hover:text-red-800 transition-colors"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 lesson_container">
-                          <input
-                            type="text"
-                            placeholder="Lesson Title"
-                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                            value={lesson.title}
-                            onChange={(e) => updateLesson(index, 'title', e.target.value)}
-                            onBlur={() => {
-                              setTouched(prev => ({ ...prev, lessons: true }));
-                            }}
-                          />
-                          <input
-                            type="text"
-                            placeholder="Content/Description"
-                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                            value={lesson.content}
-                            onChange={(e) => updateLesson(index, 'content', e.target.value)}
-                            onBlur={() => {
-                              setTouched(prev => ({ ...prev, lessons: true }));
-                            }}
-                          />
-                          <input
-                            type="text"
-                            placeholder="Duration (e.g., 30 mins)"
-                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                            value={lesson.duration}
-                            onChange={(e) => updateLesson(index, 'duration', e.target.value)}
-                            onBlur={() => {
-                              setTouched(prev => ({ ...prev, lessons: true }));
-                            }}
-                          />
-                          <div className="flex items-center space-x-2">
-                            <input
-                              type="file"
-                              name="video"
-                              accept="video/*"
-                              placeholder='Upload Video'
-                              className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                              onChange={(e) => {
-                                if (e.target.files && e.target.files[0]) {
-                                  AddeVideo(index, 'video', e.target.files[0]);
-                                }
-                              }}
-                            />
-                            <Upload className="w-5 h-5  text-gray-400" />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+
                 <button
                   type="submit"
                   className="w-full bg-purple-600 hover:bg-purple-500 text-white px-8 py-4 rounded-xl transition-all duration-200 font-medium shadow-lg"
@@ -1298,12 +1157,21 @@ export default function InstructorDashboard() {
                           </div>
                         )}
 
-                        {course.lessons && course.lessons.length > 0 && (
+                        <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-2 text-sm text-gray-600">
                             <BookOpen className="w-4 h-4" />
-                            <span>{course.lessons.length} lessons</span>
+                            <span>{course.lessons ? course.lessons.length : 0} lessons</span>
                           </div>
-                        )}
+                          <button
+                            onClick={() => navigate(`/add-lesson/${course.id}`, {
+                              state: { courseId: course.id, courseTitle: course.title }
+                            })}
+                            className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-lg text-xs transition-all duration-200 flex items-center space-x-1"
+                          >
+                            <Plus className="w-3 h-3" />
+                            <span>Add Lesson</span>
+                          </button>
+                        </div>
                       </div>
 
                       <div className="space-y-2">
