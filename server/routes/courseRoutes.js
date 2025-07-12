@@ -13,8 +13,9 @@ import {
   getLessonsOfCourse,
   getUsersEnrolledInCourse,
   getCourseProgress,
-   getCoursesByCreator 
-
+  getCoursesByCreator,
+  getCoursesByStatus,
+  searchCourses
 } from '../controllers/courseController.js';
 
 import { checkRole, protect } from '../middlewares/authMiddleware.js'; // ✅ New role-check middleware
@@ -27,13 +28,15 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage});
+const upload = multer({ storage });
 
 
 const router = express.Router();
 
 // Public Routes
 router.get('/', getAllCourses);
+router.get('/search', searchCourses);
+router.get('/status/:status', getCoursesByStatus);
 router.get('/:id', getCourseById);
 router.get('/instructor/:instructorId', getCoursesByInstructor);
 router.get('/:id/progress', protect, getCourseProgress);

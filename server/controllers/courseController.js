@@ -1,6 +1,6 @@
 import { Course } from '../models/Course.js';
 import { User } from '../models/User.js';
-import  Category  from '../models/Category.js';
+import Category from '../models/Category.js';
 import { Lesson } from '../models/Lesson.js';
 
 const asyncHandler = (fn) => (req, res, next) =>
@@ -67,30 +67,35 @@ export const updateCourse = asyncHandler(async (req, res) => {
 });
 
 export const deleteCourse = asyncHandler(async (req, res) => {
+  console.log('Attempting to delete course:', req.params.id);
   const course = await Course.findByIdAndDelete(req.params.id);
-  if (!course) return res.status(404).json({ message: 'Course not found' });
+  if (!course) {
+    console.log('Course not found:', req.params.id);
+    return res.status(404).json({ message: 'Course not found' });
+  }
+  console.log('Course deleted successfully:', req.params.id);
   res.status(204).send();
 });
 
 export const getCoursesByInstructor = asyncHandler(async (req, res) => {
-  const courses = await Course.find({ 
+  const courses = await Course.find({
     createdBy: req.params.instructorId,
     status: 'published'
   })
-  .populate('category', 'name')
-  .select('-__v');
-  
+    .populate('category', 'name')
+    .select('-__v');
+
   res.status(200).json({ count: courses.length, data: courses });
 });
 
 export const getCoursesByCategory = asyncHandler(async (req, res) => {
-  const courses = await Course.find({ 
+  const courses = await Course.find({
     category: req.params.categoryId,
     status: 'published'
   })
-  .populate('category', 'name')
-  .select('-__v');
-  
+    .populate('category', 'name')
+    .select('-__v');
+
   res.status(200).json({ count: courses.length, data: courses });
 });
 
@@ -211,9 +216,60 @@ export const getCourseProgress = async (req, res) => {
 export const getCoursesByCreator = async (req, res) => {
   try {
     const { userId } = req.params;
-    const courses = await Course.find({ createdBy: userId });
-    res.json(courses);
+    console.log('Fetching courses for creator:', userId);
+
+    const courses = await Course.find({ createdBy: userId })
+      .populate('category', 'name')
+      .populate('createdBy', 'fullName email')
+      .populate('lessons', 'title duration')
+      .select('-__v');
+
+    console.log('Found courses:', courses.length);
+    res.json({ courses });
   } catch (error) {
+    console.error('Error in getCoursesByCreator:', error);
     res.status(500).json({ message: error.message });
   }
 };
+
+// Additional useful endpoints
+export const getCoursesByStatus = asyncHandler(async (req, res) => {
+  const { status } = req.params;
+  const courses = await Course.find({ status })
+    .populate('category', 'name')
+    .populate('createdBy', 'fullName email')
+    .select('-__v');
+
+  res.status(200).json({ count: courses.length, data: courses });
+});
+
+export const searchCourses = asyncHandler(async (req, res) => {
+  const { q, category, level, price } = req.query;
+  let query = {};
+
+  if (q) {
+    query.$or = [
+      { title: { $regex: q, $options: 'i' } },
+      { description: { $regex: q, $options: 'i' } },
+      { topics: { $regex: q, $options: 'i' } }
+    ];
+  }
+
+  if (category) query.category = category;
+  if (level) query.level = level;
+  if (price) {
+    const [min, max] = price.split('-');
+    if (max) {
+      query.price = { $gte: min, $lte: max };
+    } else {
+      query.price = { $gte: min };
+    }
+  }
+
+  const courses = await Course.find(query)
+    .populate('category', 'name')
+    .populate('createdBy', 'fullName email')
+    .select('-__v');
+
+  res.status(200).json({ count: courses.length, data: courses });
+});

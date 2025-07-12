@@ -14,6 +14,7 @@ export default function InstructorDashboard() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [createCourses, setCreateCourses] = useState([]);
 
   const [newCourse, setNewCourse] = useState({
@@ -36,6 +37,9 @@ export default function InstructorDashboard() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [profileEdit, setProfileEdit] = useState(false);
   const [expandedCourse, setExpandedCourse] = useState(null);
+  const [deletingCourse, setDeletingCourse] = useState(null);
+  const [updatingCourse, setUpdatingCourse] = useState(null);
+  const [editFormData, setEditFormData] = useState({});
   const [profile, setProfile] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -193,11 +197,16 @@ export default function InstructorDashboard() {
 
   const updateCourse = async (courseId, updatedData) => {
     try {
+      setUpdatingCourse(courseId);
       const formData = new FormData();
+
+      // Handle file uploads and data
       Object.keys(updatedData).forEach(key => {
         if (key === 'lessons') {
           formData.append(key, JSON.stringify(updatedData[key]));
-        } else if (updatedData[key] !== null && updatedData[key] !== undefined) {
+        } else if (key === 'picture' && updatedData[key] instanceof File) {
+          formData.append(key, updatedData[key]);
+        } else if (updatedData[key] !== null && updatedData[key] !== undefined && updatedData[key] !== '') {
           formData.append(key, updatedData[key]);
         }
       });
@@ -215,18 +224,34 @@ export default function InstructorDashboard() {
       }
 
       const updatedCourse = await response.json();
+
+      // Update both states to ensure UI consistency
       setCourses(courses.map(course =>
         course.id === courseId ? updatedCourse : course
       ));
+      setCreateCourses(createCourses.map(course =>
+        course.id === courseId ? updatedCourse : course
+      ));
+
       setEditingCourse(null);
+      setEditFormData({});
       setError('');
+      setSuccess('Course updated successfully!');
+      console.log('Course updated successfully:', courseId);
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError('Failed to update course: ' + err.message);
+      console.error('Update course error:', err);
+    } finally {
+      setUpdatingCourse(null);
     }
   };
 
   const deleteCourse = async (courseId) => {
     try {
+      setDeletingCourse(courseId);
       const response = await fetch(`http://localhost:5000/api/courses/${courseId}`, {
         method: 'DELETE',
         headers: {
@@ -238,10 +263,20 @@ export default function InstructorDashboard() {
         throw new Error('Failed to delete course');
       }
 
+      // Update both states to ensure UI consistency
       setCourses(courses.filter(course => course.id !== courseId));
+      setCreateCourses(createCourses.filter(course => course.id !== courseId));
       setError('');
+      setSuccess('Course deleted successfully!');
+      console.log('Course deleted successfully:', courseId);
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError('Failed to delete course: ' + err.message);
+      console.error('Delete course error:', err);
+    } finally {
+      setDeletingCourse(null);
     }
   };
 
@@ -275,21 +310,21 @@ export default function InstructorDashboard() {
 
       try {
         const userId = user.id || user._id;
-        const res = await fetch(`http://localhost:5000/api/courses/creator/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        console.log('User ID being sent:', userId);
+        console.log('User object:', user);
+        const res = await fetch(`http://localhost:5000/api/courses/creator/${userId}`);
 
         if (!res.ok) throw new Error('Failed to fetch created courses');
 
         const data = await res.json();
+        console.log('API Response:', data);
 
         const normalizedCourses = (data.courses || []).map(course => ({
           ...course,
           id: course._id || course.id,
         }));
 
+        console.log('Normalized courses:', normalizedCourses);
         setCreateCourses(normalizedCourses);
       } catch (err) {
         setCreateCourses([]);
@@ -334,12 +369,51 @@ export default function InstructorDashboard() {
   };
 
   const handleEditChange = (e, courseId) => {
-    const { name, value } = e.target;
-    setCourses(courses.map(course =>
-      course.id === courseId
-        ? { ...course, [name]: value }
-        : course
-    ));
+    const { name, value, files } = e.target;
+
+    if (name === 'picture' && files && files[0]) {
+      setEditFormData(prev => ({
+        ...prev,
+        [courseId]: {
+          ...prev[courseId],
+          [name]: files[0]
+        }
+      }));
+    } else {
+      setEditFormData(prev => ({
+        ...prev,
+        [courseId]: {
+          ...prev[courseId],
+          [name]: value
+        }
+      }));
+    }
+  };
+
+  const startEditing = (course) => {
+    setEditingCourse(course.id);
+    setEditFormData(prev => ({
+      ...prev,
+      [course.id]: {
+        title: course.title || '',
+        description: course.description || '',
+        price: course.price || '',
+        level: course.level || '',
+        category: course.category || '',
+        duration: course.duration || '',
+        topics: course.topics || '',
+        language: course.language || '',
+        prerequisites: course.prerequisites || '',
+        skillTags: course.skillTags || '',
+        whatWillLearn: course.whatWillLearn || '',
+        picture: null
+      }
+    }));
+  };
+
+  const cancelEditing = () => {
+    setEditingCourse(null);
+    setEditFormData({});
   };
 
   const handleChangeonNext = (e) => {
@@ -474,6 +548,18 @@ export default function InstructorDashboard() {
               {error}
               <button
                 onClick={() => setError('')}
+                className="float-right font-bold"
+              >
+                ×
+              </button>
+            </div>
+          )}
+
+          {success && (
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-xl mb-6">
+              {success}
+              <button
+                onClick={() => setSuccess('')}
                 className="float-right font-bold"
               >
                 ×
@@ -940,49 +1026,226 @@ export default function InstructorDashboard() {
                         <span>{course.duration}</span>
                       </div>
                       <button
-                        onClick={() => deleteCourse(course.id)}
-                        className="text-red-500 hover:text-red-700 transition-colors"
-                        title="Delete Course"
+                        onClick={() => {
+                          if (window.confirm(`Are you sure you want to delete "${course.title}"? This action cannot be undone.`)) {
+                            deleteCourse(course.id);
+                          }
+                        }}
+                        disabled={deletingCourse === course.id}
+                        className={`transition-colors ${deletingCourse === course.id
+                          ? 'text-gray-400 cursor-not-allowed'
+                          : 'text-red-500 hover:text-red-700'
+                          }`}
+                        title={deletingCourse === course.id ? "Deleting..." : "Delete Course"}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        {deletingCourse === course.id ? (
+                          <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
                       </button>
                     </div>
                   </div>
 
                   {editingCourse === course.id ? (
                     <div className="space-y-4">
-                      <input
-                        type="text"
-                        name="title"
-                        value={course.title}
-                        onChange={(e) => handleEditChange(e, course.id)}
-                        className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                      />
-                      <input
-                        type="text"
-                        name="topics"
-                        value={course.topics}
-                        onChange={(e) => handleEditChange(e, course.id)}
-                        className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                      />
-                      <input
-                        type="number"
-                        name="price"
-                        value={course.price}
-                        onChange={(e) => handleEditChange(e, course.id)}
-                        className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                      />
-                      <div className="flex space-x-2">
+                      <div className="flex justify-between items-center mb-4">
+                        <h5 className="text-lg font-semibold text-gray-800">Edit Course</h5>
                         <button
-                          onClick={() => updateCourse(course.id, course)}
-                          className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-all duration-200 flex items-center justify-center space-x-1"
+                          onClick={cancelEditing}
+                          className="text-gray-400 hover:text-gray-600"
                         >
-                          <Save className="w-4 h-4" />
-                          <span>Save</span>
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                          <input
+                            type="text"
+                            name="title"
+                            value={editFormData[course.id]?.title || ''}
+                            onChange={(e) => handleEditChange(e, course.id)}
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            placeholder="Course Title"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
+                          <input
+                            type="number"
+                            name="price"
+                            value={editFormData[course.id]?.price || ''}
+                            onChange={(e) => handleEditChange(e, course.id)}
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            placeholder="Course Price"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Level</label>
+                          <select
+                            name="level"
+                            value={editFormData[course.id]?.level || ''}
+                            onChange={(e) => handleEditChange(e, course.id)}
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                          >
+                            <option value="">Select Level</option>
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advanced">Advanced</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                          <select
+                            name="category"
+                            value={editFormData[course.id]?.category || ''}
+                            onChange={(e) => handleEditChange(e, course.id)}
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                          >
+                            <option value="">Select Category</option>
+                            <option value="Educate">Educate</option>
+                            <option value="Design">Design</option>
+                            <option value="Development">Development</option>
+                            <option value="AI">AI</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Machine Learning">Machine Learning</option>
+                            <option value="Iot">Iot</option>
+                            <option value="Health">Health</option>
+                            <option value="Data Science">Data Science</option>
+                            <option value="Finance">Finance</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
+                          <input
+                            type="text"
+                            name="duration"
+                            value={editFormData[course.id]?.duration || ''}
+                            onChange={(e) => handleEditChange(e, course.id)}
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            placeholder="e.g., 8 weeks"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Language</label>
+                          <select
+                            name="language"
+                            value={editFormData[course.id]?.language || ''}
+                            onChange={(e) => handleEditChange(e, course.id)}
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                          >
+                            <option value="">Select Language</option>
+                            <option value="English">English</option>
+                            <option value="Hindi">Hindi</option>
+                            <option value="Marathi">Marathi</option>
+                            <option value="Tamil">Tamil</option>
+                            <option value="Telegu">Telegu</option>
+                            <option value="Gujurati">Gujurati</option>
+                            <option value="Bengali">Bengali</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <textarea
+                          name="description"
+                          value={editFormData[course.id]?.description || ''}
+                          onChange={(e) => handleEditChange(e, course.id)}
+                          className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                          rows="3"
+                          placeholder="Course Description"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Topics</label>
+                        <input
+                          type="text"
+                          name="topics"
+                          value={editFormData[course.id]?.topics || ''}
+                          onChange={(e) => handleEditChange(e, course.id)}
+                          className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                          placeholder="Course Topics"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Prerequisites</label>
+                        <textarea
+                          name="prerequisites"
+                          value={editFormData[course.id]?.prerequisites || ''}
+                          onChange={(e) => handleEditChange(e, course.id)}
+                          className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                          rows="2"
+                          placeholder="Requirements / Prerequisites (comma separated)"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Skills</label>
+                        <textarea
+                          name="skillTags"
+                          value={editFormData[course.id]?.skillTags || ''}
+                          onChange={(e) => handleEditChange(e, course.id)}
+                          className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                          rows="2"
+                          placeholder="Skills covered (comma separated)"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">What Will Learn</label>
+                        <textarea
+                          name="whatWillLearn"
+                          value={editFormData[course.id]?.whatWillLearn || ''}
+                          onChange={(e) => handleEditChange(e, course.id)}
+                          className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                          rows="2"
+                          placeholder="Learning outcomes (comma separated)"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Course Image</label>
+                        <input
+                          type="file"
+                          name="picture"
+                          accept="image/*"
+                          onChange={(e) => handleEditChange(e, course.id)}
+                          className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        />
+                      </div>
+
+                      <div className="flex space-x-3 pt-4">
+                        <button
+                          onClick={() => updateCourse(course.id, editFormData[course.id])}
+                          disabled={updatingCourse === course.id}
+                          className="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {updatingCourse === course.id ? (
+                            <>
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              <span>Updating...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Save className="w-4 h-4" />
+                              <span>Update Course</span>
+                            </>
+                          )}
                         </button>
                         <button
-                          onClick={() => setEditingCourse(null)}
-                          className="flex-1 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition-all duration-200 flex items-center justify-center space-x-1"
+                          onClick={cancelEditing}
+                          disabled={updatingCourse === course.id}
+                          className="flex-1 bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600 transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <X className="w-4 h-4" />
                           <span>Cancel</span>
@@ -1045,7 +1308,7 @@ export default function InstructorDashboard() {
 
                       <div className="space-y-2">
                         <button
-                          onClick={() => setEditingCourse(course.id)}
+                          onClick={() => startEditing(course)}
                           className="w-full bg-purple-600 hover:bg-purple-500 text-white py-3 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
                         >
                           <Edit3 className="w-4 h-4" />
