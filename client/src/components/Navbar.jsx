@@ -473,7 +473,7 @@ export default function Navbar() {
                 className="block w-full text-left px-4 py-2 rounded-md bg-purple-600 text-white hover:bg-purple-700"
 
               >
-                Help & Earn
+                Refer
               </button>
               <div className="flex justify-between items-center mt-4">
                 <button
