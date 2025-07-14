@@ -11,6 +11,18 @@ import Footer from '../components/Footer';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../assets/style/Courses.css'
+import {
+  FaTrophy,
+  FaCode,
+  FaFlask,
+  FaUsers,
+  FaCalendarAlt,
+  FaSearch,
+  FaChevronDown,
+  FaMedal,
+  FaFilter,
+  FaTimes
+} from 'react-icons/fa';
 
 export default function Courses() {
   const navigate = useNavigate();
@@ -157,15 +169,18 @@ export default function Courses() {
     <>
 
 
-      <div className="md:hidden flex justify-end  px-4 bg-gray-100">
+      <div
+      style={{
+        marginTop:"5px"
+      }}
+       className="md:hidden flex justify-end   px-4 bg-gray-100">
         <button
           onClick={() => setShowMobileFilters(true)}
-          className="p-2 rounded bg-white border shadow"
+          className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-all flex items-center animate-fadeIn animation-delay-300"
           aria-label="Show filters"
         >
-          <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
+            <FaFilter className="mr-2" />
+             Filters
         </button>
       </div>
 

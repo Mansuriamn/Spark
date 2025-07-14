@@ -12,7 +12,7 @@
 @media (max-width: 768px) {
   #site-footer .footer-col {
     text-align: center !important;
-    padding-bottom: 1.5rem;
+    /* padding-bottom: 1.5rem; */
   }
 
   #site-footer .footer-col ul {
@@ -39,9 +39,9 @@
     padding: 2rem 1rem;
   }
 
-  #site-footer .footer-col {
+  /* #site-footer .footer-col {
     margin-bottom: 2rem;
-  }
+  } */
 
   #site-footer .footer-col h4 {
     font-size: 1.1rem;
