@@ -10,6 +10,13 @@ export default function AddLesson() {
   const location = useLocation();
   const { courseId, courseTitle } = location.state || {};
   const { token } = useContext(AuthContext);
+  const [question, setQuestion] = useState({});
+  const [show, setshow] = useState(false);
+  const [length, setLength] = useState(1);
+
+  // if (question) {
+  //   console.log("Question is set:", question);
+  // }
 
   const [lesson, setLesson] = useState({
     title: '',
@@ -56,12 +63,12 @@ export default function AddLesson() {
         formData.append('video', lesson.video);
       }
 
-      console.log('Sending lesson data:', {
-        title: lesson.title,
-        content: lesson.content,
-        duration: lesson.duration,
-        courseId: courseId
-      });
+      // console.log('Sending lesson data:', {
+      //   title: lesson.title,
+      //   content: lesson.content,
+      //   duration: lesson.duration,
+      //   courseId: courseId
+      // });
 
       const response = await fetch('http://localhost:5000/api/lessons', {
         method: 'POST',
@@ -77,7 +84,7 @@ export default function AddLesson() {
       }
 
       const createdLesson = await response.json();
-      console.log('Lesson created successfully:', createdLesson);
+      // console.log('Lesson created successfully:', createdLesson);
 
       setSuccess('Lesson added successfully!');
       setTimeout(() => {
@@ -90,6 +97,20 @@ export default function AddLesson() {
     } finally {
       setLoading(false);
     }
+  };
+
+  function AddedQuestion() {
+    const result = window.confirm("Do you want to add  question?");
+    if (result) {
+      setshow(true);
+
+    } else {
+      setshow(false);
+    }
+  }
+  const Increase = () => {
+    setLength(prev => prev + 1);
+    // console.log("Length increased");
   };
 
   return (
@@ -188,6 +209,47 @@ export default function AddLesson() {
                   <Upload className="w-5 h-5 text-gray-400" />
                 </div>
                 <p className="text-xs text-gray-500 mt-1">Upload a video file for this lesson (optional)</p>
+              </div>
+              {
+                !show && (
+                  <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 mt-4">
+                    {/* <h2 className="text-lg font-semibold text-gray-800 mb-2">Add Question</h2> */}
+                    <button
+                      onClick={AddedQuestion}
+                      className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition-all duration-200 flex items-center space-x-2"
+                    >
+                      <Plus className="w-5 h-5" />
+                      <span>Add Question</span>
+                    </button>
+                  </div>
+                )
+              }
+
+              {show && (
+                <div className="space-y-4">
+                  {Array.from({ length }, (_, i) => (
+                    <input
+                      key={i}
+                      placeholder={`Enter question ${i + 1}`}
+                      value={question[i] || ''}
+                      onChange={(e) => setQuestion(prev => ({ ...prev, [i]: e.target.value }))}
+                      className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    />
+                  ))}
+                </div>
+              )}
+
+
+              <div
+                style={{ display: show ? 'flex' : 'none', alignItems: 'center', justifyContent: 'right', marginTop: '10px' }}
+              >
+                <button
+                  onClick={() => Increase()}
+                  type='button'
+                  className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-lg transition-all duration-200 flex items-center space-x-1"
+                >
+                  <Plus className="w-3 h-4" />
+                </button>
               </div>
 
               <div className="flex space-x-4 pt-6">
