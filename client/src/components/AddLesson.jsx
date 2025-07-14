@@ -14,9 +14,9 @@ export default function AddLesson() {
   const [show, setshow] = useState(false);
   const [length, setLength] = useState(1);
 
-  // if (question) {
-  //   console.log("Question is set:", question);
-  // }
+  if (question) {
+    console.log("Question is set:", question);
+  }
 
   const [lesson, setLesson] = useState({
     title: '',
@@ -228,13 +228,23 @@ export default function AddLesson() {
               {show && (
                 <div className="space-y-4">
                   {Array.from({ length }, (_, i) => (
-                    <input
-                      key={i}
-                      placeholder={`Enter question ${i + 1}`}
-                      value={question[i] || ''}
-                      onChange={(e) => setQuestion(prev => ({ ...prev, [i]: e.target.value }))}
-                      className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                    />
+                    <div key={i} className="bg-white/80 backdrop-blur-sm rounded-xl p-4">
+                      <input
+                        placeholder={`Enter question ${i + 1}`}
+                        value={question[i]?.question || ''}
+                        onChange={(e) => setQuestion((prev) => ({ ...prev, [i]: { ...prev[i], question: e.target.value } }))}
+                        className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                      />
+                      <input
+                        style={{
+                          marginTop: '10px'
+                        }}
+                        placeholder={`Enter URL ${i + 1}`}
+                        value={question[i]?.url || ''}
+                        onChange={(e) => setQuestion((prev) => ({ ...prev, [i]: { ...prev[i], url: e.target.value } }))}
+                        className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                      />
+                    </div>
                   ))}
                 </div>
               )}
