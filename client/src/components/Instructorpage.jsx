@@ -10,6 +10,7 @@ import '../assets/style/Instructorpage.css'
 
 export default function InstructorDashboard() {
   const navigate = useNavigate();
+  // Context and State
   const { user, token, updateUser } = useContext(AuthContext);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -468,16 +469,62 @@ export default function InstructorDashboard() {
   const totalRevenue = courses.reduce((sum, course) => sum + (course.revenue || 0), 0);
   const avgRating = courses.length > 0 ? (courses.reduce((sum, course) => sum + (course.rating || 0), 0) / courses.length).toFixed(1) : 0;
 
-  /*if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading courses...</p>
-        </div>
-      </div>
-    );
-  }*/
+
+
+  const [courseId, setCourseId] = useState(null);
+  const [QuizInfo, setQuizInfo] = useState({
+    courseId: '',
+    title: '',
+    level: '',
+    description: '',
+  });
+
+  const [submittedCourses, setSubmittedCourses] = useState([]); // Track which courses have a submitted quiz
+  const [QuizInfoData, setQuizInfoData] = useState([]); // Store quiz details
+
+  // For debugging quiz data
+  useEffect(() => {
+    console.log("Updated QuizInfoData:", QuizInfoData);
+  }, [QuizInfoData]);
+
+  // Open form popup
+  const OpenPopup = (course) => {
+    setCourseId(course.id);
+    setQuizInfo((prev) => ({ ...prev, courseId: course.id }));
+  };
+
+  // Close form popup
+  const ClosePopup = () => {
+    setCourseId(null);
+    setQuizInfo({ courseId: '', title: '', level: '', description: '' });
+  };
+
+  // Handle form input
+  const OpenQuizPopup = (e) => {
+    setQuizInfo((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  // Submit quiz form
+  const SubmitQuiz = () => {
+    if (QuizInfo.title && QuizInfo.level && QuizInfo.description && courseId) {
+      // Prevent duplicate submission for same course
+      if (submittedCourses.includes(courseId)) {
+        window.alert('Quiz already submitted for this course.');
+        return;
+      }
+
+      setQuizInfoData((prev) => [...prev, QuizInfo]);
+      setSubmittedCourses((prev) => [...prev, courseId]);
+      ClosePopup();
+    } else {
+      window.alert('Please fill all fields');
+    }
+  };
+
+  // Navigate to quiz page
+  const Go_Quiz = (id) => {
+    navigate(`/quiz/${id}`);
+  };
 
   return (
     <>
@@ -1111,6 +1158,74 @@ export default function InstructorDashboard() {
                         </button>
                       </div>
                     </div>
+                  ) : courseId === course.id ? (
+                    <>
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center mb-4">
+                          <h5 className="text-lg font-semibold text-gray-800">Initialize Quiz</h5>
+                          <button
+                            onClick={() => ClosePopup()}
+                            className="text-gray-400 hover:text-gray-600"
+                          >
+                            <X className="w-5 h-5" />
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                            <input
+                              type="text"
+                              name="title"
+                              value={QuizInfo.title}
+                              onChange={(e) => OpenQuizPopup(e)}
+                              className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                              placeholder="Course Title"
+                            />
+                          </div>
+
+
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Level</label>
+                            <select
+                              name="level"
+                              value={QuizInfo.level}
+                              onChange={(e) => OpenQuizPopup(e)}
+                              className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            >
+                              <option value="">Select Level</option>
+                              <option value="Beginner">Beginner</option>
+                              <option value="Intermediate">Intermediate</option>
+                              <option value="Advanced">Advanced</option>
+                            </select>
+                          </div>
+
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                          <textarea
+                            name="description"
+                            value={QuizInfo.description}
+                            onChange={(e) => OpenQuizPopup(e)}
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            rows="3"
+                            placeholder="Course Description"
+                          />
+                        </div>
+
+                        <div className="flex space-x-3 pt-4">
+                          <button
+                            onClick={SubmitQuiz}
+                            className="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <span>Submit</span>
+                          </button>
+
+                        </div>
+                      </div>
+                    </>
                   ) : (
                     <>
                       <h4 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors">
@@ -1134,6 +1249,10 @@ export default function InstructorDashboard() {
 
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-gray-600">Course Price: ₹{course.price}</span>
+
+
+
+
                           {course.rating > 0 && (
                             <span className="flex items-center space-x-1 text-sm text-yellow-600">
                               <Award className="w-4 h-4" />
@@ -1141,6 +1260,8 @@ export default function InstructorDashboard() {
                             </span>
                           )}
                         </div>
+
+
 
                         {course.completion > 0 && (
                           <div>
@@ -1171,6 +1292,8 @@ export default function InstructorDashboard() {
                             <Plus className="w-3 h-3" />
                             <span>Add Lesson</span>
                           </button>
+
+
                         </div>
                       </div>
 
@@ -1182,6 +1305,24 @@ export default function InstructorDashboard() {
                           <Edit3 className="w-4 h-4" />
                           <span>Edit Course</span>
                         </button>
+
+                        {submittedCourses.includes(course.id) ? (
+                          <button
+                            onClick={() => Go_Quiz(course.id)}
+                            className="w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
+                          >
+                            <span>Go to Quiz</span>
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => OpenPopup(course)}
+                            className="w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
+                          >
+                            <span>Initialize Quiz</span>
+                          </button>
+                        )}
+
+
 
                         <button
                           onClick={() => toggleStudentView(course.id)}
@@ -1271,7 +1412,9 @@ export default function InstructorDashboard() {
                         </div>
                       )}
                     </>
-                  )}
+                  )
+
+                  }
                 </div>
               ))}
             </div>
