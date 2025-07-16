@@ -11,36 +11,26 @@ export default function Quiz() {
 
   const [Show, setShow] = useState(false);
 
-  const [Question, setQuestion] = useState({
+  const [QuestionData, setQuestionData] = useState({
     question: '',
-    options: ['', '', '', ''],
-    answer: '',
+    level: '',
+    url: '',
   });
 
-  const [Colection, setColection] = useState([]);
+  const [Collection, setCollection] = useState([]);
 
   const AddedQuestion = () => {
     setShow(true);
   };
 
   const handleInputChange = (e) => {
-    setQuestion({ ...Question, [e.target.name]: e.target.value });
-  };
-
-  const handleOptionChange = (index, value) => {
-    const newOptions = [...Question.options];
-    newOptions[index] = value;
-    setQuestion({ ...Question, options: newOptions });
+    setQuestionData({ ...QuestionData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setColection([...Colection, Question]);
-    setQuestion({
-      question: '',
-      options: ['', '', '', ''],
-      answer: '',
-    });
+    setCollection([...Collection, QuestionData]);
+    setQuestionData({ question: '', level: '', url: '' });
     setShow(false);
   };
 
@@ -49,30 +39,25 @@ export default function Quiz() {
   };
 
   const deleteQuestion = (index) => {
-    const updated = [...Colection];
+    const updated = [...Collection];
     updated.splice(index, 1);
-    setColection(updated);
+    setCollection(updated);
   };
 
   return (
     <>
-      <div
-        style={{ marginTop:"10px" }}
-        className="flex flex-col items-center justify-center"
-      >
+      <div style={{ marginTop: '10px' }} className="flex flex-col items-center justify-center">
         <div className="bg-white p-4 rounded-lg shadow-md w-[90%]">
           <h1 className="text-2xl font-bold mb-4 text-center">{QuizeData.title}</h1>
-          
+
           <p className="text-gray-600">Level: {QuizeData.level}</p>
           <p className="text-gray-600">{QuizeData.description}</p>
 
           {!Show && (
-            <div
-              className="flex items-center justify-center mt-4"
-            >
+            <div className="flex items-center justify-center mt-4">
               <button
-                style={{ marginTop: "15px" }}
-                type='button'
+                style={{ marginTop: '15px' }}
+                type="button"
                 onClick={AddedQuestion}
                 className="w-[20%] bg-purple-600 hover:bg-purple-500 text-white py-3 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
               >
@@ -82,6 +67,7 @@ export default function Quiz() {
             </div>
           )}
 
+          {/* Form for Question, Level, URL */}
           <form
             onSubmit={handleSubmit}
             className={`mt-4 ${Show ? 'block' : 'hidden'}`}
@@ -91,7 +77,7 @@ export default function Quiz() {
                 type="text"
                 name="question"
                 placeholder="Enter question"
-                value={Question.question}
+                value={QuestionData.question}
                 onChange={handleInputChange}
                 className="w-full p-2 border border-gray-300 rounded-lg mt-4"
                 required
@@ -105,23 +91,24 @@ export default function Quiz() {
               </button>
             </div>
 
-            {Question.options.map((option, index) => (
-              <input
-                key={index}
-                type="text"
-                placeholder={`Option ${index + 1}`}
-                value={option}
-                onChange={(e) => handleOptionChange(index, e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-lg mt-4"
-                required
-              />
-            ))}
+            <select
+              name="level"
+              value={QuestionData.level}
+              onChange={handleInputChange}
+              className="w-full p-2 border border-gray-300 rounded-lg mt-4"
+              required
+            >
+              <option value="">Select Level</option>
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
 
             <input
-              type="text"
-              name="answer"
-              placeholder="Correct answer"
-              value={Question.answer}
+              type="url"
+              name="url"
+              placeholder="Enter related URL"
+              value={QuestionData.url}
               onChange={handleInputChange}
               className="w-full p-2 border border-gray-300 rounded-lg mt-4"
               required
@@ -135,8 +122,8 @@ export default function Quiz() {
             </button>
           </form>
 
-          {/* Table of submitted questions */}
-          {Colection.length > 0 && (
+          {/* Table for Questions */}
+          {Collection.length > 0 && (
             <div className="mt-8 overflow-x-auto">
               <h3 className="text-xl font-semibold mb-4 text-center">
                 Submitted Questions
@@ -146,22 +133,27 @@ export default function Quiz() {
                   <tr>
                     <th className="border p-2 text-left">#</th>
                     <th className="border p-2 text-left">Question</th>
-                    <th className="border p-2 text-left">Options</th>
-                    <th className="border p-2 text-left">Answer</th>
+                    <th className="border p-2 text-left">Level</th>
+                    <th className="border p-2 text-left">URL</th>
                     <th className="border p-2 text-left">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {Colection.map((item, index) => (
+                  {Collection.map((item, index) => (
                     <tr key={index} className="hover:bg-gray-50">
                       <td className="border p-2">{index + 1}</td>
                       <td className="border p-2">{item.question}</td>
+                      <td className="border p-2">{item.level}</td>
                       <td className="border p-2">
-                        {item.options.map((opt, i) => (
-                          <div key={i}>{`${i + 1}) ${opt}`}</div>
-                        ))}
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          Link
+                        </a>
                       </td>
-                      <td className="border p-2">{item.answer}</td>
                       <td className="border p-2">
                         <button
                           onClick={() => deleteQuestion(index)}
@@ -178,7 +170,9 @@ export default function Quiz() {
           )}
         </div>
       </div>
-      {/* <Footer /> */}
+     <div className='mt-10'>
+       <Footer />
+     </div>
     </>
   );
 }
