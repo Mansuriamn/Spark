@@ -62,3 +62,66 @@ export const deleteQuiz = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Add a question to a quiz
+export const addQuestion = async (req, res) => {
+  try {
+    const { quizId } = req.params;
+    const question = req.body;
+    const quiz = await QuizCard.findByIdAndUpdate(
+      quizId,
+      { $push: { questions: question } },
+      { new: true }
+    );
+    if (!quiz) return res.status(404).json({ message: 'Quiz not found' });
+    res.json(quiz);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+
+export const getQuestions = async (req, res) => {
+  try {
+    const { quizId } = req.params;
+    const quiz = await QuizCard.findById(quizId);
+    if (!quiz) return res.status(404).json({ message: 'Quiz not found' });
+    res.json(quiz.questions);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateQuestion = async (req, res) => {
+  try {
+    const { quizId, questionId } = req.params;
+    const quiz = await QuizCard.findById(quizId);
+    if (!quiz) return res.status(404).json({ message: 'Quiz not found' });
+
+    const question = quiz.questions.id(questionId);
+    if (!question) return res.status(404).json({ message: 'Question not found' });
+
+    Object.assign(question, req.body);
+    await quiz.save();
+    res.json(question);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const deleteQuestion = async (req, res) => {
+  try {
+    const { quizId, questionId } = req.params;
+    const quiz = await QuizCard.findById(quizId);
+    if (!quiz) return res.status(404).json({ message: 'Quiz not found' });
+
+    const question = quiz.questions.id(questionId);
+    if (!question) return res.status(404).json({ message: 'Question not found' });
+
+    question.remove();
+    await quiz.save();
+    res.json({ message: 'Question deleted' });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
