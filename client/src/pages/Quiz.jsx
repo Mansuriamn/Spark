@@ -14,6 +14,7 @@ export default function Quiz() {
   const [QuestionData, setQuestionData] = useState({
     question: '',
     level: '',
+    category:'',
     url: '',
   });
 
@@ -30,7 +31,8 @@ export default function Quiz() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setCollection([...Collection, QuestionData]);
-    setQuestionData({ question: '', level: '', url: '' });
+    console.log('Submitted Question:', QuestionData);
+    setQuestionData({ question: '', level: '', category: '', url: '' });
     setShow(false);
   };
 
@@ -103,6 +105,15 @@ export default function Quiz() {
               <option value="Intermediate">Intermediate</option>
               <option value="Advanced">Advanced</option>
             </select>
+              <input
+              type="text"
+              name="category"
+              placeholder="Enter category "
+              value={QuestionData.category}
+              onChange={handleInputChange}
+              className="w-full p-2 border border-gray-300 rounded-lg mt-4"
+              required
+            />
 
             <input
               type="url"
