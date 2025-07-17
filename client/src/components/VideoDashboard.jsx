@@ -23,7 +23,7 @@ const initialProblems = [
 const VideoDashboard = () => {
   const [problems, setProblems] = useState(initialProblems);
   const [filter, setFilter] = useState('All');
-   const solvedCount = problems.filter(p => p.status === 'Solved').length;
+  const solvedCount = problems.filter(p => p.status === 'Solved').length;
   const progressPercentage = Math.round((solvedCount / problems.length) * 100);
 
   const filteredProblems = problems.filter(problem => {
@@ -34,8 +34,8 @@ const VideoDashboard = () => {
 
   const handleSolve = (problemId) => {
     setProblems(prevProblems => {
-      const updatedProblems = prevProblems.map(problem => 
-        problem.id === problemId 
+      const updatedProblems = prevProblems.map(problem =>
+        problem.id === problemId
           ? { ...problem, status: 'Solved' }
           : problem
       );
@@ -453,6 +453,143 @@ const VideoDashboard = () => {
 
   const videoSections = groupLessonsBySection();
 
+  // --- Quiz Dashboard State ---
+  const [allQuizzes, setAllQuizzes] = useState([]);
+  const [selectedQuizId, setSelectedQuizId] = useState('');
+  const [selectedQuiz, setSelectedQuiz] = useState(null);
+  const [selectedQuizQuestions, setSelectedQuizQuestions] = useState([]);
+  const [addForm, setAddForm] = useState({
+    questionText: '',
+    category: '',
+    level: '',
+    status: 'Not Solve',
+    questionURL: ''
+  });
+  const [addLoading, setAddLoading] = useState(false);
+  const [addError, setAddError] = useState('');
+  const [addSuccess, setAddSuccess] = useState('');
+
+  // Fetch all quizzes on mount
+  useEffect(() => {
+    const fetchAllQuizzes = async () => {
+      try {
+        const res = await fetch('/api/quizzes', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setAllQuizzes(Array.isArray(data) ? data : data.quizzes || []);
+      } catch (err) {
+        setAllQuizzes([]);
+      }
+    };
+    fetchAllQuizzes();
+  }, [token]);
+
+  // Fetch selected quiz and its questions
+  useEffect(() => {
+    if (!selectedQuizId) return;
+    const fetchQuizAndQuestions = async () => {
+      try {
+        const resQuiz = await fetch(`/api/quizzes/${selectedQuizId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const quizData = await resQuiz.json();
+        setSelectedQuiz(quizData.quiz || quizData);
+        const resQuestions = await fetch(`/api/quizzes/${selectedQuizId}/questions`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const questionsData = await resQuestions.json();
+        setSelectedQuizQuestions(Array.isArray(questionsData) ? questionsData : questionsData.questions || []);
+      } catch (err) {
+        setSelectedQuiz(null);
+        setSelectedQuizQuestions([]);
+      }
+    };
+    fetchQuizAndQuestions();
+  }, [selectedQuizId, token]);
+
+  // Add a new question to the selected quiz
+  const handleAddInputChange = (e) => {
+    const { name, value } = e.target;
+    setAddForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddQuestion = async (e) => {
+    e.preventDefault();
+    if (!addForm.questionText || !addForm.category || !addForm.level || !addForm.questionURL) {
+      setAddError('Please fill all fields');
+      return;
+    }
+    setAddLoading(true);
+    setAddError('');
+    setAddSuccess('');
+    try {
+      const res = await fetch(`/api/quizzes/${selectedQuizId}/questions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(addForm)
+      });
+      if (!res.ok) throw new Error('Failed to add question');
+      setAddForm({ questionText: '', category: '', level: '', status: 'Not Solve', questionURL: '' });
+      setAddSuccess('Question added!');
+      // Refresh questions
+      const qRes = await fetch(`/api/quizzes/${selectedQuizId}/questions`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const qData = await qRes.json();
+      setSelectedQuizQuestions(Array.isArray(qData) ? qData : qData.questions || []);
+    } catch (err) {
+      setAddError('Failed to add question: ' + err.message);
+    } finally {
+      setAddLoading(false);
+      setTimeout(() => setAddSuccess(''), 2000);
+    }
+  };
+
+  // --- Student Quiz Display State ---
+  const [courseQuiz, setCourseQuiz] = useState(null);
+  const [courseQuizQuestions, setCourseQuizQuestions] = useState([]);
+
+  // Fetch the quiz for the current course and its questions
+  useEffect(() => {
+    const fetchCourseQuizAndQuestions = async () => {
+      if (!courseId) return;
+      try {
+        // Fetch all quizzes and find the one for this course
+        const res = await fetch('/api/quizzes', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        const quizzes = Array.isArray(data) ? data : data.quizzes || [];
+        const quiz = quizzes.find(q => q.courseId === courseId || q.courseId === (courseId + ''));
+        setCourseQuiz(quiz || null);
+        if (quiz && (quiz._id || quiz.id)) {
+          // Fetch questions for this quiz
+          const resQ = await fetch(`/api/quizzes/${quiz._id || quiz.id}/questions`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const qData = await resQ.json();
+          setCourseQuizQuestions(Array.isArray(qData) ? qData : qData.questions || []);
+        } else {
+          setCourseQuizQuestions([]);
+        }
+      } catch (err) {
+        setCourseQuiz(null);
+        setCourseQuizQuestions([]);
+      }
+    };
+    fetchCourseQuizAndQuestions();
+  }, [courseId, token]);
+
+  // Add local state to track attempted questions
+  const [attemptedQuestions, setAttemptedQuestions] = useState({}); // { [questionId]: true }
+
+  const handleSolveClick = (questionId) => {
+    setAttemptedQuestions((prev) => ({ ...prev, [questionId]: true }));
+  };
 
   if (loading) {
     return (
@@ -823,134 +960,107 @@ const VideoDashboard = () => {
             </div>
           </div>
 
-   <div style={{
-    marginTop:"4rem",
-    marginBottom:"3rem",
-   }}>
-    <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                  Quize Dashboard
-                </h1>
 
-   <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
-          {/*Desktop View*/}
-          <div className="hidden lg:block overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Problem</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Difficulty</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {filteredProblems.map((problem, index) => (
-                  <tr key={problem.id} className="hover:bg-gray-50 transition-colors duration-150">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-medium text-gray-600">
-                          {index + 1}
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-900">{problem.title}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(problem.category)}`}>
-                        {problem.category}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getDifficultyColor(problem.difficulty)}`}>
-                        {problem.difficulty}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      {problem.status === "Solved" ? (
-                        <div className="flex items-center gap-2 text-green-600">
-                          <CheckCircle className="w-4 h-4" />
-                          <span className="text-sm font-medium">Solved</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2 text-gray-500">
-                          <XCircle className="w-4 h-4" />
-                          <span className="text-sm font-medium">Not Attempted</span>
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      {problem.status !== "Solved" && (
-                        <button
-                          onClick={() => handleSolve(problem.id)}
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-all duration-200 shadow-md hover:shadow-lg"
-                        >
-                          Solve
-                          <ArrowRight className="w-4 h-4" />
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
 
-          {/*Mobile View*/}
-          <div className="lg:hidden">
-            {filteredProblems.map((problem, index) => (
-              <div key={problem.id} className="p-4 border-b border-gray-200 last:border-b-0">
-                <div className="flex items-start justify-between gap-4 mb-3">
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-medium text-gray-600 flex-shrink-0">
-                      {index + 1}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-medium text-gray-900 text-sm leading-tight">{problem.title}</h3>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex flex-wrap items-center gap-2 mb-3">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(problem.category)}`}>
-                    {problem.category}
-                  </span>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getDifficultyColor(problem.difficulty)}`}>
-                    {problem.difficulty}
-                  </span>
-                </div>
+          {/* --- Quiz Dashboard UI Section (place at the top) --- */}
 
-                <div className="flex items-center justify-between">
-                  {problem.status === "Solved" ? (
-                    <div className="flex items-center gap-2 text-green-600">
-                      <CheckCircle className="w-4 h-4" />
-                      <span className="text-sm font-medium">Solved</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 text-gray-500">
-                      <XCircle className="w-4 h-4" />
-                      <span className="text-sm font-medium">Not Attempted</span>
-                    </div>
-                  )}
-                  
-                  {problem.status !== "Solved" && (
-                    <button
-                      onClick={() => handleSolve(problem.id)}
-                      className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-all duration-200 shadow-md hover:shadow-lg"
-                    >
-                      Solve
-                      <ArrowRight className="w-3 h-3" />
-                    </button>
-                  )}
-                </div>
+
+          {/* --- Student Quiz Display UI --- */}
+          {courseQuiz && (
+            <div className="max-w-7xl w-full mx-auto my-10 p-8 bg-white rounded-2xl shadow-xl border border-gray-100">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-extrabold text-purple-800">Practice Questions</h2>
+                <BookOpen className="w-7 h-7 text-purple-400" />
               </div>
-            ))}
-          </div>
-        </div> 
-
-   </div>
-
+              <div className="mb-2 text-xl font-bold text-gray-800">{courseQuiz.title}</div>
+              <div className="mb-3 text-base text-gray-700 italic">{courseQuiz.description}</div>
+              <div className="flex flex-wrap gap-4 mb-6">
+                <span className="inline-flex items-center bg-blue-100 text-blue-700 px-4 py-1 rounded-full font-semibold text-sm">
+                  <TrendingUp className="w-4 h-4 mr-1" />
+                  Level: {courseQuiz.level}
+                </span>
+                <span className="inline-flex items-center bg-green-100 text-green-700 px-4 py-1 rounded-full font-semibold text-sm">
+                  <Award className="w-4 h-4 mr-1" />
+                  Total Questions: {courseQuizQuestions.length}
+                </span>
+              </div>
+              <h4 className="font-semibold mb-3 text-lg text-purple-700">Questions</h4>
+              <div className="overflow-x-auto rounded-xl border border-purple-200 bg-white/90 shadow">
+                <table className="min-w-full text-sm">
+                  <thead className="bg-purple-100 text-gray-800">
+                    <tr>
+                      <th className="p-3 text-left font-semibold">#</th>
+                      <th className="p-3 text-left font-semibold">Question</th>
+                      <th className="p-3 text-left font-semibold">Category</th>
+                      <th className="p-3 text-left font-semibold">Level</th>
+                      <th className="p-3 text-left font-semibold">Solve</th>
+                      <th className="p-3 text-left font-semibold">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {courseQuizQuestions.length > 0 ? courseQuizQuestions.map((item, index) => {
+                      const qid = item._id || item.id || index;
+                      const isAttempted = attemptedQuestions[qid] || item.status === 'Attempted';
+                      return (
+                        <tr key={qid} className="hover:bg-purple-50">
+                          <td className="p-3 font-semibold">{index + 1}</td>
+                          <td className="p-3">
+                            <span className="font-medium text-gray-800">{item.questionText}</span>
+                            {/* Show options if present */}
+                            {item.options && item.options.length > 0 && (
+                              <ul className="ml-4 mt-1 text-xs">
+                                {item.options.map((opt, i) => (
+                                  <li key={i} className={opt === item.correctAnswer ? 'font-bold text-green-600' : ''}>
+                                    {opt}
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                            {/* Show correct answer if present */}
+                            {item.correctAnswer && (
+                              <div className="text-xs text-green-700 mt-1">Correct: {item.correctAnswer}</div>
+                            )}
+                          </td>
+                          <td className="p-3">
+                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(item.category)}`}>{item.category}</span>
+                          </td>
+                          <td className="p-3">{item.level}</td>
+                          <td className="p-3">
+                            <a
+                              href={item.questionURL}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => handleSolveClick(qid)}
+                              className={`inline-block px-4 py-2 rounded-lg font-semibold transition-colors duration-150 ${isAttempted ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : 'bg-purple-600 text-white hover:bg-purple-700'}`}
+                              style={{ pointerEvents: isAttempted ? 'none' : 'auto' }}
+                            >
+                              Solve
+                            </a>
+                          </td>
+                          <td className="p-3">
+                            {isAttempted ? (
+                              <span className="text-green-700 font-semibold">Attempted</span>
+                            ) : (
+                              <span className="text-gray-500">Not Attempted</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    }) : (
+                      <tr>
+                        <td colSpan="6" className="text-center text-gray-500 p-4">No questions added yet.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+          {!courseQuiz && (
+            <div className="my-8 p-4 bg-white rounded-xl shadow text-center text-gray-500">
+              No quiz available for this course.
+            </div>
+          )}
 
         </div>
       </div>
