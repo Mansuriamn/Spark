@@ -303,10 +303,10 @@ export default function InstructorDashboard() {
     fetchCreatedCourses();
   }, [user, token]);
 
-  // Update the useEffect that fetches all quizzes to also set quizInfoSaved
   useEffect(() => {
     const fetchAllQuizzes = async () => {
       try {
+
         const res = await fetch('http://localhost:5000/api/quizzes', {
           headers: {
             'Authorization': `Bearer ${token}`,
