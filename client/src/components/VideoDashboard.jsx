@@ -4,8 +4,65 @@ import { AuthContext } from '../pages/AuthContext';
 import { useNavigate, useParams } from 'react-router-dom';
 import Footer from './Footer';
 import axios from 'axios';
+import { XCircle, ArrowRight, Code, Trophy, Target, Zap } from 'lucide-react';
+
+
+const initialProblems = [
+  { id: 1, title: "Online Stock Span", status: "Not Attempted", difficulty: "Medium", category: "Stack" },
+  { id: 2, title: "Daily Temperatures", status: "Not Attempted", difficulty: "Medium", category: "Stack" },
+  { id: 3, title: "Non-Overlapping Intervals", status: "Not Attempted", difficulty: "Medium", category: "Greedy" },
+  { id: 4, title: "Minimum Number of Arrows to Burst Balloons", status: "Not Attempted", difficulty: "Medium", category: "Greedy" },
+  { id: 5, title: "Unique Paths", status: "Not Attempted", difficulty: "Medium", category: "Dynamic Programming" },
+  { id: 6, title: "Longest Common Subsequence", status: "Not Attempted", difficulty: "Medium", category: "Dynamic Programming" },
+  { id: 7, title: "Best Time to Buy and Sell Stock", status: "Not Attempted", difficulty: "Easy", category: "Array" },
+  { id: 8, title: "Edit Distance", status: "Not Attempted", difficulty: "Hard", category: "Dynamic Programming" },
+  { id: 9, title: "Word Search", status: "Not Attempted", difficulty: "Medium", category: "Backtracking" },
+  { id: 10, title: "Letter Combinations of a Phone Number", status: "Not Attempted", difficulty: "Medium", category: "Backtracking" }
+];
 
 const VideoDashboard = () => {
+  const [problems, setProblems] = useState(initialProblems);
+  const [filter, setFilter] = useState('All');
+   const solvedCount = problems.filter(p => p.status === 'Solved').length;
+  const progressPercentage = Math.round((solvedCount / problems.length) * 100);
+
+  const filteredProblems = problems.filter(problem => {
+    if (filter === 'Solved') return problem.status === 'Solved';
+    if (filter === 'Unsolved') return problem.status === 'Not Attempted';
+    return true;
+  });
+
+  const handleSolve = (problemId) => {
+    setProblems(prevProblems => {
+      const updatedProblems = prevProblems.map(problem => 
+        problem.id === problemId 
+          ? { ...problem, status: 'Solved' }
+          : problem
+      );
+      console.log('Updated problems:', updatedProblems);
+      return updatedProblems;
+    });
+  };
+
+  const getDifficultyColor = (difficulty) => {
+    switch (difficulty) {
+      case 'Easy': return 'bg-green-100 text-green-700 border-green-200';
+      case 'Medium': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+      case 'Hard': return 'bg-red-100 text-red-700 border-red-200';
+      default: return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
+  };
+
+  const getCategoryColor = (category) => {
+    const colors = {
+      'Stack': 'bg-blue-50 text-blue-700',
+      'Greedy': 'bg-purple-50 text-purple-700',
+      'Dynamic Programming': 'bg-indigo-50 text-indigo-700',
+      'Array': 'bg-orange-50 text-orange-700',
+      'Backtracking': 'bg-pink-50 text-pink-700'
+    };
+    return colors[category] || 'bg-gray-50 text-gray-700';
+  };
   const navigate = useNavigate();
   const { courseId, lessonId } = useParams();
   const [selectedVideo, setSelectedVideo] = useState(null);
@@ -424,6 +481,8 @@ const VideoDashboard = () => {
 
 
 
+
+
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
@@ -763,6 +822,136 @@ const VideoDashboard = () => {
               )}
             </div>
           </div>
+
+   <div style={{
+    marginTop:"4rem",
+    marginBottom:"3rem",
+   }}>
+    <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                  Quize Dashboard
+                </h1>
+
+   <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+          {/*Desktop View*/}
+          <div className="hidden lg:block overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Problem</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Difficulty</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {filteredProblems.map((problem, index) => (
+                  <tr key={problem.id} className="hover:bg-gray-50 transition-colors duration-150">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-medium text-gray-600">
+                          {index + 1}
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">{problem.title}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(problem.category)}`}>
+                        {problem.category}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getDifficultyColor(problem.difficulty)}`}>
+                        {problem.difficulty}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      {problem.status === "Solved" ? (
+                        <div className="flex items-center gap-2 text-green-600">
+                          <CheckCircle className="w-4 h-4" />
+                          <span className="text-sm font-medium">Solved</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 text-gray-500">
+                          <XCircle className="w-4 h-4" />
+                          <span className="text-sm font-medium">Not Attempted</span>
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      {problem.status !== "Solved" && (
+                        <button
+                          onClick={() => handleSolve(problem.id)}
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-all duration-200 shadow-md hover:shadow-lg"
+                        >
+                          Solve
+                          <ArrowRight className="w-4 h-4" />
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/*Mobile View*/}
+          <div className="lg:hidden">
+            {filteredProblems.map((problem, index) => (
+              <div key={problem.id} className="p-4 border-b border-gray-200 last:border-b-0">
+                <div className="flex items-start justify-between gap-4 mb-3">
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-medium text-gray-600 flex-shrink-0">
+                      {index + 1}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-medium text-gray-900 text-sm leading-tight">{problem.title}</h3>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(problem.category)}`}>
+                    {problem.category}
+                  </span>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getDifficultyColor(problem.difficulty)}`}>
+                    {problem.difficulty}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  {problem.status === "Solved" ? (
+                    <div className="flex items-center gap-2 text-green-600">
+                      <CheckCircle className="w-4 h-4" />
+                      <span className="text-sm font-medium">Solved</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 text-gray-500">
+                      <XCircle className="w-4 h-4" />
+                      <span className="text-sm font-medium">Not Attempted</span>
+                    </div>
+                  )}
+                  
+                  {problem.status !== "Solved" && (
+                    <button
+                      onClick={() => handleSolve(problem.id)}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-all duration-200 shadow-md hover:shadow-lg"
+                    >
+                      Solve
+                      <ArrowRight className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div> 
+
+   </div>
+
+
         </div>
       </div>
       <Footer />
