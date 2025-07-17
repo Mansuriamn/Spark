@@ -79,6 +79,7 @@ const CourseSchema = new mongoose.Schema({
   slug:  { type: String, unique: true, index: true },
   description: String,
   category: String,
+  quizzes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'QuizCard' }],
   tags: [String],
   level: { type: String, enum: ['Beginner','Intermediate','Advanced'], default: 'Beginner' },
   language: { type: String, default: 'en' },
