@@ -64,7 +64,7 @@ function AppWrapper() {
           <Route path="/instructor-course" element={<ProtectedRoute allowedRoles={['instructor']}><FreeCourse /></ProtectedRoute>} />
           <Route path="/instructor" element={<ProtectedRoute allowedRoles={['instructor']}><InstructorDashboard /></ProtectedRoute>} />
           <Route path="/add-lesson/:courseId" element={<ProtectedRoute allowedRoles={['instructor']}><AddLesson /></ProtectedRoute>} />
-          <Route path="/quiz/:courseId" element={<ProtectedRoute allowedRoles={['instructor']}><Quiz /></ProtectedRoute>} />
+          <Route path="/quiz/:id" element={<ProtectedRoute allowedRoles={['instructor']}><Quiz /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute allowedRoles={['student', 'admin', 'instructor']}><UserProfile /></ProtectedRoute>} />
           <Route path='/paidcourses/:courseId' element={<ProtectedRoute allowedRoles={['student', 'admin', 'instructor']}><PaidCourseDetails /></ProtectedRoute>}></Route>
 

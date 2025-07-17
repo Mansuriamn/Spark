@@ -1,189 +1,282 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
-import { Plus, X, Trash2 } from 'lucide-react';
+import { AuthContext } from '../pages/AuthContext';
+import { Trash2, ArrowLeft } from 'lucide-react';
 
 export default function Quiz() {
-  const QuizeData = {
-    title: 'Sample Quiz',
-    level: 'Beginner',
-    description: 'This is a sample quiz description.',
-  };
-
-  const [Show, setShow] = useState(false);
-
-  const [QuestionData, setQuestionData] = useState({
-    question: '',
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [quiz, setQuiz] = useState(null);
+  const [questions, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [editingQuestionId, setEditingQuestionId] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [addForm, setAddForm] = useState({
+    questionText: '',
+    category: '',
     level: '',
-    category:'',
-    url: '',
+    status: 'Not Solve',
+    questionURL: ''
   });
+  const { token } = useContext(AuthContext);
 
-  const [Collection, setCollection] = useState([]);
+  console.log('Quiz page useParams id:', id); // Debug log
 
-  const AddedQuestion = () => {
-    setShow(true);
+  useEffect(() => {
+    if (!id) {
+      setQuiz(null);
+      setQuestions([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    const fetchQuiz = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/quizzes/${id}`);
+        if (!res.ok) throw new Error('Failed to fetch quiz');
+        const data = await res.json();
+        setQuiz(data.quiz || data);
+      } catch (err) {
+        setQuiz(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    const fetchQuestions = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/quizzes/${id}/questions`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('Failed to fetch questions');
+        const data = await res.json();
+        console.log('Quiz questions API response:', data);
+        let questionsArr = [];
+        if (Array.isArray(data)) {
+          questionsArr = data;
+        } else if (Array.isArray(data.questions)) {
+          questionsArr = data.questions;
+        } else if (data.data && Array.isArray(data.data.questions)) {
+          questionsArr = data.data.questions;
+        } else if (data.data && Array.isArray(data.data)) {
+          questionsArr = data.data;
+        } else if (data.success && Array.isArray(data.questions)) {
+          questionsArr = data.questions;
+        }
+        setQuestions(questionsArr);
+      } catch (err) {
+        setQuestions([]);
+      }
+    };
+    fetchQuiz();
+    fetchQuestions();
+  }, [id]);
+
+  const handleEditClick = (question) => {
+    setEditingQuestionId(question._id || question.id);
+    setEditForm({
+      questionText: question.questionText,
+      level: question.level,
+      category: question.category,
+      status: question.status,
+      questionURL: question.questionURL,
+    });
   };
 
-  const handleInputChange = (e) => {
-    setQuestionData({ ...QuestionData, [e.target.name]: e.target.value });
+  const handleEditChange = (e) => {
+    setEditForm({ ...editForm, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleEditSave = async (questionId) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/quizzes/${id}/questions/${questionId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(editForm),
+      });
+      if (!res.ok) throw new Error('Failed to update question');
+      setEditingQuestionId(null);
+      // Refresh questions
+      const data = await res.json();
+      setQuestions((prev) => prev.map(q => (q._id === questionId || q.id === questionId ? data : q)));
+    } catch (err) {
+      alert('Failed to update question');
+    }
+  };
+
+  const handleDeleteQuestion = async (questionId) => {
+    if (!window.confirm('Are you sure you want to delete this question?')) return;
+    try {
+      const res = await fetch(`http://localhost:5000/api/quizzes/${id}/questions/${questionId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!res.ok) throw new Error('Failed to delete question');
+      // Refresh questions
+      const qRes = await fetch(`http://localhost:5000/api/quizzes/${id}/questions`);
+      const qData = await qRes.json();
+      setQuestions(qData.questions || qData);
+    } catch (err) {
+      alert('Failed to delete question: ' + err.message);
+    }
+  };
+
+  const handleAddInputChange = (e) => {
+    const { name, value } = e.target;
+    setAddForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddQuestion = async (e) => {
     e.preventDefault();
-    setCollection([...Collection, QuestionData]);
-    console.log('Submitted Question:', QuestionData);
-    setQuestionData({ question: '', level: '', category: '', url: '' });
-    setShow(false);
+    if (!addForm.questionText || !addForm.category || !addForm.level || !addForm.questionURL) {
+      alert('Please fill all fields');
+      return;
+    }
+    try {
+      const res = await fetch(`http://localhost:5000/api/quizzes/${id}/questions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(addForm)
+      });
+      if (!res.ok) throw new Error('Failed to add question');
+      setAddForm({ questionText: '', category: '', level: '', status: 'Not Solve', questionURL: '' });
+      setShowAddForm(false);
+      // Refresh questions
+      const qRes = await fetch(`http://localhost:5000/api/quizzes/${id}/questions`);
+      const qData = await qRes.json();
+      setQuestions(qData.questions || qData);
+    } catch (err) {
+      alert('Failed to add question: ' + err.message);
+    }
   };
 
-  const cancelForm = () => {
-    setShow(false);
-  };
-
-  const deleteQuestion = (index) => {
-    const updated = [...Collection];
-    updated.splice(index, 1);
-    setCollection(updated);
-  };
+  if (!id) return <div>Quiz ID is missing from the URL.</div>;
+  if (loading) return <div>Loading...</div>;
+  if (!quiz) return <div>Quiz not found.</div>;
 
   return (
-    <>
-      <div style={{ marginTop: '10px' }} className="flex flex-col items-center justify-center">
-        <div className="bg-white p-4 rounded-lg shadow-md w-[90%]">
-          <h1 className="text-2xl font-bold mb-4 text-center">{QuizeData.title}</h1>
-
-          <p className="text-gray-600">Level: {QuizeData.level}</p>
-          <p className="text-gray-600">{QuizeData.description}</p>
-
-          {!Show && (
-            <div className="flex items-center justify-center mt-4">
-              <button
-                style={{ marginTop: '15px' }}
-                type="button"
-                onClick={AddedQuestion}
-                className="w-[20%] bg-purple-600 hover:bg-purple-500 text-white py-3 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
-              >
-                <Plus size={18} />
-                <span>Add Question</span>
-              </button>
-            </div>
-          )}
-
-          {/* Form for Question, Level, URL */}
-          <form
-            onSubmit={handleSubmit}
-            className={`mt-4 ${Show ? 'block' : 'hidden'}`}
-          >
-            <div className="relative">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4">
+      <div className="max-w-3xl mx-auto bg-white/80 rounded-2xl shadow-xl p-8 border border-white/20 relative">
+        {/* Back Icon */}
+        <button
+          className="absolute top-4 left-4 flex items-center justify-center w-10 h-10 bg-white rounded-full shadow text-gray-500 hover:text-purple-700 transition-colors border border-gray-200"
+          onClick={() => navigate(-1)}
+          title="Back"
+          style={{ zIndex: 10 }}
+        >
+          <ArrowLeft className="w-6 h-6" />
+          <span className="sr-only">Back</span>
+        </button>
+        {/* Title below the icon with extra spacing */}
+        <div className="mt-12 mb-2">
+          <h2 className="text-2xl font-bold text-purple-800">{quiz ? quiz.title : 'Practice Question'}</h2>
+        </div>
+        <p className="mb-6 text-gray-700">{quiz ? quiz.description : ''}</p>
+        <button
+          className="mb-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl font-medium"
+          onClick={() => setShowAddForm((prev) => !prev)}
+        >
+          {showAddForm ? 'Cancel' : 'Add Question'}
+        </button>
+        {showAddForm && (
+          <form className="mb-6 bg-purple-50 p-4 rounded-xl" onSubmit={handleAddQuestion}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <input
                 type="text"
-                name="question"
-                placeholder="Enter question"
-                value={QuestionData.question}
-                onChange={handleInputChange}
-                className="w-full p-2 border border-gray-300 rounded-lg mt-4"
-                required
+                name="questionText"
+                placeholder="Question"
+                value={addForm.questionText}
+                onChange={handleAddInputChange}
+                className="p-2 border rounded"
               />
-              <button
-                type="button"
-                onClick={cancelForm}
-                className="absolute top-6 right-2 text-gray-500 hover:text-red-600"
-              >
-                <X />
-              </button>
-            </div>
-
-            <select
-              name="level"
-              value={QuestionData.level}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded-lg mt-4"
-              required
-            >
-              <option value="">Select Level</option>
-              <option value="Beginner">Beginner</option>
-              <option value="Intermediate">Intermediate</option>
-              <option value="Advanced">Advanced</option>
-            </select>
               <input
-              type="text"
-              name="category"
-              placeholder="Enter category "
-              value={QuestionData.category}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded-lg mt-4"
-              required
-            />
-
-            <input
-              type="url"
-              name="url"
-              placeholder="Enter related URL"
-              value={QuestionData.url}
-              onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded-lg mt-4"
-              required
-            />
-
+                type="text"
+                name="category"
+                placeholder="Category"
+                value={addForm.category}
+                onChange={handleAddInputChange}
+                className="p-2 border rounded"
+              />
+              <input
+                type="text"
+                name="level"
+                placeholder="Level (easy, medium, hard)"
+                value={addForm.level}
+                onChange={handleAddInputChange}
+                className="p-2 border rounded"
+              />
+              <input
+                type="text"
+                name="questionURL"
+                placeholder="Question URL"
+                value={addForm.questionURL}
+                onChange={handleAddInputChange}
+                className="p-2 border rounded"
+              />
+            </div>
             <button
               type="submit"
-              className="w-full bg-purple-600 hover:bg-purple-500 text-white py-2 rounded-lg mt-4"
+              className="mt-4 bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-xl font-medium"
             >
-              Submit
+              Save Question
             </button>
           </form>
-
-          {/* Table for Questions */}
-          {Collection.length > 0 && (
-            <div className="mt-8 overflow-x-auto">
-              <h3 className="text-xl font-semibold mb-4 text-center">
-                Submitted Questions
-              </h3>
-              <table className="w-full border border-gray-300 text-sm">
-                <thead className="bg-purple-100 text-gray-800">
-                  <tr>
-                    <th className="border p-2 text-left">#</th>
-                    <th className="border p-2 text-left">Question</th>
-                    <th className="border p-2 text-left">Level</th>
-                    <th className="border p-2 text-left">URL</th>
-                    <th className="border p-2 text-left">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Collection.map((item, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
-                      <td className="border p-2">{index + 1}</td>
-                      <td className="border p-2">{item.question}</td>
-                      <td className="border p-2">{item.level}</td>
-                      <td className="border p-2">
-                        <a
-                          href={item.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline"
-                        >
-                          Link
-                        </a>
-                      </td>
-                      <td className="border p-2">
-                        <button
-                          onClick={() => deleteQuestion(index)}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+        )}
+        <div className="overflow-x-auto">
+          <h3 className="text-xl font-semibold mb-4 text-center">Quiz Questions</h3>
+          <table className="w-full border border-gray-300 text-sm">
+            <thead className="bg-purple-100 text-gray-800">
+              <tr>
+                <th className="border p-2 text-left">#</th>
+                <th className="border p-2 text-left">Question</th>
+                <th className="border p-2 text-left">Level</th>
+                <th className="border p-2 text-left">Category</th>
+                <th className="border p-2 text-left">URL</th>
+                <th className="border p-2 text-left">Status</th>
+                <th className="border p-2 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {questions.length > 0 ? questions.map((item, index) => (
+                <tr key={item._id || index} className="hover:bg-gray-50">
+                  <td className="border p-2">{index + 1}</td>
+                  <td className="border p-2">{item.questionText}</td>
+                  <td className="border p-2">{item.level}</td>
+                  <td className="border p-2">{item.category}</td>
+                  <td className="border p-2">
+                    <a
+                      href={item.questionURL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      Link
+                    </a>
+                  </td>
+                  <td className="border p-2">{item.status}</td>
+                  <td className="border p-2 text-center">
+                    <button onClick={() => handleDeleteQuestion(item._id || item.id)} className="text-red-600 hover:text-red-800">
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </td>
+                </tr>
+              )) : (
+                <tr><td colSpan="5" className="text-center text-gray-500">No questions added yet.</td></tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
-     <div className='mt-10'>
-       <Footer />
-     </div>
-    </>
+      <Footer />
+    </div>
   );
 }

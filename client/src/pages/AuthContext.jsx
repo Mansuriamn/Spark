@@ -6,7 +6,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [role, setRole] = useState(localStorage.getItem('role'));
-  
+
   const [userProfile, setUserProfile] = useState(null);
 
   const [enrolledCourses, setEnrolledCourses] = useState([]);
@@ -15,7 +15,11 @@ export const AuthProvider = ({ children }) => {
   const [enrolledCourseIds, setEnrolledCourseIds] = useState([]);
   const [cartCourseIds, setCartCourseIds] = useState([]);
 
-  const [currentLessonId, setCurrentLessonId] = useState(""); 
+  const [currentLessonId, setCurrentLessonId] = useState("");
+
+  const [lastCreatedQuizId, setLastCreatedQuizId] = useState(
+    localStorage.getItem('lastCreatedQuizId') || null
+  );
 
   useEffect(() => {
     const storedUser = localStorage.getItem('userData');
@@ -26,13 +30,12 @@ export const AuthProvider = ({ children }) => {
     const storedCourseIds = localStorage.getItem('enrolledCourseIds');
     const storedCartIds = localStorage.getItem('cartCourseIds');
     const storedLessonId = localStorage.getItem('currentLessonId');
+    const storedQuizId = localStorage.getItem('lastCreatedQuizId');
 
     if (storedUser && storedToken) {
       try {
         setUser(JSON.parse(storedUser));
         setToken(storedToken);
-
-        
 
         if (storedProfile) {
           setUserProfile(JSON.parse(storedProfile));
@@ -52,11 +55,26 @@ export const AuthProvider = ({ children }) => {
         if (storedLessonId) {
           setCurrentLessonId(storedLessonId);
         }
+        if (storedQuizId) {
+          setLastCreatedQuizId(storedQuizId);
+        }
       } catch (err) {
         localStorage.clear();
       }
     }
   }, []);
+
+  const updateLastCreatedQuizId = (id) => {
+    setLastCreatedQuizId(id);
+    localStorage.setItem('lastCreatedQuizId', id);
+    console.log('updateLastCreatedQuizId called with:', id);
+  };
+
+  useEffect(() => {
+    if (lastCreatedQuizId) {
+      console.log('AuthContext lastCreatedQuizId changed:', lastCreatedQuizId);
+    }
+  }, [lastCreatedQuizId]);
 
   const isAuthenticated = !!user && !!token;
 
@@ -72,8 +90,6 @@ export const AuthProvider = ({ children }) => {
 
     const courseIds = normalizedUserCourses.map(c => String(c._id));
     const cartIds = normalizedCart.map(c => String(c._id));
-
-    
 
     localStorage.setItem('userData', JSON.stringify(userData));
     localStorage.setItem('authToken', authToken);
@@ -106,6 +122,7 @@ export const AuthProvider = ({ children }) => {
     setEnrolledCourseIds([]);
     setCartCourseIds([]);
     setCurrentLessonId(null);
+    setLastCreatedQuizId(null);
   };
 
   const updateUser = (updatedUser) => {
@@ -178,6 +195,8 @@ export const AuthProvider = ({ children }) => {
         updateCartCourses,
         isCourseEnrolled,
         isCourseInCart,
+        lastCreatedQuizId,
+        updateLastCreatedQuizId,
       }}
     >
       {children}

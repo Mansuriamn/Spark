@@ -49,8 +49,6 @@ export default function InstructorDashboard() {
   const [touched, setTouched] = useState({});
   const [errors, setErrors] = useState({});
 
-
-
   // Fetch courses on component mount
   useEffect(() => {
     if (user?.id) {
@@ -305,7 +303,34 @@ export default function InstructorDashboard() {
     fetchCreatedCourses();
   }, [user, token]);
 
-
+  // Update the useEffect that fetches all quizzes to also set quizInfoSaved
+  useEffect(() => {
+    const fetchAllQuizzes = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/quizzes', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (!res.ok) throw new Error('Failed to fetch quizzes');
+        const data = await res.json();
+        // Map courseId to quizId and mark quizInfoSaved true for existing quizzes
+        const mapping = {};
+        const infoSaved = {};
+        (data || []).forEach(q => {
+          if (q.courseId) {
+            mapping[q.courseId] = q._id || q.id;
+            infoSaved[q.courseId] = true;
+          }
+        });
+        setQuizIdForCourse(mapping);
+        setQuizInfoSaved(infoSaved);
+      } catch (err) {
+        // Optionally handle error
+      }
+    };
+    if (user && token) fetchAllQuizzes();
+  }, [user, token]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -469,8 +494,6 @@ export default function InstructorDashboard() {
   const totalRevenue = courses.reduce((sum, course) => sum + (course.revenue || 0), 0);
   const avgRating = courses.length > 0 ? (courses.reduce((sum, course) => sum + (course.rating || 0), 0) / courses.length).toFixed(1) : 0;
 
-
-
   const [courseId, setCourseId] = useState(null);
   const [QuizInfo, setQuizInfo] = useState({
     courseId: '',
@@ -525,6 +548,202 @@ export default function InstructorDashboard() {
   const Go_Quiz = (id) => {
     navigate(`/quiz/${id}`);
   };
+
+  // --- QUIZ & QUESTION STATE ---
+  const [quizIdForCourse, setQuizIdForCourse] = useState({}); // { [courseId]: quizId }
+  const [showQuestionForm, setShowQuestionForm] = useState(null); // courseId for which to show question form
+  const [questionForm, setQuestionForm] = useState({
+    question: '',
+    options: ['', '', '', ''],
+    correctAnswer: 0,
+  });
+  const [questions, setQuestions] = useState({}); // { [quizId]: [questions] }
+  const [quizLoading, setQuizLoading] = useState(false);
+  const [quizError, setQuizError] = useState('');
+  const [quizSuccess, setQuizSuccess] = useState('');
+
+  // Add a state to track if quiz info has been saved for a course
+  const [quizInfoSaved, setQuizInfoSaved] = useState({}); // { [courseId]: true/false }
+
+  // --- QUIZ API INTEGRATION ---
+  const createQuizForCourse = async (course) => {
+    setQuizLoading(true);
+    setQuizError('');
+    try {
+      const res = await fetch('http://localhost:5000/api/quizzes', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          courseId: course.id,
+          title: course.title + ' Quiz',
+          level: course.level,
+          description: course.description,
+        }),
+      });
+      if (!res.ok) throw new Error('Failed to create quiz');
+      const quiz = await res.json();
+      setQuizIdForCourse((prev) => ({ ...prev, [course.id]: quiz._id || quiz.id }));
+      setShowQuestionForm(course.id);
+      setQuizSuccess('Quiz created! Now add quiz info.');
+      setQuizInfoSaved(prev => ({ ...prev, [course.id]: false }));
+      setTimeout(() => setQuizSuccess(''), 2000);
+    } catch (err) {
+      setQuizError('Quiz creation failed: ' + err.message);
+    } finally {
+      setQuizLoading(false);
+    }
+  };
+
+  const addQuestionToQuiz = async (courseId) => {
+    const quizId = quizIdForCourse[courseId];
+    if (!quizId) return;
+    setQuizLoading(true);
+    setQuizError('');
+    try {
+      const res = await fetch(`http://localhost:5000/api/quizzes/${quizId}/questions`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question: questionForm.question,
+          options: questionForm.options,
+          correctAnswer: questionForm.correctAnswer,
+        }),
+      });
+      if (!res.ok) throw new Error('Failed to add question');
+      const q = await res.json();
+      setQuestions((prev) => ({
+        ...prev,
+        [quizId]: [...(prev[quizId] || []), q],
+      }));
+      setQuestionForm({ question: '', options: ['', '', '', ''], correctAnswer: 0 });
+      setQuizSuccess('Question added!');
+      setTimeout(() => setQuizSuccess(''), 1500);
+    } catch (err) {
+      setQuizError('Add question failed: ' + err.message);
+    } finally {
+      setQuizLoading(false);
+    }
+  };
+
+  const handleQuestionInput = (e, idx = null) => {
+    const { name, value } = e.target;
+    if (name === 'question') {
+      setQuestionForm((prev) => ({ ...prev, question: value }));
+    } else if (name.startsWith('option')) {
+      const i = parseInt(name.replace('option', ''));
+      setQuestionForm((prev) => {
+        const opts = [...prev.options];
+        opts[i] = value;
+        return { ...prev, options: opts };
+      });
+    } else if (name === 'correctAnswer') {
+      setQuestionForm((prev) => ({ ...prev, correctAnswer: parseInt(value) }));
+    }
+  };
+
+  const closeQuestionForm = () => {
+    setShowQuestionForm(null);
+    setQuestionForm({ question: '', options: ['', '', '', ''], correctAnswer: 0 });
+  };
+
+  // Add state for editing quiz info
+  const [quizEditForm, setQuizEditForm] = useState({ title: '', description: '', level: '' });
+  const [quizEditLoading, setQuizEditLoading] = useState(false);
+  const [quizEditSuccess, setQuizEditSuccess] = useState('');
+  const [quizEditError, setQuizEditError] = useState('');
+
+  // Fetch quiz info when showQuestionForm is set
+  useEffect(() => {
+    const fetchQuizInfo = async () => {
+      const quizId = quizIdForCourse[showQuestionForm];
+      if (!quizId) return;
+      try {
+        const res = await fetch(`http://localhost:5000/api/quizzes/${quizId}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error('Failed to fetch quiz info');
+        const data = await res.json();
+        setQuizEditForm({
+          title: data.title || '',
+          description: data.description || '',
+          level: data.level || '',
+        });
+      } catch (err) {
+        setQuizEditForm({ title: '', description: '', level: '' });
+      }
+    };
+    if (showQuestionForm && quizIdForCourse[showQuestionForm]) {
+      fetchQuizInfo();
+    }
+  }, [showQuestionForm, quizIdForCourse, token]);
+
+  const handleQuizEditChange = (e) => {
+    const { name, value } = e.target;
+    setQuizEditForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleQuizEditSave = async () => {
+    const quizId = quizIdForCourse[showQuestionForm];
+    if (!quizId) return;
+    setQuizEditLoading(true);
+    setQuizEditError('');
+    setQuizEditSuccess('');
+    try {
+      const res = await fetch(`http://localhost:5000/api/quizzes/${quizId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(quizEditForm),
+      });
+      if (!res.ok) throw new Error('Failed to update quiz info');
+      setQuizEditSuccess('Quiz info updated!');
+      setQuizInfoSaved(prev => ({ ...prev, [showQuestionForm]: true }));
+      setTimeout(() => setQuizEditSuccess(''), 2000);
+      // Optionally close the form after save
+      setTimeout(() => setShowQuestionForm(null), 1200);
+    } catch (err) {
+      setQuizEditError('Failed to update quiz info: ' + err.message);
+    } finally {
+      setQuizEditLoading(false);
+    }
+  };
+
+  // Cross icon handler
+  const closeQuizPopup = () => {
+    setShowQuestionForm(null);
+    setQuizEditForm({ title: '', description: '', level: '' });
+    setQuizEditError('');
+    setQuizEditSuccess('');
+  };
+
+  // Add effect to fetch questions for the quiz when showQuestionForm is set
+  useEffect(() => {
+    const fetchQuizQuestions = async () => {
+      const quizId = quizIdForCourse[showQuestionForm];
+      if (!quizId) return;
+      try {
+        const res = await fetch(`http://localhost:5000/api/quizzes/${quizId}/questions`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error('Failed to fetch quiz questions');
+        const data = await res.json();
+        setQuestions(prev => ({ ...prev, [quizId]: data.questions || data }));
+      } catch (err) {
+        setQuestions(prev => ({ ...prev, [quizId]: [] }));
+      }
+    };
+    if (showQuestionForm && quizIdForCourse[showQuestionForm]) {
+      fetchQuizQuestions();
+    }
+  }, [showQuestionForm, quizIdForCourse, token]);
 
   return (
     <>
@@ -916,255 +1135,50 @@ export default function InstructorDashboard() {
 
           {/* Courses Grid */}
           {createCourses && createCourses.length > 0 ? (
-            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8 items-stretch">
               {createCourses.map((course) => (
                 <div
                   key={course.id}
-                  className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 border border-white/20 group"
+                  className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 border border-white/20 group flex flex-col h-full"
                 >
-                  <div className="flex justify-between items-start mb-4">
-                    <span className={`text-sm px-3 py-1 rounded-full font-medium ${course.level === 'Beginner' ? 'bg-green-100 text-green-700' : course.level === 'Intermediate' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>
-                      {course.level}
-                    </span>
-                    <div className="flex items-center space-x-2">
-                      <div className="flex items-center space-x-2 text-sm text-gray-500">
-                        <Calendar className="w-4 h-4" />
-                        <span>{course.duration}</span>
-                      </div>
-                      <button
-                        onClick={() => {
-                          if (window.confirm(`Are you sure you want to delete "${course.title}"? This action cannot be undone.`)) {
-                            deleteCourse(course.id);
-                          }
-                        }}
-                        disabled={deletingCourse === course.id}
-                        className={`transition-colors ${deletingCourse === course.id
-                          ? 'text-gray-400 cursor-not-allowed'
-                          : 'text-red-500 hover:text-red-700'
-                          }`}
-                        title={deletingCourse === course.id ? "Deleting..." : "Delete Course"}
-                      >
-                        {deletingCourse === course.id ? (
-                          <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-                        ) : (
-                          <Trash2 className="w-4 h-4" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  {editingCourse === course.id ? (
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center mb-4">
-                        <h5 className="text-lg font-semibold text-gray-800">Edit Course</h5>
+                  <div className="flex-grow">
+                    <div className="flex justify-between items-start mb-4">
+                      <span className={`text-sm px-3 py-1 rounded-full font-medium ${course.level === 'Beginner' ? 'bg-green-100 text-green-700' : course.level === 'Intermediate' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>
+                        {course.level}
+                      </span>
+                      <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-2 text-sm text-gray-500">
+                          <Calendar className="w-4 h-4" />
+                          <span>{course.duration}</span>
+                        </div>
                         <button
-                          onClick={cancelEditing}
-                          className="text-gray-400 hover:text-gray-600"
+                          onClick={() => {
+                            if (window.confirm(`Are you sure you want to delete "${course.title}"? This action cannot be undone.`)) {
+                              deleteCourse(course.id);
+                            }
+                          }}
+                          disabled={deletingCourse === course.id}
+                          className={`transition-colors ${deletingCourse === course.id
+                            ? 'text-gray-400 cursor-not-allowed'
+                            : 'text-red-500 hover:text-red-700'
+                            }`}
+                          title={deletingCourse === course.id ? "Deleting..." : "Delete Course"}
                         >
-                          <X className="w-5 h-5" />
-                        </button>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                          <input
-                            type="text"
-                            name="title"
-                            value={editFormData[course.id]?.title || ''}
-                            onChange={(e) => handleEditChange(e, course.id)}
-                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                            placeholder="Course Title"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
-                          <input
-                            type="number"
-                            name="price"
-                            value={editFormData[course.id]?.price || ''}
-                            onChange={(e) => handleEditChange(e, course.id)}
-                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                            placeholder="Course Price"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Level</label>
-                          <select
-                            name="level"
-                            value={editFormData[course.id]?.level || ''}
-                            onChange={(e) => handleEditChange(e, course.id)}
-                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                          >
-                            <option value="">Select Level</option>
-                            <option value="Beginner">Beginner</option>
-                            <option value="Intermediate">Intermediate</option>
-                            <option value="Advanced">Advanced</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                          <select
-                            name="category"
-                            value={editFormData[course.id]?.category || ''}
-                            onChange={(e) => handleEditChange(e, course.id)}
-                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                          >
-                            <option value="">Select Category</option>
-                            <option value="Educate">Educate</option>
-                            <option value="Design">Design</option>
-                            <option value="Development">Development</option>
-                            <option value="AI">AI</option>
-                            <option value="Marketing">Marketing</option>
-                            <option value="Machine Learning">Machine Learning</option>
-                            <option value="Iot">Iot</option>
-                            <option value="Health">Health</option>
-                            <option value="Data Science">Data Science</option>
-                            <option value="Finance">Finance</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
-                          <input
-                            type="text"
-                            name="duration"
-                            value={editFormData[course.id]?.duration || ''}
-                            onChange={(e) => handleEditChange(e, course.id)}
-                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                            placeholder="e.g., 8 weeks"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Language</label>
-                          <select
-                            name="language"
-                            value={editFormData[course.id]?.language || ''}
-                            onChange={(e) => handleEditChange(e, course.id)}
-                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                          >
-                            <option value="">Select Language</option>
-                            <option value="English">English</option>
-                            <option value="Hindi">Hindi</option>
-                            <option value="Marathi">Marathi</option>
-                            <option value="Tamil">Tamil</option>
-                            <option value="Telegu">Telegu</option>
-                            <option value="Gujurati">Gujurati</option>
-                            <option value="Bengali">Bengali</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                        <textarea
-                          name="description"
-                          value={editFormData[course.id]?.description || ''}
-                          onChange={(e) => handleEditChange(e, course.id)}
-                          className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                          rows="3"
-                          placeholder="Course Description"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Topics</label>
-                        <input
-                          type="text"
-                          name="topics"
-                          value={editFormData[course.id]?.topics || ''}
-                          onChange={(e) => handleEditChange(e, course.id)}
-                          className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                          placeholder="Course Topics"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Prerequisites</label>
-                        <textarea
-                          name="prerequisites"
-                          value={editFormData[course.id]?.prerequisites || ''}
-                          onChange={(e) => handleEditChange(e, course.id)}
-                          className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                          rows="2"
-                          placeholder="Requirements / Prerequisites (comma separated)"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Skills</label>
-                        <textarea
-                          name="skillTags"
-                          value={editFormData[course.id]?.skillTags || ''}
-                          onChange={(e) => handleEditChange(e, course.id)}
-                          className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                          rows="2"
-                          placeholder="Skills covered (comma separated)"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">What Will Learn</label>
-                        <textarea
-                          name="whatWillLearn"
-                          value={editFormData[course.id]?.whatWillLearn || ''}
-                          onChange={(e) => handleEditChange(e, course.id)}
-                          className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                          rows="2"
-                          placeholder="Learning outcomes (comma separated)"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Course Image</label>
-                        <input
-                          type="file"
-                          name="picture"
-                          accept="image/*"
-                          onChange={(e) => handleEditChange(e, course.id)}
-                          className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                        />
-                      </div>
-
-                      <div className="flex space-x-3 pt-4">
-                        <button
-                          onClick={() => updateCourse(course.id, editFormData[course.id])}
-                          disabled={updatingCourse === course.id}
-                          className="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {updatingCourse === course.id ? (
-                            <>
-                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                              <span>Updating...</span>
-                            </>
+                          {deletingCourse === course.id ? (
+                            <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
                           ) : (
-                            <>
-                              <Save className="w-4 h-4" />
-                              <span>Update Course</span>
-                            </>
+                            <Trash2 className="w-4 h-4" />
                           )}
                         </button>
-                        <button
-                          onClick={cancelEditing}
-                          disabled={updatingCourse === course.id}
-                          className="flex-1 bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600 transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <X className="w-4 h-4" />
-                          <span>Cancel</span>
-                        </button>
                       </div>
                     </div>
-                  ) : courseId === course.id ? (
-                    <>
+
+                    {editingCourse === course.id ? (
                       <div className="space-y-4">
                         <div className="flex justify-between items-center mb-4">
-                          <h5 className="text-lg font-semibold text-gray-800">Initialize Quiz</h5>
+                          <h5 className="text-lg font-semibold text-gray-800">Edit Course</h5>
                           <button
-                            onClick={() => ClosePopup()}
+                            onClick={cancelEditing}
                             className="text-gray-400 hover:text-gray-600"
                           >
                             <X className="w-5 h-5" />
@@ -1177,21 +1191,31 @@ export default function InstructorDashboard() {
                             <input
                               type="text"
                               name="title"
-                              value={QuizInfo.title}
-                              onChange={(e) => OpenQuizPopup(e)}
+                              value={editFormData[course.id]?.title || ''}
+                              onChange={(e) => handleEditChange(e, course.id)}
                               className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                               placeholder="Course Title"
                             />
                           </div>
 
-
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
+                            <input
+                              type="number"
+                              name="price"
+                              value={editFormData[course.id]?.price || ''}
+                              onChange={(e) => handleEditChange(e, course.id)}
+                              className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                              placeholder="Course Price"
+                            />
+                          </div>
 
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Level</label>
                             <select
                               name="level"
-                              value={QuizInfo.level}
-                              onChange={(e) => OpenQuizPopup(e)}
+                              value={editFormData[course.id]?.level || ''}
+                              onChange={(e) => handleEditChange(e, course.id)}
                               className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                             >
                               <option value="">Select Level</option>
@@ -1201,227 +1225,349 @@ export default function InstructorDashboard() {
                             </select>
                           </div>
 
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                            <select
+                              name="category"
+                              value={editFormData[course.id]?.category || ''}
+                              onChange={(e) => handleEditChange(e, course.id)}
+                              className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            >
+                              <option value="">Select Category</option>
+                              <option value="Educate">Educate</option>
+                              <option value="Design">Design</option>
+                              <option value="Development">Development</option>
+                              <option value="AI">AI</option>
+                              <option value="Marketing">Marketing</option>
+                              <option value="Machine Learning">Machine Learning</option>
+                              <option value="Iot">Iot</option>
+                              <option value="Health">Health</option>
+                              <option value="Data Science">Data Science</option>
+                              <option value="Finance">Finance</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
+                            <input
+                              type="text"
+                              name="duration"
+                              value={editFormData[course.id]?.duration || ''}
+                              onChange={(e) => handleEditChange(e, course.id)}
+                              className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                              placeholder="e.g., 8 weeks"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Language</label>
+                            <select
+                              name="language"
+                              value={editFormData[course.id]?.language || ''}
+                              onChange={(e) => handleEditChange(e, course.id)}
+                              className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            >
+                              <option value="">Select Language</option>
+                              <option value="English">English</option>
+                              <option value="Hindi">Hindi</option>
+                              <option value="Marathi">Marathi</option>
+                              <option value="Tamil">Tamil</option>
+                              <option value="Telegu">Telegu</option>
+                              <option value="Gujurati">Gujurati</option>
+                              <option value="Bengali">Bengali</option>
+                            </select>
+                          </div>
                         </div>
 
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                           <textarea
                             name="description"
-                            value={QuizInfo.description}
-                            onChange={(e) => OpenQuizPopup(e)}
+                            value={editFormData[course.id]?.description || ''}
+                            onChange={(e) => handleEditChange(e, course.id)}
                             className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                             rows="3"
                             placeholder="Course Description"
                           />
                         </div>
 
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Topics</label>
+                          <input
+                            type="text"
+                            name="topics"
+                            value={editFormData[course.id]?.topics || ''}
+                            onChange={(e) => handleEditChange(e, course.id)}
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            placeholder="Course Topics"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Prerequisites</label>
+                          <textarea
+                            name="prerequisites"
+                            value={editFormData[course.id]?.prerequisites || ''}
+                            onChange={(e) => handleEditChange(e, course.id)}
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            rows="2"
+                            placeholder="Requirements / Prerequisites (comma separated)"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Skills</label>
+                          <textarea
+                            name="skillTags"
+                            value={editFormData[course.id]?.skillTags || ''}
+                            onChange={(e) => handleEditChange(e, course.id)}
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            rows="2"
+                            placeholder="Skills covered (comma separated)"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">What Will Learn</label>
+                          <textarea
+                            name="whatWillLearn"
+                            value={editFormData[course.id]?.whatWillLearn || ''}
+                            onChange={(e) => handleEditChange(e, course.id)}
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            rows="2"
+                            placeholder="Learning outcomes (comma separated)"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Course Image</label>
+                          <input
+                            type="file"
+                            name="picture"
+                            accept="image/*"
+                            onChange={(e) => handleEditChange(e, course.id)}
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                          />
+                        </div>
+
                         <div className="flex space-x-3 pt-4">
                           <button
-                            onClick={SubmitQuiz}
+                            onClick={() => updateCourse(course.id, editFormData[course.id])}
+                            disabled={updatingCourse === course.id}
                             className="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            <span>Submit</span>
+                            {updatingCourse === course.id ? (
+                              <>
+                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                <span>Updating...</span>
+                              </>
+                            ) : (
+                              <>
+                                <Save className="w-4 h-4" />
+                                <span>Update Course</span>
+                              </>
+                            )}
                           </button>
-
+                          <button
+                            onClick={cancelEditing}
+                            disabled={updatingCourse === course.id}
+                            className="flex-1 bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600 transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <X className="w-4 h-4" />
+                            <span>Cancel</span>
+                          </button>
                         </div>
                       </div>
-                    </>
-                  ) : (
-                    <>
-                      <h4 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors">
-                        {course.title}
-                      </h4>
-                      <p className="text-sm text-gray-600 mb-2">{course.description}</p>
-                      <p className="text-sm text-gray-600 mb-4">
-                        <span className="font-medium">Topics:</span> {course.topics}
-                      </p>
+                    ) : courseId === course.id ? (
+                      <>
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-center mb-4">
+                            <h5 className="text-lg font-semibold text-gray-800">Initialize Quiz</h5>
+                            <button
+                              onClick={() => ClosePopup()}
+                              className="text-gray-400 hover:text-gray-600"
+                            >
+                              <X className="w-5 h-5" />
+                            </button>
+                          </div>
 
-                      <div className="space-y-3 mb-6">
-                        <div className="flex justify-between items-center">
-                          <span className="flex items-center space-x-2 text-sm text-gray-600">
-                            <Users className="w-4 h-4" />
-                            <span>{course.students || 0} students</span>
-                          </span>
-                          <span className="flex items-center space-x-2 text-sm font-medium text-green-600">
-                            <span>₹{(course.revenue || 0).toLocaleString()}</span>
-                          </span>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                              <input
+                                type="text"
+                                name="title"
+                                value={QuizInfo.title}
+                                onChange={(e) => OpenQuizPopup(e)}
+                                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                placeholder="Course Title"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Level</label>
+                              <select
+                                name="level"
+                                value={QuizInfo.level}
+                                onChange={(e) => OpenQuizPopup(e)}
+                                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                              >
+                                <option value="">Select Level</option>
+                                <option value="Beginner">Beginner</option>
+                                <option value="Intermediate">Intermediate</option>
+                                <option value="Advanced">Advanced</option>
+                              </select>
+                            </div>
+
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                            <textarea
+                              name="description"
+                              value={QuizInfo.description}
+                              onChange={(e) => OpenQuizPopup(e)}
+                              className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                              rows="3"
+                              placeholder="Course Description"
+                            />
+                          </div>
+
+                          <div className="flex space-x-3 pt-4">
+                            <button
+                              onClick={SubmitQuiz}
+                              className="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <span>Submit</span>
+                            </button>
+                          </div>
                         </div>
+                      </>
+                    ) : (
+                      <>
+                        <h4 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors">
+                          {course.title}
+                        </h4>
+                        <p className="text-sm text-gray-600 mb-2">{course.description}</p>
+                        <p className="text-sm text-gray-600 mb-4">
+                          <span className="font-medium">Topics:</span> {course.topics}
+                        </p>
 
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">Course Price: ₹{course.price}</span>
-
-
-
-
-                          {course.rating > 0 && (
-                            <span className="flex items-center space-x-1 text-sm text-yellow-600">
-                              <Award className="w-4 h-4" />
-                              <span>{course.rating}/5</span>
+                        <div className="space-y-3 mb-6">
+                          <div className="flex justify-between items-center">
+                            <span className="flex items-center space-x-2 text-sm text-gray-600">
+                              <Users className="w-4 h-4" />
+                              <span>{course.students || 0} students</span>
                             </span>
+                            <span className="flex items-center space-x-2 text-sm font-medium text-green-600">
+                              <span>₹{course.price}</span>
+                            </span>
+                          </div>
+
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Course Price: ₹{course.price}</span>
+
+                            {course.rating > 0 && (
+                              <span className="flex items-center space-x-1 text-sm text-yellow-600">
+                                <Award className="w-4 h-4" />
+                                <span>{course.rating}/5</span>
+                              </span>
+                            )}
+                          </div>
+
+                          {course.completion > 0 && (
+                            <div>
+                              <div className="flex justify-between text-sm text-gray-600 mb-1">
+                                <span>Avg Completion</span>
+                                <span>{course.completion}%</span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div
+                                  className="bg-purple-600 h-2 rounded-full transition-all duration-300"
+                                  style={{ width: `${course.completion}%` }}
+                                ></div>
+                              </div>
+                            </div>
                           )}
                         </div>
 
-
-
-                        {course.completion > 0 && (
-                          <div>
-                            <div className="flex justify-between text-sm text-gray-600 mb-1">
-                              <span>Avg Completion</span>
-                              <span>{course.completion}%</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                              <div
-                                className="bg-purple-600 h-2 rounded-full transition-all duration-300"
-                                style={{ width: `${course.completion}%` }}
-                              ></div>
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2 text-sm text-gray-600">
-                            <BookOpen className="w-4 h-4" />
-                            <span>{course.lessons ? course.lessons.length : 0} lessons</span>
-                          </div>
+                        <div className="mt-6 flex flex-col space-y-2">
+                          <button
+                            onClick={() => startEditing(course)}
+                            className="w-full bg-purple-600 hover:bg-purple-500 text-white py-3 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                            <span>Edit Course</span>
+                          </button>
+                          {quizIdForCourse[course.id] && quizInfoSaved[course.id] ? (
+                            <button
+                              onClick={() => navigate(`/quiz/${quizIdForCourse[course.id]}`)}
+                              className="w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
+                            >
+                              <span>Go to Quiz</span>
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => createQuizForCourse(course)}
+                              className="w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
+                              disabled={quizLoading}
+                            >
+                              <span>{quizLoading ? 'Creating Quiz...' : 'Initialize Quiz'}</span>
+                            </button>
+                          )}
+                          <button
+                            onClick={() => toggleStudentView(course.id)}
+                            className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
+                          >
+                            <Eye className="w-4 h-4" />
+                            <span>View Students</span>
+                            {expandedCourse === course.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                          </button>
                           <button
                             onClick={() => navigate(`/add-lesson/${course.id}`, {
                               state: { courseId: course.id, courseTitle: course.title }
                             })}
-                            className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-lg text-xs transition-all duration-200 flex items-center space-x-1"
+                            className="w-full bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
                           >
-                            <Plus className="w-3 h-3" />
+                            <Plus className="w-4 h-4" />
                             <span>Add Lesson</span>
                           </button>
-
-
                         </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <button
-                          onClick={() => startEditing(course)}
-                          className="w-full bg-purple-600 hover:bg-purple-500 text-white py-3 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
-                        >
-                          <Edit3 className="w-4 h-4" />
-                          <span>Edit Course</span>
-                        </button>
-
-                        {submittedCourses.includes(course.id) ? (
-                          <button
-                            onClick={() => Go_Quiz(course.id)}
-                            className="w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
-                          >
-                            <span>Go to Quiz</span>
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => OpenPopup(course)}
-                            className="w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
-                          >
-                            <span>Initialize Quiz</span>
-                          </button>
-                        )}
-
-
-
-                        <button
-                          onClick={() => toggleStudentView(course.id)}
-                          className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg"
-                        >
-                          <Eye className="w-4 h-4" />
-                          <span>View Students</span>
-                          {expandedCourse === course.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                        </button>
-                      </div>
-
-                      {expandedCourse === course.id && (
-                        <div className="mt-4 space-y-3 border-t pt-4">
-                          <h5 className="font-medium text-gray-800 mb-3">Enrolled Students ({(course.enrolledStudents || []).length})</h5>
-                          {(!course.enrolledStudents || course.enrolledStudents.length === 0) ? (
-                            <p className="text-gray-500 text-sm">No students enrolled yet.</p>
-                          ) : (
-                            <div className="max-h-60 overflow-y-auto space-y-2">
-                              {course.enrolledStudents.map((student) => (
-                                <div key={student.id} className="bg-gray-50 rounded-lg p-3 flex items-center justify-between">
-                                  <div className="flex-1">
-                                    <div className="flex items-center space-x-3">
-                                      <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                                        <User className="w-4 h-4 text-indigo-600" />
-                                      </div>
-                                      <div>
-                                        <span>
-                                          <span
-                                            className="font-medium text-blue-600 cursor-pointer hover:underline"
-                                            onClick={() => navigate('/student', {
-                                              state: { courseId: course.id }
-                                            })}
-                                          >
-                                            {student.name || "Unnamed Student"}
-                                          </span>
-                                          {student.email && <span className="text-gray-500 ml-2">({student.email})</span>}
-                                        </span>
-                                      </div>
+                        {course.lessons && course.lessons.length > 0 && (
+                          <div className="mt-4 border-t pt-4">
+                            <h5 className="font-medium text-gray-800 mb-3">Course Lessons</h5>
+                            <div className="space-y-2 max-h-40 overflow-y-auto">
+                              {course.lessons.map((lesson, index) => (
+                                <div key={index} className="bg-gray-50 rounded-lg p-3">
+                                  <div className="flex justify-between items-start">
+                                    <div>
+                                      <h6 className="font-medium text-sm text-gray-800">
+                                        Lesson {index + 1}: {lesson.title}
+                                      </h6>
+                                      <p className="text-xs text-gray-600 mt-1">
+                                        {lesson.content}
+                                      </p>
                                     </div>
-                                    <div className="mt-2 flex items-center justify-between">
-                                      <span className="text-xs text-gray-500">
-                                        Enrolled: {student.enrolledDate ? new Date(student.enrolledDate).toLocaleDateString() : 'N/A'}
+                                    {lesson.duration && (
+                                      <span className="text-xs text-gray-500 ml-2">
+                                        {lesson.duration}
                                       </span>
-                                      <span className="text-xs text-gray-600">
-                                        Progress: {student.progress || 0}%
-                                      </span>
-                                    </div>
+                                    )}
                                   </div>
-                                  <button
-                                    onClick={() => removeStudent(course.id, student.id)}
-                                    className="ml-3 bg-red-100 hover:bg-red-200 text-red-600 p-2 rounded-lg transition-colors duration-200"
-                                    title="Remove student"
-                                  >
-                                    <UserMinus className="w-4 h-4" />
-                                  </button>
                                 </div>
                               ))}
                             </div>
-                          )}
-                        </div>
-                      )}
-
-                      {course.lessons && course.lessons.length > 0 && (
-                        <div className="mt-4 border-t pt-4">
-                          <h5 className="font-medium text-gray-800 mb-3">Course Lessons</h5>
-                          <div className="space-y-2 max-h-40 overflow-y-auto">
-                            {course.lessons.map((lesson, index) => (
-                              <div key={index} className="bg-gray-50 rounded-lg p-3">
-                                <div className="flex justify-between items-start">
-                                  <div>
-                                    <h6 className="font-medium text-sm text-gray-800">
-                                      Lesson {index + 1}: {lesson.title}
-                                    </h6>
-                                    <p className="text-xs text-gray-600 mt-1">
-                                      {lesson.content}
-                                    </p>
-                                  </div>
-                                  {lesson.duration && (
-                                    <span className="text-xs text-gray-500 ml-2">
-                                      {lesson.duration}
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                            ))}
                           </div>
-                        </div>
-                      )}
-                    </>
-                  )
-
-                  }
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
           ) : (
             <p className="text-gray-500 text-center">No courses created yet.</p>
           )}
-
 
           {/* Empty State */}
           {courses.length === 0 && !loading && (
