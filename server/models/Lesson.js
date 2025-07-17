@@ -22,7 +22,7 @@ const LessonSchema = new mongoose.Schema({
   video: { type: String },
   quizzes: { type: mongoose.Schema.Types.ObjectId, ref: 'VideoSchema' },
   module: { type: mongoose.Schema.Types.ObjectId, ref: 'Module' },
-  courseId: { type: mongoose.Schema.Types.ObjectId, ref: 'Course', required: true },
+  courseId: { type: mongoose.Schema.Types.ObjectId, ref: 'Course'},
   duration: { type: String, default: '0 mins' },
   attachments: [String],
 
