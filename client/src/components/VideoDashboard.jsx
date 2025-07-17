@@ -960,11 +960,6 @@ const VideoDashboard = () => {
             </div>
           </div>
 
-
-
-          {/* --- Quiz Dashboard UI Section (place at the top) --- */}
-
-
           {/* --- Student Quiz Display UI --- */}
           {courseQuiz && (
             <div className="max-w-7xl w-full mx-auto my-10 p-8 bg-white rounded-2xl shadow-xl border border-gray-100">
@@ -1022,7 +1017,7 @@ const VideoDashboard = () => {
                             )}
                           </td>
                           <td className="p-3">
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(item.category)}`}>{item.category}</span>
+                            <span className={`px-3 py-1 rounded-full text-xs font-medium bg-blue-400 ${getCategoryColor(item.category)}`}>{item.category}</span>
                           </td>
                           <td className="p-3">{item.level}</td>
                           <td className="p-3">
