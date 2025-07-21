@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Footer from './Footer';
 import { AuthContext } from '../pages/AuthContext';
 import '../assets/style/UserProfile.css'
+import ProfileHeader from './ProfileHeader';
 
 const UserProfile = () => {
   const navigate = useNavigate();
@@ -63,7 +64,7 @@ const UserProfile = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('/api/user/67f0b81f2fc577093ad382b6', {
+      const response = await fetch(`http://localhost:5000/api/users/${user.id || user._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -77,8 +78,15 @@ const UserProfile = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update profile');
+        let errorMessage = 'Failed to update profile';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+          // If not JSON, fallback to status text
+          errorMessage = response.statusText || errorMessage;
+        }
+        throw new Error(errorMessage);
       }
 
       const updatedUser = await response.json();
@@ -281,108 +289,17 @@ const UserProfile = () => {
             <p className="text-gray-600">Manage your account information and enrolled courses</p>
           </div>
 
-          {/* ...profile header code... */}
-          <div className="profile-container" id="profile-container">
-            <div className="profile-header" id="profile-header">
-              <div className="profile-main" id="profile-main">
-                <div className="profile-picture-wrapper">
-                  <div className="profile-picture-box">
-                    {profilePic ? (
-                      <User className="profile-icon" />
-                    ) : (
-                      <div className="profile-initial">
-                        {userInfo?.name?.[0]?.toUpperCase() || 'U'}
-                      </div>
-                    )}
-                  </div>
-                  {isEditing && (
-                    <div className="profile-overlay">
-                      <label htmlFor="profile-upload" className="upload-label">
-                        <Camera className="camera-icon" />
-                      </label>
-                      <input
-                        id="profile-upload"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="file-input"
-                      />
-                    </div>
-                  )}
-                  <div className="profile-status-indicator"></div>
-                </div>
-
-                <div className="profile-details" id="profile-details">
-                  {isEditing ? (
-                    <div className="edit-form">
-                      <input
-                        type="text"
-                        id="edit-name"
-                        value={userInfo.name}
-                        onChange={(e) => setUserInfo({ ...userInfo, name: e.target.value })}
-                        className="edit-input name-input"
-                        placeholder="Full Name"
-                      />
-                      <input
-                        type="email"
-                        id="edit-email"
-                        value={userInfo.email}
-                        onChange={(e) => setUserInfo({ ...userInfo, email: e.target.value })}
-                        className="edit-input email-input"
-                        placeholder="Email Address"
-                      />
-                    </div>
-                  ) : (
-                    <div className="display-info">
-                      <h2 className="display-name">{userInfo.name}</h2>
-                      <div className="display-email">
-                        <Mail className="icon" />
-                        <span>{userInfo.email}</span>
-                      </div>
-                      <div className="display-role">
-                        <User className="icon" />
-                        <span className="role-badge">
-                          {userInfo.role || 'Student'}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="profile-actions" id="profile-actions">
-                {isEditing ? (
-                  <>
-                    <button
-                      onClick={() => setIsEditing(false)}
-                      className="btn cancel-btn"
-                      disabled={loading}
-                      id="cancel-edit"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={handleSave}
-                      disabled={loading}
-                      className="btn save-btn"
-                      id="save-profile"
-                    >
-                      {loading ? 'Saving...' : 'Save'}
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    onClick={handleEditToggle}
-                    className="btn edit-btn"
-                    id="edit-toggle"
-                  >
-                    <Edit3 className="icon" />
-                    <span>Edit Profile</span>
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
+          <ProfileHeader
+            userInfo={userInfo}
+            isEditing={isEditing}
+            profilePic={profilePic}
+            loading={loading}
+            handleEditToggle={handleEditToggle}
+            handleSave={handleSave}
+            handleImageUpload={handleImageUpload}
+            setIsEditing={setIsEditing}
+            setUserInfo={setUserInfo}
+          />
 
           {enrolledCourses && enrolledCourses.length > 0 && (
             <div className="mb-8">
