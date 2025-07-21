@@ -7,7 +7,7 @@ import { AuthContext } from '../pages/AuthContext';
 import axios from 'axios';
 import '../assets/style/UserProfile.css'
 import '../assets/style/Instructorpage.css'
-
+import Button from './Button';
 export default function InstructorDashboard() {
   const navigate = useNavigate();
   // Context and State
@@ -922,6 +922,12 @@ export default function InstructorDashboard() {
               <Plus className="w-5 h-5" />
               <span>Add New Course</span>
             </button>
+            {/* <Button 
+            label="Add New Course"
+            onClick={() => setShowAddForm(!showAddForm)}
+              className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl transition-all duration-200 flex items-center space-x-2 shadow-lg"
+            
+            /> */}
           </div>
 
           {/* Add Course Form */}
@@ -1123,12 +1129,16 @@ export default function InstructorDashboard() {
                   />
                 </div>
 
-                <button
+                {/* <button
                   type="submit"
                   className="w-full bg-purple-600 hover:bg-purple-500 text-white px-8 py-4 rounded-xl transition-all duration-200 font-medium shadow-lg"
                 >
                   Create Course
-                </button>
+                </button> */}
+                <Button
+                  label=" Create Course"
+                  className="w-full bg-purple-600 hover:bg-purple-500 text-white px-8 py-4 rounded-xl transition-all duration-200 font-medium shadow-lg"
+                />
               </form>
             </div>
           )}

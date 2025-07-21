@@ -7,7 +7,7 @@ import { AuthContext } from '../pages/AuthContext'; // Add this import
 import {
   FaClock, FaUsers, FaBookOpen, FaCheck, FaPlay, FaArrowRight, FaStar, FaFire, FaGraduationCap, FaAward, FaCompass, FaBook
 } from 'react-icons/fa';
-
+import Button from './Button';
 
 const filterOptions = [
   { id: 'all', label: 'All Courses' },
@@ -573,9 +573,12 @@ export default function MyCoursesPage() {
             </div>
 
             <div className="mt-4 lg:mt-0">
-              <button onClick={handlebrowse} className="bg-purple-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-purple-500 transition-all duration-200 shadow-lg hover:shadow-xl">
-                Explore New Courses
-              </button>
+            
+              <Button
+               label="Explore New Courses"
+               onClick={handlebrowse}
+               className={`bg-purple-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-purple-500 transition-all duration-200 shadow-lg hover:shadow-xl`}
+              />
             </div>
           </div>
 
@@ -620,6 +623,7 @@ export default function MyCoursesPage() {
                   >
                     {option.label}
                   </button>
+                  
                 ))}
               </div>
             </div>
@@ -663,12 +667,12 @@ export default function MyCoursesPage() {
               <p className="text-gray-600 max-w-md mx-auto mb-6">
                 You don't have any courses matching your selected filter.
               </p>
-              <button
+             
+              <Button
+                label="View All Courses"
                 onClick={() => setFilter('all')}
                 className="bg-purple-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-purple-700 transition-colors duration-200"
-              >
-                View All Courses
-              </button>
+              />
             </div>
           )}
         </div>

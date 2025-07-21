@@ -4,7 +4,7 @@ import { FaBell, FaBars, FaTimes, FaCog, FaUser, FaSignOutAlt, FaChevronRight } 
 import { Bell, Menu, X, Settings, User, LogOut, ChevronRight} from 'lucide-react';
 import { AuthContext } from '../pages/AuthContext';
 import logo5 from '../assets/img/logo5.jpeg'
-
+import Button from './Button';
 export default function Navbar() {
   const { user, logout } = useContext(AuthContext);
 
@@ -150,12 +150,12 @@ export default function Navbar() {
           {user ? (
             <>
               <div className="relative">
-                <button
+                
+                <Button
+                  label="Refer"
                   onClick={() => setHelpEarnOpen(!helpEarnOpen)}
                   className="px-5 py-1 rounded-full text-sm font-medium bg-purple-600 text-white hover:bg-purple-700 focus:outline-none transition-colors"
-                >
-                  Refer 
-                </button>
+                />
                 {helpEarnOpen && (
                   <div
                     ref={helpEarnRef}
@@ -198,7 +198,7 @@ export default function Navbar() {
                           </button>
                         </div>
                       </div>
-                      <button
+                      {/* <button
                         className="w-full py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-md font-medium transition-all"
                         onClick={() => {
                           setHelpEarnOpen(false);
@@ -206,7 +206,18 @@ export default function Navbar() {
                         }}
                       >
                         Start Referring Now
-                      </button>
+                      </button> */}
+                      <Button
+                      label=" Start Referring Now"
+                       onClick={() => {
+                          setHelpEarnOpen(false);
+                          console.log('Navigate to register');
+                        }}
+                       className="w-full py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-md font-medium transition-all"
+
+                      />
+
+
                     </div>
                   </div>
                 )}
@@ -240,7 +251,7 @@ export default function Navbar() {
                           </div>
                           <div>
                             <p className="text-sm font-medium text-gray-900">{user.name}</p>
-                            <p className="text-xs text-gray-500">{user.email}</p>
+                           
                           </div>
                         </div>
                         <div className="flex space-x-2">
@@ -293,16 +304,14 @@ export default function Navbar() {
                   >
                     <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
                       <div className="flex items-center space-x-3">
-                        <User
+                        {/* <User
                           className="bg-purple-600 text-white h-10 w-10 rounded-full cursor-pointer hover:ring-2 hover:ring-purple-300 transition-all"
-                        />
+                        /> */}
                         <div>
                           <p style={{
                             cursor: "pointer"
                           }} className="text-sm font-semibold text-gray-900">{user.name}</p>
-                          <p style={{
-                            cursor: "pointer"
-                          }} className="text-xs text-gray-500">{user.email}</p>
+                         
                         </div>
                       </div>
                     </div>
@@ -503,7 +512,7 @@ export default function Navbar() {
                           <User className='bg-purple-500 text-white rounded-2xl'></User>
                           <div>
                             <p className="text-sm font-semibold text-gray-900">{user.name}</p>
-                            <p className="text-xs text-gray-500">{user.email}</p>
+                          
                           </div>
                         </div>
                       </div>

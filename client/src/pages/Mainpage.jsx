@@ -46,9 +46,22 @@ export default function WelcomePage() {
         </div>
 
       <div className="flex flex-col sm:flex-row gap-6">
-      <Button label="Student" onClick={handleStudentLogin} />
-      <Button label="Instructor" onClick={handleInstructorLogin} />
-      <Button label="Admin" onClick={handleAdminLogin} />
+      <Button
+       label="Student"
+        onClick={handleStudentLogin}
+        className={`px-12 py-4 text-white font-semibold text-lg rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-out`}
+       />
+      <Button
+       label="Instructor"
+        onClick={handleInstructorLogin}
+          className={`px-12 py-4 text-white font-semibold text-lg rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-out`}
+
+      />
+      <Button 
+      label="Admin"
+        onClick={handleAdminLogin}
+        className={`px-12 py-4 text-white font-semibold text-lg rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-out`}
+      />
     </div>
       </div>
 
