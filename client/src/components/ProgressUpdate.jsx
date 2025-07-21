@@ -8,6 +8,7 @@ import {
   FaClock, FaUsers, FaBookOpen, FaCheck, FaPlay, FaArrowRight, FaStar, FaFire, FaGraduationCap, FaAward, FaCompass, FaBook
 } from 'react-icons/fa';
 
+
 const filterOptions = [
   { id: 'all', label: 'All Courses' },
   { id: 'completed', label: 'Completed' },
