@@ -46,6 +46,12 @@ progress: [
     totalDuration: Number,
     completed: { type: Boolean, default: false }
   }
+],
+quizProgress: [
+  {
+    questionId: mongoose.Schema.Types.ObjectId,
+    status: { type: String, enum: ['correct', 'not correct'], default: 'not correct' }
+  }
 ]
 
 });

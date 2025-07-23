@@ -8,6 +8,8 @@ import axios from 'axios';
 import '../assets/style/UserProfile.css'
 import '../assets/style/Instructorpage.css'
 import Button from './Button';
+import ProfileHeader from './ProfileHeader';
+
 export default function InstructorDashboard() {
   const navigate = useNavigate();
   // Context and State
@@ -60,7 +62,7 @@ export default function InstructorDashboard() {
   const fetchCourses = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:5000/api/courses/instructor/${user.id}`, {
+      const response = await fetch(`http://localhost:5000/api/courses/instructor/${user.id || user._id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -97,7 +99,7 @@ export default function InstructorDashboard() {
       formData.append('level', newCourse.level);
       formData.append('price', newCourse.price);
       formData.append('category', newCourse.category);
-      formData.append('createdBy', user.id);
+      formData.append('createdBy', user.id || user._id);
       formData.append('language', newCourse.language);
       formData.append('whatWillLearn', newCourse.whatWillLearn);
 
@@ -250,7 +252,7 @@ export default function InstructorDashboard() {
 
   const updateProfile = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/users/profile`, {
+      const response = await fetch(`http://localhost:5000/api/users/${user.id || user._id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -326,7 +328,7 @@ export default function InstructorDashboard() {
         setQuizIdForCourse(mapping);
         setQuizInfoSaved(infoSaved);
       } catch (err) {
-        // Optionally handle error
+
       }
     };
     if (user && token) fetchAllQuizzes();
@@ -565,7 +567,6 @@ export default function InstructorDashboard() {
   // Add a state to track if quiz info has been saved for a course
   const [quizInfoSaved, setQuizInfoSaved] = useState({}); // { [courseId]: true/false }
 
-  // --- QUIZ API INTEGRATION ---
   const createQuizForCourse = async (course) => {
     setQuizLoading(true);
     setQuizError('');
@@ -815,103 +816,18 @@ export default function InstructorDashboard() {
           </div>
 
           {/* Profile Section */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-8 border border-white/20">
-            <div className="flex flex-col lg:flex-row items-center justify-between">
-              <div className="flex items-center space-x-6 mb-6 lg:mb-0">
-                <div className="w-20 h-20 bg-purple-600 text-white rounded-2xl flex items-center justify-center text-3xl font-bold shadow-lg">
-                  <User />
-                </div>
-                <div className="profile-details" id="profile-details">
-                  {profileEdit ? (
-                    <div className="edit-form">
-                      <input
-                        type="text"
-                        value={profile.name}
-                        onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                        id="edit-name"
-                        className="edit-input name-input"
-                        placeholder="Full Name"
-                      />
-                      <input
-                        type="email"
-                        value={profile.email}
-                        onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                        id="edit-email"
-                        className="edit-input email-input"
-                        placeholder="Email Address"
-                      />
+          <ProfileHeader
+            userInfo={profile}
+            isEditing={profileEdit}
+            profilePic={null}
+            loading={false}
+            handleEditToggle={() => setProfileEdit(true)}
+            handleSave={updateProfile}
+            handleImageUpload={() => { }}
+            setIsEditing={setProfileEdit}
+            setUserInfo={setProfile}
+          />
 
-                    </div>
-                  ) : (
-                    <>
-                      <h2 className="text-3xl font-bold text-gray-800">{profile.name}</h2>
-                      <p className="text-gray-600">{profile.email}</p>
-                      <span className="inline-block text-sm bg-indigo-100 text-indigo-700 px-4 py-2 rounded-full mt-2 font-medium">
-                        Senior Instructor
-                      </span>
-                    </>
-                  )}
-                </div>
-              </div>
-              {/* <div className="flex space-x-3">
-              {profileEdit ? (
-                <>
-                  <button
-                    onClick={handleProfileSave}
-                    className="bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700 transition-all duration-200 flex items-center space-x-2 shadow-lg"
-                  >
-                    <Save className="w-4 h-4" />
-                    <span>Save</span>
-                  </button>
-                  <button
-                    onClick={() => setProfileEdit(false)}
-                    className="bg-gray-500 text-white px-6 py-3 rounded-xl hover:bg-gray-600 transition-all duration-200 flex items-center space-x-2"
-                  >
-                    <X className="w-4 h-4" />
-                    <span>Cancel</span>
-                  </button>
-                </>
-              ) : (
-                <button
-                  onClick={() => setProfileEdit(true)}
-                  className="bg-purple-500 text-white px-6 py-3 rounded-xl hover:bg-purple-600 transition-all duration-200 flex items-center space-x-2 shadow-lg"
-                >
-                  <Edit3 className="w-4 h-4" />
-                  <span>Edit Profile</span>
-                </button>
-              )}
-            </div> */}
-              <div className="profile-actions" id="profile-actions">
-                {profileEdit ? (
-                  <>
-                    <button
-                      onClick={() => setProfileEdit(false)}
-                      className="btn cancel-btn"
-                      id="cancel-edit"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={handleProfileSave}
-                      className="btn save-btn"
-                      id="save-profile"
-                    >
-                      Save
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    onClick={() => setProfileEdit(true)}
-                    className="btn edit-btn"
-                    id="edit-toggle"
-                  >
-                    <Edit3 className="icon" />
-                    <span>Edit Profile</span>
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
           {/* Course Header */}
           <div className="flex justify-between items-center mb-8">
             <h3 className="text-2xl font-bold text-gray-800">Your Courses</h3>
@@ -922,12 +838,6 @@ export default function InstructorDashboard() {
               <Plus className="w-5 h-5" />
               <span>Add New Course</span>
             </button>
-            {/* <Button 
-            label="Add New Course"
-            onClick={() => setShowAddForm(!showAddForm)}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl transition-all duration-200 flex items-center space-x-2 shadow-lg"
-            
-            /> */}
           </div>
 
           {/* Add Course Form */}
@@ -1129,12 +1039,6 @@ export default function InstructorDashboard() {
                   />
                 </div>
 
-                {/* <button
-                  type="submit"
-                  className="w-full bg-purple-600 hover:bg-purple-500 text-white px-8 py-4 rounded-xl transition-all duration-200 font-medium shadow-lg"
-                >
-                  Create Course
-                </button> */}
                 <Button
                   label=" Create Course"
                   className="w-full bg-purple-600 hover:bg-purple-500 text-white px-8 py-4 rounded-xl transition-all duration-200 font-medium shadow-lg"

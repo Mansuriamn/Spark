@@ -14,8 +14,11 @@ getTotalCoursesCount,
 getUserById,
 getUserProfile,
 getUserEnrolledCourses,
-addToCart, removeFromCart, getCart
+addToCart, removeFromCart, getCart,
+submitAnswer
 } from '../controllers/userController.js';
+
+import { checkRole, protect } from '../middlewares/authMiddleware.js'; // ✅ New role-check middleware
 
 import { loginUser } from '../controllers/loginController.js'
 
@@ -42,7 +45,7 @@ router.get('/:id/in-progress-courses-count', getInProgressCoursesCount);
 
 // Route to get number of enrolled courses
 router.get('/:userId/enrolled-courses-count', getEnrolledCoursesCount);
-
+router.post('/submit',protect, submitAnswer);
 // Route to get number of completed courses
 router.get('/:userId/completed-courses-count', getCompletedCoursesCount);
 
