@@ -4,6 +4,8 @@ import { Course } from '../models/Course.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
+import { QuestionSchema } from '../models/QuizCard.js';
+
 
 export const registerUser = async (req, res) => {
   try {
@@ -271,5 +273,41 @@ export const getCart = async (req, res) => {
     res.json({ cart: user.cart });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+
+export const submitAnswer = async (req, res) => {
+  const userId = req.user._id;
+  const { questionId, selectedAnswer } = req.body;
+
+  try {
+    const question = await QuizQuestion.findById(questionId);
+    if (!question) return res.status(404).json({ message: 'Question not found' });
+
+    const isCorrect = question.answer === selectedAnswer;
+
+    // Update user's quiz progress
+    const user = await User.findById(userId);
+    const existing = user.quizProgress.find(q => q.questionId.toString() === questionId);
+
+    if (existing) {
+      existing.status = isCorrect ? 'correct' : 'not correct';
+    } else {
+      user.quizProgress.push({
+        questionId,
+        status: isCorrect ? 'correct' : 'not correct'
+      });
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      correct: isCorrect,
+      message: isCorrect ? 'Correct answer!' : 'Wrong answer',
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: 'Error submitting answer', error: error.message });
   }
 };
