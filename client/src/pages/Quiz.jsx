@@ -13,13 +13,16 @@ export default function Quiz() {
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [showAddForm, setShowAddForm] = useState(false);
-  const [addForm, setAddForm] = useState({
-    questionText: '',
-    category: '',
-    level: '',
-    status: 'Not Solve',
-    questionURL: ''
-  });
+ const [addForm, setAddForm] = useState({
+  questionText: '',
+  option1:'',  
+  option2: '',
+  option3: '',
+  option4: '',
+  answer: '',
+  status: 'Not Solve',
+});
+
   const { token } = useContext(AuthContext);
 
   console.log('Quiz page useParams id:', id); // Debug log
@@ -77,10 +80,12 @@ export default function Quiz() {
     setEditingQuestionId(question._id || question.id);
     setEditForm({
       questionText: question.questionText,
-      level: question.level,
-      category: question.category,
+      option1: question.option1,
+      option2: question.option2,
+      option3: question.option3,
+      option4: question.option4,
+      answer: question.answer,
       status: question.status,
-      questionURL: question.questionURL,
     });
   };
 
@@ -134,7 +139,7 @@ export default function Quiz() {
 
   const handleAddQuestion = async (e) => {
     e.preventDefault();
-    if (!addForm.questionText || !addForm.category || !addForm.level || !addForm.questionURL) {
+    if (!addForm.questionText || !addForm.option1 || !addForm.option2 || !addForm.option3 || !addForm.option4 || !addForm.answer) {
       alert('Please fill all fields');
       return;
     }
@@ -148,7 +153,7 @@ export default function Quiz() {
         body: JSON.stringify(addForm)
       });
       if (!res.ok) throw new Error('Failed to add question');
-      setAddForm({ questionText: '', category: '', level: '', status: 'Not Solve', questionURL: '' });
+      setAddForm({ questionText: '', option1: '', option2: '', option3: '', option4: '', answer: '', status: 'Not Solve' });
       setShowAddForm(false);
       // Refresh questions
       const qRes = await fetch(`http://localhost:5000/api/quizzes/${id}/questions`);
@@ -200,25 +205,41 @@ export default function Quiz() {
               />
               <input
                 type="text"
-                name="category"
-                placeholder="Category"
-                value={addForm.category}
+                name="option1"
+                placeholder="Option 1"
+                value={addForm.option1}
                 onChange={handleAddInputChange}
                 className="p-2 border rounded"
               />
               <input
                 type="text"
-                name="level"
-                placeholder="Level (easy, medium, hard)"
-                value={addForm.level}
+                name="option2"
+                placeholder="Option 2"
+                value={addForm.option2}
                 onChange={handleAddInputChange}
                 className="p-2 border rounded"
               />
               <input
                 type="text"
-                name="questionURL"
-                placeholder="Question URL"
-                value={addForm.questionURL}
+                name="option3"
+                placeholder="Option 3"
+                value={addForm.option3}
+                onChange={handleAddInputChange}
+                className="p-2 border rounded"
+              />
+              <input
+                type="text"
+                name="option4"
+                placeholder="Option 4"
+                value={addForm.option4}
+                onChange={handleAddInputChange}
+                className="p-2 border rounded"
+              />
+              <input
+                type="text"
+                name="answer"
+                placeholder="Answer"
+                value={addForm.answer}
                 onChange={handleAddInputChange}
                 className="p-2 border rounded"
               />
@@ -238,9 +259,7 @@ export default function Quiz() {
               <tr>
                 <th className="border p-2 text-left">#</th>
                 <th className="border p-2 text-left">Question</th>
-                <th className="border p-2 text-left">Level</th>
-                <th className="border p-2 text-left">Category</th>
-                <th className="border p-2 text-left">URL</th>
+                <th className="border p-2 text-left">Answer</th>
                 <th className="border p-2 text-left">Status</th>
                 <th className="border p-2 text-left">Actions</th>
               </tr>
@@ -250,18 +269,7 @@ export default function Quiz() {
                 <tr key={item._id || index} className="hover:bg-gray-50">
                   <td className="border p-2">{index + 1}</td>
                   <td className="border p-2">{item.questionText}</td>
-                  <td className="border p-2">{item.level}</td>
-                  <td className="border p-2">{item.category}</td>
-                  <td className="border p-2">
-                    <a
-                      href={item.questionURL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      Link
-                    </a>
-                  </td>
+                  <td className="border p-2">{item.answer}</td>
                   <td className="border p-2">{item.status}</td>
                   <td className="border p-2 text-center">
                     <button onClick={() => handleDeleteQuestion(item._id || item.id)} className="text-red-600 hover:text-red-800">
