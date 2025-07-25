@@ -117,7 +117,7 @@ export default function Quiz() {
     console.log('Deleting question with ID:', questionId,id);
     if (!window.confirm('Are you sure you want to delete this question?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/quiz-questions/${questionId}`, {
+      const res = await fetch(`http://localhost:5000/api/quizzes/${id}/questions/${questionId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
