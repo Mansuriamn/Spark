@@ -14,6 +14,7 @@ import meetingRouter from "./routes/meetingRouter.js"
 import trackRoutes from './routes/trackRoutes.js'
 import contestRoutes from './routes/contestRoutes.js';
 import quizRoutes from './routes/quizRoutes.js';
+import quizQuestionRoutes from './routes/quizQuestionRoutes.js';
 
 dotenv.config();
 
@@ -105,3 +106,4 @@ app.use('/api/meetings', meetingRouter)
 app.use('/api/tracks', trackRoutes);
 app.use('/api/contests', contestRoutes);
 app.use('/api/quizzes', quizRoutes);
+app.use('/api/quiz-questions', quizQuestionRoutes);

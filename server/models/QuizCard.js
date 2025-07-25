@@ -16,7 +16,7 @@ const QuizCardSchema = new mongoose.Schema({
   title: { type: String, required: true },
   level: { type: String, enum: ['Beginner', 'Intermediate', 'Advanced'], default: 'Beginner' },
   description: String,
-  questions: [QuestionSchema],
+  questions: [{type: mongoose.Schema.Types.ObjectId, ref: 'Question'}],
   courseId: { type: mongoose.Schema.Types.ObjectId, ref: 'Course'}
 }, { timestamps: true });
 
