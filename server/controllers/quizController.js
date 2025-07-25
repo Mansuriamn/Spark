@@ -118,7 +118,7 @@ export const deleteQuestion = async (req, res) => {
     const question = quiz.questions.id(questionId);
     if (!question) return res.status(404).json({ message: 'Question not found' });
 
-    question.remove();
+    question.deleteOne();
     await quiz.save();
     res.json({ message: 'Question deleted' });
   } catch (error) {

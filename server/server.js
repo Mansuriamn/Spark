@@ -106,4 +106,4 @@ app.use('/api/meetings', meetingRouter)
 app.use('/api/tracks', trackRoutes);
 app.use('/api/contests', contestRoutes);
 app.use('/api/quizzes', quizRoutes);
-app.use('/api/quiz-questions', quizQuestionRoutes);
+
