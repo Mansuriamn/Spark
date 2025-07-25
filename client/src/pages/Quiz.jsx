@@ -114,9 +114,10 @@ export default function Quiz() {
   };
 
   const handleDeleteQuestion = async (questionId) => {
+    console.log('Deleting question with ID:', questionId,id);
     if (!window.confirm('Are you sure you want to delete this question?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/quizzes/${id}/questions/${questionId}`, {
+      const res = await fetch(`http://localhost:5000/api/quiz-questions/${questionId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -125,8 +126,11 @@ export default function Quiz() {
       if (!res.ok) throw new Error('Failed to delete question');
       // Refresh questions
       const qRes = await fetch(`http://localhost:5000/api/quizzes/${id}/questions`);
+
       const qData = await qRes.json();
+     
       setQuestions(qData.questions || qData);
+       console.log('Questions after deletion:', questions);
     } catch (err) {
       alert('Failed to delete question: ' + err.message);
     }
