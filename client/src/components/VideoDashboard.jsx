@@ -21,48 +21,12 @@ const initialProblems = [
 ];
 
 const VideoDashboard = () => {
+  // Place all useState hooks together at the top of the component
   const [problems, setProblems] = useState(initialProblems);
   const [filter, setFilter] = useState('All');
   const solvedCount = problems.filter(p => p.status === 'Solved').length;
   const progressPercentage = Math.round((solvedCount / problems.length) * 100);
 
-  const filteredProblems = problems.filter(problem => {
-    if (filter === 'Solved') return problem.status === 'Solved';
-    if (filter === 'Unsolved') return problem.status === 'Not Attempted';
-    return true;
-  });
-
-  const handleSolve = (problemId) => {
-    setProblems(prevProblems => {
-      const updatedProblems = prevProblems.map(problem =>
-        problem.id === problemId
-          ? { ...problem, status: 'Solved' }
-          : problem
-      );
-      console.log('Updated problems:', updatedProblems);
-      return updatedProblems;
-    });
-  };
-
-  const getDifficultyColor = (difficulty) => {
-    switch (difficulty) {
-      case 'Easy': return 'bg-green-100 text-green-700 border-green-200';
-      case 'Medium': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-      case 'Hard': return 'bg-red-100 text-red-700 border-red-200';
-      default: return 'bg-gray-100 text-gray-700 border-gray-200';
-    }
-  };
-
-  const getCategoryColor = (category) => {
-    const colors = {
-      'Stack': 'bg-blue-50 text-blue-700',
-      'Greedy': 'bg-purple-50 text-purple-700',
-      'Dynamic Programming': 'bg-indigo-50 text-indigo-700',
-      'Array': 'bg-orange-50 text-orange-700',
-      'Backtracking': 'bg-pink-50 text-pink-700'
-    };
-    return colors[category] || 'bg-gray-50 text-gray-700';
-  };
   const navigate = useNavigate();
   const { courseId, lessonId } = useParams();
   const [selectedVideo, setSelectedVideo] = useState(null);
@@ -80,6 +44,23 @@ const VideoDashboard = () => {
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [videoDurations, setVideoDurations] = useState({});
+
+  const [allQuizzes, setAllQuizzes] = useState([]);
+  const [selectedQuizId, setSelectedQuizId] = useState('');
+  const [selectedQuiz, setSelectedQuiz] = useState(null);
+  const [selectedQuizQuestions, setSelectedQuizQuestions] = useState([]);
+  const [courseQuiz, setCourseQuiz] = useState(null);
+  const [courseQuizQuestions, setCourseQuizQuestions] = useState([]);
+  const [addForm, setAddForm] = useState({
+    questionText: '',
+    category: '',
+    level: '',
+    status: 'Not Solve',
+    questionURL: ''
+  });
+  const [addLoading, setAddLoading] = useState(false);
+  const [addError, setAddError] = useState('');
+  const [addSuccess, setAddSuccess] = useState('');
 
   const {
     isAuthenticated, enrolledCourses, user, token, enrolledCourseIds, currentLessonId, updateCurrentLessonId, } = useContext(AuthContext) || {};
@@ -413,7 +394,8 @@ const VideoDashboard = () => {
         lessons: sectionLessons.length,
         duration: calculateSectionDuration(sectionLessons),
         progress: calculateSectionProgress(sectionLessons),
-        videos: sectionLessons,
+        video: sectionLessons,
+
       }));
     }
 
@@ -454,104 +436,62 @@ const VideoDashboard = () => {
   const videoSections = groupLessonsBySection();
 
   // --- Quiz Dashboard State ---
-  const [allQuizzes, setAllQuizzes] = useState([]);
-  const [selectedQuizId, setSelectedQuizId] = useState('');
-  const [selectedQuiz, setSelectedQuiz] = useState(null);
-  const [selectedQuizQuestions, setSelectedQuizQuestions] = useState([]);
-  const [addForm, setAddForm] = useState({
-    questionText: '',
-    category: '',
-    level: '',
-    status: 'Not Solve',
-    questionURL: ''
+  // Add state for quiz submit response
+  const [quizSubmitSuccess, setQuizSubmitSuccess] = useState('');
+  const [quizSubmitSummary, setQuizSubmitSummary] = useState([]);
+
+  const [showMCQQuiz, setShowMCQQuiz] = useState(true); // Always show fallback for now
+  const [mcqState, setMcqState] = useState({
+    showOptions: {}, // { [qid]: true }
+    answers: {},     // { [qid]: selectedOption }
+    submitted: false,
+    score: 0,
   });
-  const [addLoading, setAddLoading] = useState(false);
-  const [addError, setAddError] = useState('');
-  const [addSuccess, setAddSuccess] = useState('');
 
-  // Fetch all quizzes on mount
-  useEffect(() => {
-    const fetchAllQuizzes = async () => {
-      try {
-        const res = await fetch('/api/quizzes', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        setAllQuizzes(Array.isArray(data) ? data : data.quizzes || []);
-      } catch (err) {
-        setAllQuizzes([]);
-      }
-    };
-    fetchAllQuizzes();
-  }, [token]);
-
-  // Fetch selected quiz and its questions
-  useEffect(() => {
-    if (!selectedQuizId) return;
-    const fetchQuizAndQuestions = async () => {
-      try {
-        const resQuiz = await fetch(`/api/quizzes/${selectedQuizId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const quizData = await resQuiz.json();
-        setSelectedQuiz(quizData.quiz || quizData);
-        const resQuestions = await fetch(`/api/quizzes/${selectedQuizId}/questions`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const questionsData = await resQuestions.json();
-        setSelectedQuizQuestions(Array.isArray(questionsData) ? questionsData : questionsData.questions || []);
-      } catch (err) {
-        setSelectedQuiz(null);
-        setSelectedQuizQuestions([]);
-      }
-    };
-    fetchQuizAndQuestions();
-  }, [selectedQuizId, token]);
-
-  // Add a new question to the selected quiz
-  const handleAddInputChange = (e) => {
-    const { name, value } = e.target;
-    setAddForm((prev) => ({ ...prev, [name]: value }));
+  const handleShowOptions = (qid) => {
+    setMcqState((prev) => ({ ...prev, showOptions: { ...prev.showOptions, [qid]: true } }));
   };
 
-  const handleAddQuestion = async (e) => {
-    e.preventDefault();
-    if (!addForm.questionText || !addForm.category || !addForm.level || !addForm.questionURL) {
-      setAddError('Please fill all fields');
-      return;
-    }
-    setAddLoading(true);
-    setAddError('');
-    setAddSuccess('');
+  const handleSelectOption = (qid, option) => {
+    setMcqState((prev) => ({ ...prev, answers: { ...prev.answers, [qid]: option } }));
+  };
+
+  const handleSubmitQuiz = async () => {
+    let correct = 0;
+    courseQuizQuestions.forEach((q) => {
+      if (mcqState.answers[q._id] === q.correctAnswer) correct++;
+    });
+    setMcqState((prev) => ({ ...prev, submitted: true, score: correct }));
+
+    // Submit quiz result to backend
     try {
-      const res = await fetch(`/api/quizzes/${selectedQuizId}/questions`, {
+      const response = await fetch('http://localhost:5000/api/users/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+          ...(token && { Authorization: `Bearer ${token}` }),
         },
-        body: JSON.stringify(addForm)
+        body: JSON.stringify({
+          userId: user?._id,
+          quizTitle: courseQuiz?.title,
+          score: correct,
+          total: courseQuizQuestions.length,
+          answers: mcqState.answers,
+        }),
       });
-      if (!res.ok) throw new Error('Failed to add question');
-      setAddForm({ questionText: '', category: '', level: '', status: 'Not Solve', questionURL: '' });
-      setAddSuccess('Question added!');
-      // Refresh questions
-      const qRes = await fetch(`/api/quizzes/${selectedQuizId}/questions`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const qData = await qRes.json();
-      setSelectedQuizQuestions(Array.isArray(qData) ? qData : qData.questions || []);
+      if (!response.ok) throw new Error('Failed to submit quiz');
+      const data = await response.json();
+      setQuizSubmitSuccess(data.message || 'Quiz submitted successfully');
+      setQuizSubmitSummary(data.summary || []);
     } catch (err) {
-      setAddError('Failed to add question: ' + err.message);
-    } finally {
-      setAddLoading(false);
-      setTimeout(() => setAddSuccess(''), 2000);
+      setQuizSubmitSuccess('Failed to submit quiz');
+      setQuizSubmitSummary([]);
     }
   };
 
-  // --- Student Quiz Display State ---
-  const [courseQuiz, setCourseQuiz] = useState(null);
-  const [courseQuizQuestions, setCourseQuizQuestions] = useState([]);
+  const handleRetest = () => {
+    setMcqState({ showOptions: {}, answers: {}, submitted: false, score: 0 });
+  };
 
   // Fetch the quiz for the current course and its questions
   useEffect(() => {
@@ -615,11 +555,6 @@ const VideoDashboard = () => {
     );
   }
 
-
-
-
-
-
   return (
     <>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
@@ -676,9 +611,9 @@ const VideoDashboard = () => {
                     <div className="aspect-video bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center relative">
                       <div className="absolute inset-0 bg-black bg-opacity-20"></div>
                       <div className="w-full aspect-video rounded overflow-hidden mb-0 z-10">
-                        {courseData?.videos?.length > 0 ? (
+                        {currentLesson?.video ? (
                           <video
-                            src={courseData.videos[0]?.url}
+                            src={currentLesson.video}
                             controls
                             className="w-full h-full rounded"
                             onLoadedMetadata={e => setDuration(e.target.duration)}
@@ -867,11 +802,11 @@ const VideoDashboard = () => {
                                   <h4 className="font-medium text-gray-900">{lesson.title}</h4>
                                   <p className="text-sm text-gray-500">
                                     Duration: {lesson.duration} min
-                                    {lesson.videoUrl && (
+                                    {lesson.video && (
                                       <>
                                         {/* Hidden video to get duration */}
                                         <video
-                                          src={lesson.videoUrl}
+                                          src={lesson.video}
                                           style={{ display: 'none' }}
                                           onLoadedMetadata={e => handleLoadedMetadata(lesson._id, e)}
                                         />
@@ -960,8 +895,8 @@ const VideoDashboard = () => {
             </div>
           </div>
 
-          {/* --- Student Quiz Display UI --- */}
-          {courseQuiz && (
+          {/* --- Student Quiz Display UI (MCQ Fallback) --- */}
+          {showMCQQuiz && courseQuiz && courseQuizQuestions.length > 0 && (
             <div className="max-w-7xl w-full mx-auto my-10 p-8 bg-white rounded-2xl shadow-xl border border-gray-100">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-extrabold text-purple-800">Practice Questions</h2>
@@ -980,82 +915,109 @@ const VideoDashboard = () => {
                 </span>
               </div>
               <h4 className="font-semibold mb-3 text-lg text-purple-700">Questions</h4>
-              <div className="overflow-x-auto rounded-xl border border-purple-200 bg-white/90 shadow">
-                <table className="min-w-full text-sm">
-                  <thead className="bg-purple-100 text-gray-800">
-                    <tr>
-                      <th className="p-3 text-left font-semibold">#</th>
-                      <th className="p-3 text-left font-semibold">Question</th>
-                      <th className="p-3 text-left font-semibold">Category</th>
-                      <th className="p-3 text-left font-semibold">Level</th>
-                      <th className="p-3 text-left font-semibold">Solve</th>
-                      <th className="p-3 text-left font-semibold">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {courseQuizQuestions.length > 0 ? courseQuizQuestions.map((item, index) => {
-                      const qid = item._id || item.id || index;
-                      const isAttempted = attemptedQuestions[qid] || item.status === 'Attempted';
-                      return (
-                        <tr key={qid} className="hover:bg-purple-50">
-                          <td className="p-3 font-semibold">{index + 1}</td>
-                          <td className="p-3">
-                            <span className="font-medium text-gray-800">{item.questionText}</span>
-                            {/* Show options if present */}
-                            {item.options && item.options.length > 0 && (
-                              <ul className="ml-4 mt-1 text-xs">
-                                {item.options.map((opt, i) => (
-                                  <li key={i} className={opt === item.correctAnswer ? 'font-bold text-green-600' : ''}>
-                                    {opt}
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                            {/* Show correct answer if present */}
-                            {item.correctAnswer && (
-                              <div className="text-xs text-green-700 mt-1">Correct: {item.correctAnswer}</div>
-                            )}
-                          </td>
-                          <td className="p-3">
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium bg-blue-400 ${getCategoryColor(item.category)}`}>{item.category}</span>
-                          </td>
-                          <td className="p-3">{item.level}</td>
-                          <td className="p-3">
-                            <a
-                              href={item.questionURL}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={() => handleSolveClick(qid)}
-                              className={`inline-block px-4 py-2 rounded-lg font-semibold transition-colors duration-150 ${isAttempted ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : 'bg-purple-600 text-white hover:bg-purple-700'}`}
-                              style={{ pointerEvents: isAttempted ? 'none' : 'auto' }}
-                            >
-                              Solve
-                            </a>
-                          </td>
-                          <td className="p-3">
-                            {isAttempted ? (
-                              <span className="text-green-700 font-semibold">Attempted</span>
-                            ) : (
-                              <span className="text-gray-500">Not Attempted</span>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    }) : (
-                      <tr>
-                        <td colSpan="6" className="text-center text-gray-500 p-4">No questions added yet.</td>
-                      </tr>
+              <div className="space-y-6">
+                {courseQuizQuestions.map((q, idx) => (
+                  <div key={q._id} className="border border-purple-200 rounded-xl p-4 mb-2 bg-purple-50/30">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="font-medium text-gray-800">{idx + 1}. {q.questionText}</div>
+                      {!mcqState.showOptions[q._id] && !mcqState.submitted && (
+                        <button
+                          className="bg-purple-600 text-white px-4 py-1 rounded-lg font-semibold hover:bg-purple-700 transition"
+                          onClick={() => handleShowOptions(q._id)}
+                        >
+                          Solve
+                        </button>
+                      )}
+                    </div>
+                    {/* Show options if Solve clicked or after submit */}
+                    {(mcqState.showOptions[q._id] || mcqState.submitted) && (
+                      <div className="space-y-2 mt-2">
+                        {q.options.map((opt, i) => {
+                          const isSelected = mcqState.answers[q._id] === opt;
+                          const isCorrect = mcqState.submitted && opt === q.correctAnswer;
+                          const isWrong = mcqState.submitted && isSelected && opt !== q.correctAnswer;
+                          return (
+                            <label key={i} className={`block px-4 py-2 rounded cursor-pointer border transition
+                              ${isSelected ? 'border-purple-600 bg-purple-100' : 'border-gray-200'}
+                              ${isCorrect ? 'bg-green-100 border-green-400' : ''}
+                              ${isWrong ? 'bg-red-100 border-red-400' : ''}
+                            `}>
+                              <input
+                                type="radio"
+                                name={`q_${q._id}`}
+                                value={opt}
+                                disabled={mcqState.submitted}
+                                checked={isSelected}
+                                onChange={() => handleSelectOption(q._id, opt)}
+                                className="mr-2"
+                              />
+                              {opt}
+                            </label>
+                          );
+                        })}
+                        {mcqState.submitted && (
+                          <div className="mt-1 text-xs text-green-700">Correct Answer: {q.correctAnswer}</div>
+                        )}
+                      </div>
                     )}
-                  </tbody>
-                </table>
+                  </div>
+                ))}
               </div>
+              {/* Submit/Result Section */}
+              {!mcqState.submitted && (
+                <button
+                  className="mt-6 bg-purple-700 text-white px-6 py-2 rounded-lg font-bold hover:bg-purple-800 transition disabled:opacity-50"
+                  onClick={handleSubmitQuiz}
+                  disabled={Object.keys(mcqState.answers).length !== courseQuizQuestions.length}
+                >
+                  Submit
+                </button>
+              )}
+              {mcqState.submitted && (
+                <div className="mt-6 text-center">
+                  <div className="text-xl font-bold mb-2">
+                    Score: {mcqState.score} / {courseQuizQuestions.length} ({Math.round((mcqState.score / courseQuizQuestions.length) * 100)}%)
+                  </div>
+                  {quizSubmitSuccess && (
+                    <div className="text-green-600 font-semibold mb-2">{quizSubmitSuccess}</div>
+                  )}
+                  {/* Show summary if available */}
+                  {quizSubmitSummary.length > 0 && (
+                    <div className="mt-4">
+                      <h4 className="font-semibold text-purple-700 mb-2">Summary</h4>
+                      <ul className="space-y-2">
+                        {quizSubmitSummary.map((item, idx) => (
+                          <li key={item.questionId || idx} className={`p-3 rounded border ${item.isCorrect ? 'border-green-300 bg-green-50' : 'border-red-300 bg-red-50'}`}>
+                            <div className="font-medium">Q{idx + 1}: {item.isCorrect ? 'Correct' : 'Incorrect'}</div>
+                            <div className="text-sm">Selected: <span className="font-semibold">{item.selectedAnswer}</span></div>
+                            <div className="text-sm">Correct: <span className="font-semibold">{item.correctAnswer}</span></div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {((mcqState.score / courseQuizQuestions.length) * 100) < 50 ? (
+                    <>
+                      <div className="text-red-600 font-semibold mb-2">Score is less than 50%. Please retest!</div>
+                      <button
+                        className="bg-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-600"
+                        onClick={handleRetest}
+                      >
+                        Retest
+                      </button>
+                    </>
+                  ) : (
+                    <div className="text-green-600 font-semibold">Good job! You passed the quiz.</div>
+                  )}
+                </div>
+              )}
             </div>
           )}
-          {!courseQuiz && (
+          {!showMCQQuiz || !courseQuiz || courseQuizQuestions.length === 0 ? (
             <div className="my-8 p-4 bg-white rounded-xl shadow text-center text-gray-500">
               No quiz available for this course.
             </div>
-          )}
+          ) : null}
 
         </div>
       </div>

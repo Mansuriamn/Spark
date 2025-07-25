@@ -1,9 +1,9 @@
-import QuizQuestion from '../models/quizQuestion.js';
+import { Question } from '../models/Questions.js'; // <-- Correct import
 
 // Create a new quiz question
 export const createQuizQuestion = async (req, res) => {
     try {
-        const quizQuestion = new QuizQuestion(req.body);
+        const quizQuestion = new Question(req.body);
         await quizQuestion.save();
         res.status(201).json(quizQuestion);
     } catch (error) {
@@ -14,7 +14,7 @@ export const createQuizQuestion = async (req, res) => {
 // Get a quiz question by ID
 export const getQuizQuestionById = async (req, res) => {
     try {
-        const quizQuestion = await QuizQuestion.findById(req.params.id);
+        const quizQuestion = await Question.findById(req.params.id);
         if (!quizQuestion) return res.status(404).json({ message: 'Quiz question not found' });
         res.json(quizQuestion);
     } catch (error) {
@@ -26,7 +26,7 @@ export const getQuizQuestionById = async (req, res) => {
 
 export const getQuizQuestionByTopic = async (req, res) => {
     try{
-        const quizQuestion = await QuizQuestion.find({topic: req.params.topic});
+        const quizQuestion = await Question.find({topic: req.params.topic});
         if (!quizQuestion) return res.status(404).json({ message: 'Quiz question not found' });
         res.json(quizQuestion);
     }
@@ -37,7 +37,7 @@ export const getQuizQuestionByTopic = async (req, res) => {
 
 export const updateQuizQuestion = async (req, res) => {
     try {
-        const updatedQuizQuestion = await QuizQuestion.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const updatedQuizQuestion = await Question.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!updatedQuizQuestion) return res.status(404).json({ message: 'Quiz question not found' });
         res.json(updatedQuizQuestion);
     } catch (error) {
@@ -48,7 +48,7 @@ export const updateQuizQuestion = async (req, res) => {
 // Delete a quiz question
 export const deleteQuizQuestion = async (req, res) => {
     try {
-        const deletedQuizQuestion = await QuizQuestion.findByIdAndDelete(req.params.id);
+        const deletedQuizQuestion = await Question.findByIdAndDelete(req.params.id);
         if (!deletedQuizQuestion) return res.status(404).json({ message: 'Quiz question not found' });
         res.json({ message: 'Quiz question deleted successfully' });
     } catch (error) {
