@@ -9,7 +9,7 @@ export const QuestionSchema = new mongoose.Schema({
   status: { type: String, enum: ['correct', 'Not correct','Not attempted'], default: 'Not attempted' },
   questionURL: { type: String }, // optional: for image/audio/video questions
   options: [{ type: String, required: true }], // <-- MCQ options
-  answer: { type: String, required: true },    // <-- correct answer (or use Number for index)
+  answer: { type: String},    // <-- correct answer (or use Number for index)
 }, { timestamps: true });
 
 const QuizCardSchema = new mongoose.Schema({
