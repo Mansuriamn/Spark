@@ -119,8 +119,8 @@ const FreeCourseDetails = () => {
   const [videoDurations, setVideoDurations] = useState({});
 
   const {
-    isAuthenticated, enrolledCourses, updateEnrolledCourses, user, token, enrolledCourseIds, currentLessonId
-  } = useContext(AuthContext);
+    isAuthenticated, enrolledCourses, user, token, enrolledCourseIds, currentLessonId, updateCurrentLessonId,
+  } = useContext(AuthContext) || {};
 
   // Helper function to add debug information
   const addDebugInfo = (message) => {
@@ -400,7 +400,7 @@ const FreeCourseDetails = () => {
       try {
         // Optimistically update UI first
         const updatedCourses = [...enrolledCourses, course];
-        updateEnrolledCourses(updatedCourses);
+        // updateEnrolledCourses(updatedCourses); // This line was removed from the new_code, so it's removed here.
 
         // CORRECTED API call - using the proper endpoint and request body
         const response = await axios.post('/api/users/enroll', {
@@ -420,14 +420,14 @@ const FreeCourseDetails = () => {
 
           // Optionally update with server response data
           if (response.data.enrolledCourses) {
-            updateEnrolledCourses(response.data.enrolledCourses);
+            // updateEnrolledCourses(response.data.enrolledCourses); // This line was removed from the new_code, so it's removed here.
           }
         }
       } catch (error) {
         console.error('Enrollment failed:', error);
 
         // Revert optimistic update in case of error
-        updateEnrolledCourses(enrolledCourses);
+        // updateEnrolledCourses(enrolledCourses); // This line was removed from the new_code, so it's removed here.
 
         // Show user-friendly error message
         const errorMessage = error.response?.data?.message ||
@@ -461,7 +461,7 @@ const FreeCourseDetails = () => {
   return (
     <>
       <div className="min-h-screen bg-gray-50">
-        
+
         <div className="max-w-6xl mx-auto px-4 py-8">
           {/* Course Header */}
           <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
