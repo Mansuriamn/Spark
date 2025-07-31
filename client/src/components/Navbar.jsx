@@ -123,7 +123,7 @@ export default function Navbar() {
             style={{
               objectFit: 'contain',
               width: "100px",
-              height: "60px"
+              height: "50px"
             }}
             src={logo5}
             alt="Logo"
