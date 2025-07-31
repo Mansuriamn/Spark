@@ -930,7 +930,7 @@ const VideoDashboard = () => {
                       )}
                     </div>
                     {/* Show options if Solve clicked or after submit */}
-                    {(mcqState.showOptions[q._id] || mcqState.submitted) && (
+                    {(mcqState.showOptions[q._id] || mcqState.submitted) && (<h1>Loading</h1>) && (
                       <div className="space-y-2 mt-2">
                         {q.options.map((opt, i) => {
                           const isSelected = mcqState.answers[q._id] === opt;
