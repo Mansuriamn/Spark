@@ -67,22 +67,40 @@ export const deleteQuiz = async (req, res) => {
 export const addQuestion = async (req, res) => {
   try {
     const { quizId } = req.params;
-    const { questionText, options, answer, level } = req.body;
+    const {
+      questionText,
+      option1,
+      option2,
+      option3,
+      option4,
+      answer,
+      level
+    } = req.body;
 
-    if (!questionText || !options || options.length === 0 || !answer) {
+    const missingFields = [];
+    if (!questionText) missingFields.push('questionText');
+    if (!option1) missingFields.push('option1');
+    if (!option2) missingFields.push('option2');
+    if (!option3) missingFields.push('option3');
+    if (!option4) missingFields.push('option4');
+    if (!answer) missingFields.push('answer');
+
+    if (missingFields.length > 0) {
       console.log('Received Body:', req.body);
-      return res.status(400).json({ message: 'Missing required fields' });
+      return res.status(400).json({
+        message: `Missing or invalid required fields: ${missingFields.join(', ')}`
+      });
     }
-
-    
-
 
     const quiz = await QuizCard.findById(quizId);
     if (!quiz) return res.status(404).json({ message: 'Quiz not found' });
 
     const newQuestion = {
       questionText,
-      options,
+      option1,
+      option2,
+      option3,
+      option4,
       answer,
       level: level || 'easy',
     };
@@ -96,6 +114,7 @@ export const addQuestion = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
 
 
 export const getQuestions = async (req, res) => {
