@@ -110,8 +110,10 @@ export default function Navbar() {
       navigate('/profile');
     }
   };
-
-
+const Link=`https://spark-ards.com/refer-earn?code=`;
+ function copyLink(){
+   navigator.clipboard.writeText(Link);
+ }
 
 
 
@@ -193,7 +195,7 @@ export default function Navbar() {
                             readOnly
                             className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md bg-gray-50 text-sm"
                           />
-                          <button className="px-4 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600 text-sm font-medium">
+                          <button onClick={copyLink} className="px-4 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600 text-sm font-medium">
                             📋 Copy
                           </button>
                         </div>
