@@ -448,6 +448,9 @@ const VideoDashboard = () => {
     score: 0,
   });
 
+  const handleShowOptions = (qid) => {
+    setMcqState((prev) => ({ ...prev, showOptions: { ...prev.showOptions, [qid]: true } }));
+  };
 
   const handleSelectOption = (qid, option) => {
     setMcqState((prev) => ({ ...prev, answers: { ...prev.answers, [qid]: option } }));
@@ -525,15 +528,8 @@ const VideoDashboard = () => {
   const [attemptedQuestions, setAttemptedQuestions] = useState({}); // { [questionId]: true }
 
   const handleSolveClick = (questionId) => {
-    setMcqState(prev => ({
-      ...prev,
-      showOptions: {
-        ...prev.showOptions,
-        [questionId]: true,
-      },
-    }));
+    setAttemptedQuestions((prev) => ({ ...prev, [questionId]: true }));
   };
-
 
   if (loading) {
     return (
@@ -927,44 +923,38 @@ const VideoDashboard = () => {
                       {!mcqState.showOptions[q._id] && !mcqState.submitted && (
                         <button
                           className="bg-purple-600 text-white px-4 py-1 rounded-lg font-semibold hover:bg-purple-700 transition"
-                          onClick={() => handleSolveClick(q._id)}
+                          onClick={() => handleShowOptions(q._id)}
                         >
                           Solve
                         </button>
-
                       )}
                     </div>
                     {/* Show options if Solve clicked or after submit */}
-                    {(mcqState.showOptions[q._id] || mcqState.submitted) && (
+                    {(mcqState.showOptions[q._id] || mcqState.submitted) && (<h1>Loading</h1>) && (
                       <div className="space-y-2 mt-2">
-                        {[q.option1, q.option2, q.option3, q.option4].map((opt, i) => {
-  if (!opt) return null; // skip if option is undefined or empty
-  const isSelected = mcqState.answers[q._id] === opt;
-  const isCorrect = mcqState.submitted && opt === q.answer;
-  const isWrong = mcqState.submitted && isSelected && opt !== q.answer;
-  return (
-    <label
-      key={i}
-      className={`block px-4 py-2 rounded cursor-pointer border transition
-        ${isSelected ? 'border-purple-600 bg-purple-100' : 'border-gray-200'}
-        ${isCorrect ? 'bg-green-100 border-green-400' : ''}
-        ${isWrong ? 'bg-red-100 border-red-400' : ''}
-      `}
-    >
-      <input
-        type="radio"
-        name={`q_${q._id}`}
-        value={opt}
-        disabled={mcqState.submitted}
-        checked={isSelected}
-        onChange={() => handleSelectOption(q._id, opt)}
-        className="mr-2"
-      />
-      {opt}
-    </label>
-  );
-})}
-
+                        {q.options.map((opt, i) => {
+                          const isSelected = mcqState.answers[q._id] === opt;
+                          const isCorrect = mcqState.submitted && opt === q.correctAnswer;
+                          const isWrong = mcqState.submitted && isSelected && opt !== q.correctAnswer;
+                          return (
+                            <label key={i} className={`block px-4 py-2 rounded cursor-pointer border transition
+                              ${isSelected ? 'border-purple-600 bg-purple-100' : 'border-gray-200'}
+                              ${isCorrect ? 'bg-green-100 border-green-400' : ''}
+                              ${isWrong ? 'bg-red-100 border-red-400' : ''}
+                            `}>
+                              <input
+                                type="radio"
+                                name={`q_${q._id}`}
+                                value={opt}
+                                disabled={mcqState.submitted}
+                                checked={isSelected}
+                                onChange={() => handleSelectOption(q._id, opt)}
+                                className="mr-2"
+                              />
+                              {opt}
+                            </label>
+                          );
+                        })}
                         {mcqState.submitted && (
                           <div className="mt-1 text-xs text-green-700">Correct Answer: {q.correctAnswer}</div>
                         )}
@@ -997,10 +987,7 @@ const VideoDashboard = () => {
                       <h4 className="font-semibold text-purple-700 mb-2">Summary</h4>
                       <ul className="space-y-2">
                         {quizSubmitSummary.map((item, idx) => (
-                          <li
-                            key={item.questionId || idx}
-                            className={`p-3 rounded border ${item.isCorrect ? 'border-green-300 bg-green-50' : 'border-red-300 bg-red-50'}`}
-                          >
+                          <li key={item.questionId || idx} className={`p-3 rounded border ${item.isCorrect ? 'border-green-300 bg-green-50' : 'border-red-300 bg-red-50'}`}>
                             <div className="font-medium">Q{idx + 1}: {item.isCorrect ? 'Correct' : 'Incorrect'}</div>
                             <div className="text-sm">Selected: <span className="font-semibold">{item.selectedAnswer}</span></div>
                             <div className="text-sm">Correct: <span className="font-semibold">{item.correctAnswer}</span></div>
@@ -1026,7 +1013,6 @@ const VideoDashboard = () => {
               )}
             </div>
           )}
-
           {!showMCQQuiz || !courseQuiz || courseQuizQuestions.length === 0 ? (
             <div className="my-8 p-4 bg-white rounded-xl shadow text-center text-gray-500">
               No quiz available for this course.
