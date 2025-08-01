@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Clock, Users, BarChart3, Book, Star } from 'lucide-react';
+import { Clock, Users, BarChart3, Book, Star, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import '../style/CourseCard.css';
 
@@ -9,7 +9,7 @@ export default function CourseCard({ course }) {
 
   // Convert minutes to "Xh Ym" format
   const getDurationString = (minutes) => {
-     if (minutes === 0) return '0 min';
+    if (minutes === 0) return '0 min';
     if (!minutes || isNaN(minutes)) return '2h 0m';
     const h = Math.floor(minutes / 60);
     const m = minutes % 60;
@@ -24,18 +24,18 @@ export default function CourseCard({ course }) {
   const title = course.title || 'Intro to Node.js';
   const instructor = course.createdBy?.email || 'Darkd1@gmail.com';
   const level = course.level || 'Beginner';
-  
+
   const isCompleted = course.isCompleted || false;
 
 
-let category = 'Development';
-if (course.category) {
-  if (typeof course.category === 'object') {
-    category = course.category.name || course.category._id || course.category.id || 'Development';
-  } else {
-    category = course.category;
+  let category = 'Development';
+  if (course.category) {
+    if (typeof course.category === 'object') {
+      category = course.category.name || course.category._id || course.category.id || 'Development';
+    } else {
+      category = course.category;
+    }
   }
-}
   // Fetch enrolled users count
   useEffect(() => {
     const fetchStudentCount = async () => {
@@ -94,40 +94,40 @@ if (course.category) {
       onClick={handleNavigation}
     >
       {/* Left Image Section - Wider (60% on desktop) */}
-<div className="relative w-full md:w-3/5 h-64 md:h-auto bg-white flex items-center justify-center overflow-hidden">
-  <div
-    className="w-full h-[256px] flex items-center justify-center bg-white"
-    style={{
-      minHeight: "256px",
-      maxHeight: "256px",
-      height: "256px",
-      width: "100%",
-    }}
-  >
-    <img
-      src={course.pictureUrl}
-      alt="Course"
-      className="object-cover h-full w-full"
-      style={{
-        display: "block",
-        background: "white",
-      }}
-    />
-  </div>
-  {/* Category Badge */}
-  <span className="absolute top-4 left-4 bg-green-500 text-white text-sm px-3 py-1 rounded-lg font-medium shadow-lg">
-    {category}
-  </span>
-  {/* Level Badge */}
-  <span className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-gray-800 text-sm px-3 py-1 rounded-lg font-medium shadow-lg">
-    {level}
-  </span>
-</div>
+      <div className="relative w-full md:w-3/5 h-64 md:h-auto bg-white flex items-center justify-center overflow-hidden">
+        <div
+          className="w-full h-[256px] flex items-center justify-center bg-white"
+          style={{
+            minHeight: "256px",
+            maxHeight: "256px",
+            height: "256px",
+            width: "100%",
+          }}
+        >
+          <img
+            src={course.pictureUrl}
+            alt="Course"
+            className="object-cover h-full w-full"
+            style={{
+              display: "block",
+              background: "white",
+            }}
+          />
+        </div>
+        {/* Category Badge */}
+        <span className="absolute top-4 left-4 bg-green-500 text-white text-sm px-3 py-1 rounded-lg font-medium shadow-lg">
+          {category}
+        </span>
+        {/* Level Badge */}
+        <span className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-gray-800 text-sm px-3 py-1 rounded-lg font-medium shadow-lg">
+          {level}
+        </span>
+      </div>
       {/* Right Content Section - Narrower (40% on desktop) */}
       <div className="p-6 w-full md:w-2/5 flex flex-col justify-between">
         <div className="flex-1">
           {/* Instructor */}
-          <p className="text-sm text-gray-500 mb-2">by {instructor}</p>
+          <p className="text-sm text-gray-500 mb-1">by {instructor}</p>
 
           {/* Course Title */}
           <h3 className="text-xl font-bold text-gray-900 mb-3 leading-tight">{title}</h3>
@@ -162,7 +162,7 @@ if (course.category) {
         </div>
 
         {/* Bottom Section */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100 amount">
           <div className="flex items-center">
             {price === 0 ? (
               <span className="text-xl font-bold text-purple-600">FREE</span>
@@ -172,14 +172,16 @@ if (course.category) {
           </div>
 
           <a
-  onClick={(e) => {
-    e.stopPropagation();
-    handleNavigation();
-  }}
-  className="text-blue-600 hover:text-blue-800 text-sm font-medium underline cursor-pointer"
->
-  View Course
-</a>
+            onClick={(e) => {
+              e.stopPropagation();
+              handleNavigation();
+            }}
+            className="group text-blue-600 hover:text-blue-800 text-sm font-medium underline cursor-pointer inline-flex items-center"
+          >
+            View Course
+            <ArrowRight className="inline w-4 h-4 ml-1 transition-all duration-300 translate-x-0 group-hover:translate-x-1" />
+          </a>
+
         </div>
       </div>
     </div>

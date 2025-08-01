@@ -19,4 +19,18 @@
         flex-wrap: wrap;
          
   }
+  .course-card .p-6 {
+    width: 100%;
+    order: 2;
+  }
+  .course-card .flex-1 {
+    order: 1;
+  }
+  .course-card .pt-4 {
+    order: 3;
+  }
+  .amount{
+    padding: 0px;
+    
+  }
 }
