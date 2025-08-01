@@ -930,14 +930,47 @@ const VideoDashboard = () => {
                       )}
                     </div>
                     {/* Show options if Solve clicked or after submit */}
-                    {(mcqState.showOptions[q._id] || mcqState.submitted) && (<h1>Loading</h1>) && (
+                    {(mcqState.showOptions[q._id] || mcqState.submitted) && (
                       <div className="space-y-2 mt-2">
-                      z
+                        {Array.isArray(q.options) ? (
+                          q.options.map((opt, i) => {
+                            const isSelected = mcqState.answers[q._id] === opt;
+                            const isCorrect = mcqState.submitted && opt === q.correctAnswer;
+                            const isWrong = mcqState.submitted && isSelected && opt !== q.correctAnswer;
+                            return (
+                              <label
+                                key={i}
+                                className={`block px-4 py-2 rounded cursor-pointer border transition
+              ${isSelected ? 'border-purple-600 bg-purple-100' : 'border-gray-200'}
+              ${isCorrect ? 'bg-green-100 border-green-400' : ''}
+              ${isWrong ? 'bg-red-100 border-red-400' : ''}
+            `}
+                              >
+                                <input
+                                  type="radio"
+                                  name={`q_${q._id}`}
+                                  value={opt}
+                                  disabled={mcqState.submitted}
+                                  checked={isSelected}
+                                  onChange={() => handleSelectOption(q._id, opt)}
+                                  className="mr-2"
+                                />
+                                {opt}
+                              </label>
+                            );
+                          })
+                        ) : (
+                          <p className="text-sm text-gray-500">Loading options...</p>
+                        )}
+
                         {mcqState.submitted && (
-                          <div className="mt-1 text-xs text-green-700">Correct Answer: {q.correctAnswer}</div>
+                          <div className="mt-1 text-xs text-green-700">
+                            Correct Answer: {q.correctAnswer}
+                          </div>
                         )}
                       </div>
                     )}
+
                   </div>
                 ))}
               </div>
